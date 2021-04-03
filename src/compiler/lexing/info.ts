@@ -1,8 +1,8 @@
 export interface PlFileInfo {
-    row: number;
-    col: number;
-    length: number;
-    filename: string;
+    row: number; // zero indexed row of word
+    col: number; // zero indexed end of word
+    length: number; // size of word
+    filename: string; // file that the word is in
 }
 
 export function EmptyFileInfo(filename: string): PlFileInfo {

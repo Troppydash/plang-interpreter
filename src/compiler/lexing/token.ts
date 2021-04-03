@@ -41,7 +41,7 @@ export enum PlTokenType {
     LPAREN,     // (
     RPAREN,     // )
     COMMA,      // ,
-    FSLASH,     // /
+    // FSLASH,     // /
     COLON,      // :
     SEMICOLON,  // ;
 
@@ -59,16 +59,22 @@ export enum PlTokenType {
     ERR,
 }
 
-class PlToken {
-    readonly type: PlTokenType;
-    readonly content: string;
-    readonly info: PlFileInfo;
+interface PlToken {
+    type: PlTokenType;
+    content: string;
+    info: PlFileInfo;
+}
 
-    constructor( type: PlTokenType, content: string, info: PlFileInfo ) {
-        this.type = type;
-        this.content = content;
-        this.info = info;
+export function NewPlToken(type: PlTokenType, content: string, info: PlFileInfo) {
+    return {
+        type,
+        content,
+        info
     }
+}
+
+export function PlTokenToString(token: PlToken) {
+    return `[${token.type}|'${token.content}'|${token.info.row}:${token.info.col-token.info.length}-${token.info.col},<${token.info.filename}>]`;
 }
 
 export default PlToken;

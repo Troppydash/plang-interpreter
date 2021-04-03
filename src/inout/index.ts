@@ -9,11 +9,11 @@ interface Inout {
     input: (message: string) => string | null;
 }
 
-let module: Inout;
+let inout: Inout;
 if ( isNode ) {
-    module = require("./nodeInout");
+    inout = require("./nodeInout");
 } else {
-    module = require('./otherInout');
+    inout = require('./otherInout');
 }
 
-export default module;
+export default inout;

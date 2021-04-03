@@ -3,11 +3,11 @@
 
 
 // Starting repl
-import { startREPL } from "./repl";
+import { StartREPL } from "./repl";
 import inout, { isNode } from "./inout";
 
 if (!isNode || process.argv.length !== 3) {
-    const result = startREPL("repl");
+    const result = StartREPL("repl");
     process.exit(result);
 }
 

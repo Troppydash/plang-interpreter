@@ -1,6 +1,8 @@
 import inout, { isNode } from "../inout";
+import { RunLinker } from "../linking";
+import { PlTokenToString } from "../compiler/lexing/token";
 
-export function startREPL(filename: string): number {
+export function StartREPL( filename: string): number {
     inout.print("Welcome to the Plang Interactive console");
     if (isNode) {
         const os = require('os');
@@ -13,7 +15,17 @@ export function startREPL(filename: string): number {
             inout.print("Input terminated, goodbye");
             break;
         }
-        inout.print(message);
+
+        // debug only
+        // inout.print(message);
+        // run stuff
+        // const tokens = RunLinker(message, filename);
+        const tokens = RunLinker("12 + 13\n5.5 + 6\n1 % 2\n7 + 5", filename);
+        if (tokens !== null) {
+            for (const token of tokens) {
+                inout.print(PlTokenToString(token));
+            }
+        }
     }
 
     return 0;

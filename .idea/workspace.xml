@@ -2,8 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/problem/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/problem/problem.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/inout/nodeInout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/nodeInout.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/info.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/info.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/token.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/token.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inout/file.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/file.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inout/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +36,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1qbg7fFfl5AOsJw2dUbqJ7ut1Lp" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -45,7 +59,12 @@
     <property name="ts.external.directory.path" value="E:\Folder2021\PlangProjects\plang-interpreter\node_modules\typescript\lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
-  <component name="RunManager" selected="npm.build-browser">
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.build-run">
     <configuration name="build-browser" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -98,8 +117,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.build-browser" />
         <item itemvalue="npm.build-run" />
+        <item itemvalue="npm.build-browser" />
         <item itemvalue="npm.build-dist" />
         <item itemvalue="npm.run" />
       </list>
@@ -114,7 +133,7 @@
       <option name="presentableId" value="Default" />
       <updated>1617353538494</updated>
       <workItem from="1617353539945" duration="8986000" />
-      <workItem from="1617400384081" duration="5061000" />
+      <workItem from="1617400384081" duration="18639000" />
     </task>
     <servers />
   </component>
