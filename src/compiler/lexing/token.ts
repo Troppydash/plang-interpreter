@@ -1,4 +1,4 @@
-import { PlFile } from "../inout/file";
+import { PlFile } from "../../inout/file";
 import { PlFileInfo } from "./info";
 
 export enum PlTokenType {

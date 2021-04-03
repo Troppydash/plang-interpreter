@@ -1,4 +1,4 @@
-import { PlFile } from "../inout/file";
+import { PlFile } from "../../inout/file";
 import PlToken, { PlTokenType } from "./token";
 import { EmptyFileInfo, NewFileInfo } from "./info";
 
