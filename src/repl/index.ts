@@ -20,7 +20,7 @@ export function StartREPL( filename: string): number {
         // inout.print(message);
         // run stuff
         // const tokens = RunLinker(message, filename);
-        const tokens = RunLinker("12 + 13\n5.5 + 6\n1 % 2\n7 + 5", filename);
+        const tokens = RunLinker(message, filename);
         if (tokens !== null) {
             for (const token of tokens) {
                 inout.print(PlTokenToString(token));
@@ -28,5 +28,6 @@ export function StartREPL( filename: string): number {
         }
     }
 
+    inout.flush();
     return 0;
 }

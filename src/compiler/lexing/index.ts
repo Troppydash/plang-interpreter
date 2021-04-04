@@ -1,23 +1,9 @@
 import { PlFile } from "../../inout/file";
 import PlToken, { NewPlToken, PlTokenType } from "./token";
 import { EmptyFileInfo, NewFileInfo } from "./info";
+import { isnum, isws } from "../../extension/types";
 
-function isws( c ) {
-    return c === ' ' || c === '\t';
-}
 
-function isnum( c ) {
-    return c >= '0' && c <= '9';
-}
-
-function isalpha( c ) {
-    return (c >= 'A' && c <= 'Z') ||
-        (c >= 'a' && c <= 'z');
-}
-
-function tonum( c: string ): number {
-    return (c as any) - ('0' as any);
-}
 
 interface Lexer {
     nextToken(): PlToken;
@@ -69,6 +55,11 @@ class PlLexer implements Lexer {
         ++this.currentCol;
         ++this.charPointer;
         return this.currentChar();
+    }
+
+    advanceRow() {
+        ++this.currentRow;
+        this.currentCol = 0;
     }
 
     isEOF() {
@@ -166,23 +157,62 @@ class PlLexer implements Lexer {
                 this.advancePointer();
                 return NewPlToken( PlTokenType.ADD, c, this.currentFileInfo( 1 ) )
             }
-
-            case '\r': {
-                this.advancePointer();
-                if ( this.isEOF() || this.currentChar() !== '\n' ) {
-                    // macos or something
-                    const token = NewPlToken( PlTokenType.LF, '\n', this.currentFileInfo( 1 ) );
-                    if (!this.isEOF())
-                        ++this.currentRow;
+            case '-': {
+                let token = this.testNextChars( "--", PlTokenType.DEC );
+                if ( token ) {
                     return token;
                 }
-                // fallthrough to '\n'
+                this.advancePointer();
+                return NewPlToken( PlTokenType.SUB, c, this.currentFileInfo( 1 ) )
             }
+            case '*': {
+                this.advancePointer();
+                return NewPlToken(PlTokenType.MUL, c, this.currentFileInfo(1));
+            }
+            case '/': {
+                let token = this.testNextChars( "/=", PlTokenType.NEQ );
+                if ( token ) {
+                    return token;
+                }
+                this.advancePointer();
+                return NewPlToken( PlTokenType.DIV, c, this.currentFileInfo( 1 ) )
+            }
+            case '=': {
+                let token = this.testNextChars( "==", PlTokenType.EQ );
+                if ( token ) {
+                    return token;
+                }
+                this.advancePointer();
+                return NewPlToken( PlTokenType.ASGN, c, this.currentFileInfo( 1 ) )
+            }
+            case '>': {
+                let token = this.testNextChars( ">=", PlTokenType.GTE );
+                if ( token ) {
+                    return token;
+                }
+                this.advancePointer();
+                return NewPlToken( PlTokenType.GT, c, this.currentFileInfo( 1 ) )
+            }
+            case '<': {
+                let token = this.testNextChars( "<=", PlTokenType.LTE );
+                if ( token ) {
+                    return token;
+                }
+                this.advancePointer();
+                return NewPlToken( PlTokenType.LT, c, this.currentFileInfo( 1 ) )
+            }
+
+
             case '\n': {
                 this.advancePointer();
                 const token = NewPlToken( PlTokenType.LF, '\n', this.currentFileInfo( 1 ) );
-                ++this.currentRow;
+                this.advanceRow();
                 return token;
+            }
+            default: {
+                // parse variables
+
+                break;
             }
         }
 

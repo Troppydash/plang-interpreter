@@ -26,6 +26,7 @@ export enum PlTokenType {
     SUB,        // -
     MUL,        // *
     DIV,        // /
+    ASGN,       // =
     INC,        // ++
     DEC,        // --
     GT,         // >

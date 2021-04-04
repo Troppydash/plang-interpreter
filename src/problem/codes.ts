@@ -6,7 +6,7 @@ const templates = {
 }
 
 const hints: Record<PlProblemCode, string> = {
-    LE0001: 'maybe check your spelling?'
+    LE0001: 'this character does not belong here, maybe check your spelling?'
 }
 
 const problemFullName = {

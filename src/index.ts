@@ -4,13 +4,14 @@
 
 // Starting repl
 import { StartREPL } from "./repl";
-import inout, { isNode } from "./inout";
+import { isNode } from "./inout";
+import { RunFile } from "./linking";
 
 if (!isNode || process.argv.length !== 3) {
     const result = StartREPL("repl");
     process.exit(result);
 }
 
-inout.print("Running file");
-
-process.exit(0);
+// run file
+const result = RunFile(process.argv[2]);
+process.exit(result);

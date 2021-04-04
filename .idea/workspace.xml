@@ -2,19 +2,27 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/problem/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/problem/problem.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/constants.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/extension/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/extension/types.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/inout/buffer.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/inout/color.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/inout/path.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/lexing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/info.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/info.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/lexing/token.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/token.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/inout/file.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/file.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/inout/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inout/nodeInout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/nodeInout.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inout/otherInout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/otherInout.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/printer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/problem.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/problem.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,16 +63,19 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
+    <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="preferences.sourceCode.JavaScript" />
     <property name="ts.external.directory.path" value="E:\Folder2021\PlangProjects\plang-interpreter\node_modules\typescript\lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Folder2021\PlangProjects\plang-interpreter\playground" />
+      <recent name="E:\Folder2021\PlangProjects\plang-interpreter" />
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.build-run">
+  <component name="RunManager" selected="npm.build-run playground\test.plang">
     <configuration name="build-browser" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -95,12 +106,13 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="build-run" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="build-run playground\test.plang" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="build-run" />
       </scripts>
+      <arguments value="playground\test.plang" />
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
@@ -115,9 +127,15 @@
       <envs />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="npm.build-cli" />
+      <item itemvalue="npm.build-run playground\test.plang" />
+      <item itemvalue="npm.build-browser" />
+      <item itemvalue="npm.build-dist" />
+      <item itemvalue="npm.run" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.build-run" />
         <item itemvalue="npm.build-browser" />
         <item itemvalue="npm.build-dist" />
         <item itemvalue="npm.run" />
@@ -133,7 +151,8 @@
       <option name="presentableId" value="Default" />
       <updated>1617353538494</updated>
       <workItem from="1617353539945" duration="8986000" />
-      <workItem from="1617400384081" duration="18639000" />
+      <workItem from="1617400384081" duration="18847000" />
+      <workItem from="1617491472354" duration="6126000" />
     </task>
     <servers />
   </component>

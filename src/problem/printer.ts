@@ -2,8 +2,8 @@ import { PlProblem } from "./problem";
 import { PCFullName, PCHint } from "./codes";
 import inout from "../inout";
 
-const nlinesUp = 1;
-const nlinesDown = 2;
+const NLINESUP = 1;
+const NLINESDOWN = 2;
 
 function getLine( lines: string[], targetRow: number ): string | null {
     if ( targetRow >= 0 && targetRow < lines.length ) {
@@ -17,11 +17,11 @@ function getLines( lines: string[], targetRow: number ): [ string[], string, str
     let linesUp = [];
     let linesDown = [];
 
-    for ( let i = 0; i < nlinesUp; ++i ) {
+    for ( let i = 0; i < NLINESUP; ++i ) {
         linesUp.push( getLine( lines, targetRow - i - 1 ) );
     }
 
-    for ( let i = 0; i < nlinesDown; ++i ) {
+    for ( let i = 0; i < NLINESDOWN; ++i ) {
         linesDown.push( getLine( lines, targetRow + i + 1 ) );
     }
 
@@ -33,11 +33,11 @@ function getLines( lines: string[], targetRow: number ): [ string[], string, str
 }
 
 export function LogProblem( problem: PlProblem, content: string ) {
-    // todo: deal with larger line numbers
-    let buffer = [ "Problem Occurred" ];
+    let buffer = [];
 
     const { code, fileInfo, message } = problem;
     const actualCol = fileInfo.col - fileInfo.length;
+    const largestLineNumberLength = (fileInfo.row + NLINESDOWN).toString().length;
 
     // add header
     buffer.push( `[${code}] In "${fileInfo.filename}" at ${fileInfo.row + 1}:${actualCol + 1}` );
@@ -46,18 +46,21 @@ export function LogProblem( problem: PlProblem, content: string ) {
     const contentLines = content.split( '\n' );
     const [ linesUp, targetLine, linesDown ] = getLines( contentLines, fileInfo.row );
 
-    let startLine = fileInfo.row - nlinesUp + 1;
+    let startLine = fileInfo.row - NLINESUP + 1;
+    // add all the lines above
     for ( const line of linesUp ) {
         if ( line !== null )
-            buffer.push( `${startLine}| ${line}` );
+            buffer.push( `${startLine.toString().padStart(largestLineNumberLength)}| ${line}` );
         ++startLine;
     }
-    buffer.push( `${startLine}| ${targetLine}` );
+    // add current line and ^^ pointers
+    buffer.push( `${startLine.toString().padStart(largestLineNumberLength)}| ${targetLine}` );
     ++startLine;
-    buffer.push( ' | ' + ' '.repeat( actualCol ) + '^'.repeat( fileInfo.length ) + ' here' );
+    buffer.push( ' ' .repeat(largestLineNumberLength) + '| ' + ' '.repeat( actualCol ) + '^'.repeat( fileInfo.length ) + ' here' );
+    // add all the lines below
     for ( const line of linesDown ) {
         if ( line !== null )
-            buffer.push( `${startLine}| ${line}` );
+            buffer.push( `${startLine.toString().padStart(largestLineNumberLength)}| ${line}` );
         ++startLine;
     }
     buffer.push( '' );
