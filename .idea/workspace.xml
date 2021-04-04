@@ -2,27 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/constants.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/extension/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/extension/types.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/inout/buffer.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/inout/color.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/inout/path.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/token.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/token.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/extension/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/extension/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/inout/file.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/file.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/inout/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/inout/nodeInout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/nodeInout.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inout/color.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/color.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/inout/otherInout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/otherInout.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/problem/printer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/problem.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/problem.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -75,7 +62,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.build-run playground\test.plang">
+  <component name="RunManager" selected="npm.run-build playground\test.plang">
     <configuration name="build-browser" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -106,11 +93,11 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="build-run playground\test.plang" type="js.build_tools.npm" nameIsGenerated="true">
+    <configuration name="run-build playground\test.plang" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
-        <script value="build-run" />
+        <script value="run-build" />
       </scripts>
       <arguments value="playground\test.plang" />
       <node-interpreter value="project" />
@@ -129,7 +116,7 @@
     </configuration>
     <list>
       <item itemvalue="npm.build-cli" />
-      <item itemvalue="npm.build-run playground\test.plang" />
+      <item itemvalue="npm.run-build playground\test.plang" />
       <item itemvalue="npm.build-browser" />
       <item itemvalue="npm.build-dist" />
       <item itemvalue="npm.run" />
@@ -152,7 +139,7 @@
       <updated>1617353538494</updated>
       <workItem from="1617353539945" duration="8986000" />
       <workItem from="1617400384081" duration="18847000" />
-      <workItem from="1617491472354" duration="6126000" />
+      <workItem from="1617491472354" duration="9542000" />
     </task>
     <servers />
   </component>

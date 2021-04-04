@@ -2,7 +2,7 @@ import inout, { isNode } from "../inout";
 import { RunLinker } from "../linking";
 import { PlTokenToString } from "../compiler/lexing/token";
 
-export function StartREPL( filename: string): number {
+export function StartREPL( filename: string ): number {
     inout.print("Welcome to the Plang Interactive console");
     if (isNode) {
         const os = require('os');

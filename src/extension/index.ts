@@ -32,3 +32,16 @@ export function escapeString( source: string ): string {
         return escapeChar(c);
     } ).join( '' );
 }
+
+// https://stackoverflow.com/questions/1772941/how-can-i-insert-a-character-after-every-n-characters-in-javascript
+export function chunkString(str, n) {
+    var ret = [];
+    var i;
+    var len;
+
+    for(i = 0, len = str.length; i < len; i += n) {
+        ret.push(str.substr(i, n))
+    }
+
+    return ret
+}

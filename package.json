@@ -7,7 +7,7 @@
     "build-cli": "npm run build && pkg .",
     "build": "tsc",
     "run": "node out/index.js",
-    "build-run": "npm run build && npm run run"
+    "run-build": "npm run build && npm run run"
   },
   "pkg": {
     "scripts": "out/**/*.js",

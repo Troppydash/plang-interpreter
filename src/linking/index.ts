@@ -4,7 +4,6 @@ import { ReportProblem } from "../problem";
 import { NewPlFile } from "../inout/file";
 import { NewPlProblem } from "../problem/problem";
 import inout from "../inout";
-import * as path from "path";
 
 export function RunLinker( content: string, filename: string): PlToken[] | null {
     const lexer = new PlLexer(NewPlFile(filename, content));
@@ -21,6 +20,7 @@ export function RunLinker( content: string, filename: string): PlToken[] | null 
 }
 
 export function RunFile(filePath: string): number {
+    const path = require('path');
     inout.setRootPath(filePath);
 
     const filename = path.basename(filePath);
