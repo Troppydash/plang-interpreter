@@ -1,18 +1,18 @@
-import PlToken, { PlTokenType } from "../compiler/lexing/token";
+import PlToken, { PlTokenToString } from "../compiler/lexing/token";
 import PlLexer from "../compiler/lexing";
 import { ReportProblem } from "../problem";
 import { NewPlFile } from "../inout/file";
-import { NewPlProblem } from "../problem/problem";
 import inout from "../inout";
 
 export function RunLinker( content: string, filename: string): PlToken[] | null {
     const lexer = new PlLexer(NewPlFile(filename, content));
     const result = lexer.parseAll();
 
-    const last = result[result.length-1];
-    if (last.type === PlTokenType.ERR) {
-        const problem = NewPlProblem("LE0001", last.info, last.content);
-        ReportProblem(problem, content);
+    const problems = lexer.getProblems();
+    if (problems.length !== 0) {
+        for (const problem of problems) {
+            ReportProblem(problem, content);
+        }
         return null;
     }
 
@@ -36,5 +36,9 @@ export function RunFile(filePath: string): number {
         return 1;
     }
 
+    for (const token of result) {
+        inout.print(PlTokenToString(token));
+    }
+    inout.flush();
     return 0;
 }

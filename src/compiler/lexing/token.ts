@@ -1,5 +1,5 @@
-import { PlFile } from "../../inout/file";
 import { PlFileInfo } from "./info";
+import { escapeString } from "../../extension";
 
 export enum PlTokenType {
     // keywords
@@ -54,6 +54,7 @@ export enum PlTokenType {
     NULL,
     LIST,
     DICT,
+    STR,
 
     // others
     LF, EOF,
@@ -75,7 +76,7 @@ export function NewPlToken(type: PlTokenType, content: string, info: PlFileInfo)
 }
 
 export function PlTokenToString(token: PlToken) {
-    return `[${token.type}|'${token.content}'|${token.info.row}:${token.info.col-token.info.length}-${token.info.col},<${token.info.filename}>]`;
+    return `[${token.type}|'${escapeString(token.content)}'|${token.info.row}:${token.info.col-token.info.length}-${token.info.col},<${token.info.filename}>]`;
 }
 
 export default PlToken;

@@ -26,7 +26,7 @@ function escapeChar(c) {
 
 export function escapeString( source: string ): string {
     return source.split( '' ).map( c => {
-        if ( isalphanum( source ) ) {
+        if ( isalphanum( c ) ) {
             return c;
         }
         return escapeChar(c);

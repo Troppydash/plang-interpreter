@@ -1,8 +1,9 @@
 import { PlFile } from "../../inout/file";
 import PlToken, { NewPlToken, PlTokenType } from "./token";
-import { EmptyFileInfo, NewFileInfo } from "./info";
-import { isnum, isws } from "../../extension/types";
-
+import { NewFileInfo, PlFileInfo } from "./info";
+import { isalpha, isalphanum, isblank, iscap, isnum, isws } from "../../extension/types";
+import { NewPlProblem, PlProblem } from "../../problem/problem";
+import { PlProblemCode } from "../../problem/codes";
 
 
 interface Lexer {
@@ -21,6 +22,8 @@ class PlLexer implements Lexer {
     private currentRow: number;
     private currentCol: number;
 
+    private problems: PlProblem[];
+
     constructor( file: PlFile ) {
         this.filename = file.filename;
         this.content = file.content;
@@ -29,6 +32,8 @@ class PlLexer implements Lexer {
         this.charPointer = 0;
         this.currentRow = 0;
         this.currentCol = 0;
+
+        this.problems = [];
     }
 
     currentChar() {
@@ -44,11 +49,11 @@ class PlLexer implements Lexer {
     }
 
     eofFileInfo() {
-        return NewFileInfo(this.currentRow, this.currentCol + 1, 1, this.filename);
+        return NewFileInfo( this.currentRow, this.currentCol + 1, 1, this.filename );
     }
 
     errFileInfo() {
-        return NewFileInfo(this.currentRow, this.currentCol + 1, 1, this.filename);
+        return NewFileInfo( this.currentRow, this.currentCol + 1, 1, this.filename );
     }
 
     advancePointer() {
@@ -91,16 +96,58 @@ class PlLexer implements Lexer {
         return NewPlToken( tokenType, chars, this.currentFileInfo( i ) );
     }
 
+    testNextKeyword( keyword: string, tokenType: PlTokenType ): null | PlToken {
+        const size = keyword.length;
+        let i;
+        for ( i = 0; i < size; ++i ) {
+            if ( !this.isEOF() ) {
+                let c = this.currentChar();
+                if ( c === keyword[i] ) {
+                    this.advancePointer();
+                    continue;
+                }
+            }
+
+            // doesnt match
+            this.currentCol -= i;
+            this.charPointer -= i;
+            return null;
+        }
+        if ( !this.isEOF() && !isws( this.currentChar() ) ) {
+            this.currentCol -= i;
+            this.charPointer -= i;
+            return null;
+        }
+        // matched fully
+        return NewPlToken( tokenType, keyword, this.currentFileInfo( i ) );
+    }
+
+    newErrorToken( code: PlProblemCode, info: PlFileInfo, ...args: string[] ): PlToken {
+        this.problems.push( NewPlProblem( code, info, ...args ) );
+        return NewPlToken( PlTokenType.ERR, "", info );
+    }
+
     nextToken(): PlToken {
-        if ( this.charPointer >= this.contentSize ) {
+        if ( this.isEOF() ) {
             return NewPlToken( PlTokenType.EOF, "", this.eofFileInfo() );
         }
 
-        while ( isws( this.currentChar() ) ) {
+        while ( isblank( this.currentChar() ) ) {
             this.advancePointer();
         }
 
-        if ( this.charPointer >= this.contentSize ) {
+        if ( this.isEOF() ) {
+            return NewPlToken( PlTokenType.EOF, "", this.eofFileInfo() );
+        }
+
+        // is comment
+        while ( !this.isEOF() && this.currentChar() === '#' ) {
+            do {
+                this.advancePointer();
+            } while ( !this.isEOF() && this.currentChar() !== '\n' );
+        }
+
+        if ( this.isEOF() ) {
             return NewPlToken( PlTokenType.EOF, "", this.eofFileInfo() );
         }
 
@@ -115,7 +162,7 @@ class PlLexer implements Lexer {
                 c = this.currentChar();
             } while ( isnum( c ) && !this.isEOF() );
 
-            if (!this.isEOF() && !this.isNextEOF() && c === '.' && isnum(this.nextChar())) {
+            if ( !this.isEOF() && !this.isNextEOF() && c === '.' && isnum( this.nextChar() ) ) {
                 // parse dot
                 do {
                     content += c;
@@ -167,7 +214,7 @@ class PlLexer implements Lexer {
             }
             case '*': {
                 this.advancePointer();
-                return NewPlToken(PlTokenType.MUL, c, this.currentFileInfo(1));
+                return NewPlToken( PlTokenType.MUL, c, this.currentFileInfo( 1 ) );
             }
             case '/': {
                 let token = this.testNextChars( "/=", PlTokenType.NEQ );
@@ -202,6 +249,147 @@ class PlLexer implements Lexer {
                 return NewPlToken( PlTokenType.LT, c, this.currentFileInfo( 1 ) )
             }
 
+            // keywords
+            case 'f': {
+                for ( const pair of [ [ "func", PlTokenType.FUNC ], [ "for", PlTokenType.FOR ], [ "false", PlTokenType.BOOLEAN ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'i': {
+                for ( const pair of [ [ "impl", PlTokenType.IMPL ], [ "import", PlTokenType.IMPORT ], [ "if", PlTokenType.IF ], [ "in", PlTokenType.IN ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'a': {
+                for ( const pair of [ [ "as", PlTokenType.AS ], [ "all", PlTokenType.ALL ], [ "and", PlTokenType.AND ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 't': {
+                for ( const pair of [ [ "take", PlTokenType.TAKE ], [ "true", PlTokenType.BOOLEAN ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'e': {
+                for ( const pair of [ [ "export", PlTokenType.EXPORT ], [ "elif", PlTokenType.ELIF ], [ "else", PlTokenType.ELSE ], [ "each", PlTokenType.EACH ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'r': {
+                for ( const pair of [ [ "return", PlTokenType.RETURN ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'b': {
+                for ( const pair of [ [ "break", PlTokenType.BREAK ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'c': {
+                for ( const pair of [ [ "continue", PlTokenType.CONTINUE ], [ "case", PlTokenType.CASE ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'l': {
+                for ( const pair of [ [ "loop", PlTokenType.LOOP ], [ "list", PlTokenType.LIST ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'w': {
+                for ( const pair of [ [ "while", PlTokenType.WHILE ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'm': {
+                for ( const pair of [ [ "match", PlTokenType.MATCH ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'd': {
+                for ( const pair of [ [ "default", PlTokenType.DEFAULT ], [ "dict", PlTokenType.DICT ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'o': {
+                for ( const pair of [ [ "or", PlTokenType.OR ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 'n': {
+                for ( const pair of [ [ "not", PlTokenType.NOT ], [ "null", PlTokenType.NULL ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
 
             case '\n': {
                 this.advancePointer();
@@ -209,28 +397,147 @@ class PlLexer implements Lexer {
                 this.advanceRow();
                 return token;
             }
-            default: {
-                // parse variables
+        }
 
-                break;
+        // string
+        if ( c === '"' ) {
+            let content = '';
+            const oldCol = this.currentCol;
+            do {
+                content += c;
+                this.advancePointer();
+                if ( this.isEOF() || this.currentChar() === '\n' ) {
+                    // error
+                    return this.newErrorToken( "LE0002", NewFileInfo( this.currentRow, oldCol + 1, 1, this.filename ) );
+                }
+                c = this.currentChar();
+                if ( c === '\\' ) {
+                    this.advancePointer();
+                    c = this.currentChar();
+                    switch ( c ) {
+                        case 'n': {
+                            content += "\n";
+                            break;
+                        }
+                        case 't': {
+                            content += '\t';
+                            break;
+                        }
+                        case 'r': {
+                            content += '\r';
+                            break;
+                        }
+                        case 'f': {
+                            content += '\f';
+                            break;
+                        }
+                        case '"': {
+                            content += '"';
+                            break;
+                        }
+                        case '\\': {
+                            content += "\\";
+                            break;
+                        }
+                        default: {
+                            return this.newErrorToken( "LE0003", NewFileInfo( this.currentRow, this.currentCol + 1, 2, this.filename ), c );
+                        }
+                    }
+                    this.advancePointer();
+                    c = this.currentChar();
+                }
+            } while ( c !== '"' );
+            this.advancePointer();
+            return NewPlToken( PlTokenType.STR, content.substring( 1, content.length ), this.currentFileInfo( this.currentCol - oldCol ) );
+        }
+
+        // data types
+        if ( iscap( c ) ) {
+            // check datatypes
+            switch ( c ) {
+                case "I": {
+                    const token = this.testNextKeyword( "Int", PlTokenType.TYPE );
+                    if ( token ) {
+                        return token;
+                    }
+                    break;
+                }
+                case "S": {
+                    const token = this.testNextKeyword( "Str", PlTokenType.TYPE );
+                    if ( token ) {
+                        return token;
+                    }
+                    break;
+                }
+                case "N": {
+                    const token = this.testNextKeyword( "Null", PlTokenType.TYPE );
+                    if ( token ) {
+                        return token;
+                    }
+                    break;
+                }
+                case "L": {
+                    const token = this.testNextKeyword( "List", PlTokenType.TYPE );
+                    if ( token ) {
+                        return token;
+                    }
+                    break;
+                }
+                case "D": {
+                    const token = this.testNextKeyword( "Dict", PlTokenType.TYPE );
+                    if ( token ) {
+                        return token;
+                    }
+                    break;
+                }
+                case "F": {
+                    const token = this.testNextKeyword( "Func", PlTokenType.TYPE );
+                    if ( token ) {
+                        return token;
+                    }
+                    break;
+                }
+                case "T": {
+                    const token = this.testNextKeyword( "Type", PlTokenType.TYPE );
+                    if ( token ) {
+                        return token;
+                    }
+                    break;
+                }
             }
         }
 
-        return NewPlToken( PlTokenType.ERR, c, this.errFileInfo() );
+        // variables
+        if ( isalpha( c ) || c === '_' ) {
+            let content = '';
+            const oldCol = this.currentCol;
+            do {
+                content += c;
+                this.advancePointer();
+                c = this.currentChar();
+            } while ( !this.isEOF() && (isalphanum( c ) || c === '?' || c === '!' || c === '_') );
+            return NewPlToken( PlTokenType.VARIABLE, content, this.currentFileInfo( this.currentCol - oldCol ) );
+        }
+
+        return this.newErrorToken( "LE0001", this.errFileInfo(), c );
     }
 
     parseAll(): PlToken[] {
         let tokens = [];
 
-        while (true) {
+        while ( true ) {
             const token = this.nextToken();
-            tokens.push(token);
-            if (token.type === PlTokenType.EOF || token.type === PlTokenType.ERR) {
+            tokens.push( token );
+            if ( token.type === PlTokenType.EOF || token.type === PlTokenType.ERR ) {
                 break;
             }
         }
 
         return tokens;
+    }
+
+    getProblems() {
+        return this.problems;
     }
 }
 
