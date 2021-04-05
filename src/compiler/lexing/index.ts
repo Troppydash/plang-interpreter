@@ -6,15 +6,16 @@ import { NewPlProblem, PlProblem } from "../../problem/problem";
 import { PlProblemCode } from "../../problem/codes";
 
 
-interface Lexer {
+export interface Lexer {
+    readonly filename: string;
     nextToken(): PlToken;
-
     parseAll(): PlToken[];
+    getProblems(): PlProblem[];
 }
 
 
 class PlLexer implements Lexer {
-    private readonly filename: string;
+    readonly filename: string;
     private readonly content: string;
     private readonly contentSize: number;
 
