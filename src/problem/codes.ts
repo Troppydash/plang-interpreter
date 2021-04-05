@@ -10,7 +10,7 @@ const templates = {
 const hints: Record<PlProblemCode, string> = {
     LE0001: 'this character does not belong here, maybe check your spelling?',
     LE0002: 'did you forget to close your strings?',
-    LE0003: "if you intended to type '\\', write two forward-slashes '\\\\' to escape the first slash",
+    LE0003: "if you intended to type '\\', write two forward-slashes '\\\\' to escape the first slash"
 }
 
 const problemFullName = {

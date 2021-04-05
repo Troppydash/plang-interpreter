@@ -1,11 +1,10 @@
-// https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
-
 import { isNode } from "./index";
 
 const COLORS = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white'];
 
 export let colors;
 if (isNode) {
+    // https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
     colors = (function (colors) {
         const fn = (code: number, str: string) => `\x1b[${code}m${str}\x1b[39m`;
         const obj = { grey: fn.bind(null, 90) };
