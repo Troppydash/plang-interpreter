@@ -130,7 +130,7 @@ class PlLexer implements Lexer {
 
     nextToken(): PlToken {
         if ( this.isEOF() ) {
-            return NewPlToken( PlTokenType.EOF, "", this.eofFileInfo() );
+            return NewPlToken( PlTokenType.EOF, "eof", this.eofFileInfo() );
         }
 
         while ( isblank( this.currentChar() ) ) {
@@ -138,7 +138,7 @@ class PlLexer implements Lexer {
         }
 
         if ( this.isEOF() ) {
-            return NewPlToken( PlTokenType.EOF, "", this.eofFileInfo() );
+            return NewPlToken( PlTokenType.EOF, "eof", this.eofFileInfo() );
         }
 
         // is comment
@@ -149,7 +149,7 @@ class PlLexer implements Lexer {
         }
 
         if ( this.isEOF() ) {
-            return NewPlToken( PlTokenType.EOF, "", this.eofFileInfo() );
+            return NewPlToken( PlTokenType.EOF, "eof", this.eofFileInfo() );
         }
 
         let c = this.currentChar();

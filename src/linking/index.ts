@@ -47,14 +47,12 @@ export function RunFile(filePath: string): number {
         return 1;
     }
 
-    const result = RunLinker(content, filename);
+    const result = RunParser(content, filename);
     if (result === null) {
         return 1;
     }
 
-    for (const token of result) {
-        inout.print(PlTokenToString(token));
-    }
+    console.log(result);
     inout.flush();
     return 0;
 }

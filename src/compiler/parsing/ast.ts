@@ -19,10 +19,18 @@ export abstract class ASTNode {
         this.tokens = tokens;
     }
 
+    firstToken() {
+        return this.tokens[0];
+    }
+
+    lastToken() {
+        return this.tokens[this.tokens.length - 1];
+    }
+
     getSpanToken() {
         // TODO: this might break if the tokens span multiple lines
-        const firstToken = this.tokens[0];
-        const lastToken = this.tokens[this.tokens.length - 1]; // maybe make this the last token on the same line?
+        const firstToken = this.firstToken();
+        const lastToken = this.lastToken(); // maybe make this the last token on the same line?
         return NewPlToken(PlTokenType.SPAN, this.tokens.map(t => t.content).join(''),
             NewFileInfo(firstToken.info.row, lastToken.info.col, lastToken.info.col - firstToken.info.col + firstToken.info.length, firstToken.info.filename));
     }
@@ -211,13 +219,21 @@ export class ASTAssign extends ASTExpression {
 export class ASTDot extends ASTExpression {
     left: ASTExpression;
     operator: PlToken;
-    right: ASTVariable;
+    right: ASTVariable | ASTDot;
 
-    constructor(tokens: PlToken[], left: ASTExpression, operator: PlToken, right: ASTVariable) {
+    constructor(tokens: PlToken[], left: ASTExpression, operator: PlToken, right: ASTVariable | ASTDot) {
         super(tokens);
         this.left = left;
         this.operator = operator;
         this.right = right;
+    }
+
+    firstToken(): PlToken {
+        return this.left.getSpanToken();
+    }
+
+    lastToken(): PlToken {
+        return this.right.getSpanToken();
     }
 }
 
@@ -243,18 +259,24 @@ export class ASTBinary extends ASTExpression {
         this.right = right;
         this.operator = operator;
     }
+
+    firstToken(): PlToken {
+        return this.left.getSpanToken();
+    }
+
+    lastToken(): PlToken {
+        return this.right.getSpanToken();
+    }
 }
 
 export class ASTUnary extends ASTExpression {
     operator: PlToken;
     value: ASTExpression;
-    isPrefix: boolean;
 
-    constructor(tokens: PlToken[], operator: PlToken, value: ASTExpression, isPrefix: boolean = true) {
+    constructor(tokens: PlToken[], operator: PlToken, value: ASTExpression) {
         super(tokens);
         this.operator = operator;
         this.value = value;
-        this.isPrefix = isPrefix;
     }
 }
 

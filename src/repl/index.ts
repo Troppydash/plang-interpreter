@@ -27,7 +27,9 @@ export function StartREPL( filename: string ): number {
         // }
         const tree = RunParser(message, filename);
         // inout.print(ASTProgramToString(tree));
-        console.log(tree);
+        if (tree != null) {
+            console.log(tree);
+        }
     }
 
     inout.flush();
