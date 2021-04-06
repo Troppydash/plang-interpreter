@@ -1,18 +1,34 @@
 import PlToken, { PlTokenToString } from "../compiler/lexing/token";
 import PlLexer from "../compiler/lexing";
-import { ReportProblem } from "../problem";
+import {ReportProblem, ReportProblems} from "../problem";
 import { NewPlFile } from "../inout/file";
 import inout from "../inout";
+import {ASTProgram, ASTStatement} from "../compiler/parsing/ast";
+import {PlAstParser} from "../compiler/parsing";
 
 export function RunLinker( content: string, filename: string): PlToken[] | null {
     const lexer = new PlLexer(NewPlFile(filename, content));
     const result = lexer.parseAll();
 
     const problems = lexer.getProblems();
-    if (problems.length !== 0) {
+    if (problems.length != 0) {
         for (const problem of problems) {
             ReportProblem(problem, content);
         }
+        return null;
+    }
+
+    return result;
+}
+
+export function RunParser(content: string, filename: string): ASTProgram | null {
+    const lexer = new PlLexer(NewPlFile(filename, content));
+    const parser = new PlAstParser(lexer);
+    const result = parser.parseAll();
+
+    const problems = parser.getProblems();
+    if (result == null || problems.length != 0) {
+        ReportProblems(problems, content);
         return null;
     }
 

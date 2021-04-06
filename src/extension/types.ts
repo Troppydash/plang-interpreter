@@ -1,4 +1,4 @@
-export function isws( c ) {
+export function isws(c) {
     return c === ' ' || c === '\t' || c === '\r' || c === '\n' || c === '\f';
 }
 
@@ -6,11 +6,11 @@ export function isblank(c) {
     return c === ' ' || c === '\t';
 }
 
-export function isnum( c ) {
+export function isnum(c) {
     return c >= '0' && c <= '9';
 }
 
-export function isalpha( c ) {
+export function isalpha(c) {
     return (c >= 'A' && c <= 'Z') ||
         (c >= 'a' && c <= 'z');
 }
@@ -23,6 +23,7 @@ export function iscap(c) {
     return c >= 'A' && c <= 'Z';
 }
 
-export function tonum( c: string ): number {
+export function tonum(c: string): number {
     return (c as any) - ('0' as any);
 }
+

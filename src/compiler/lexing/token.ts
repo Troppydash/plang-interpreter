@@ -58,6 +58,7 @@ export enum PlTokenType {
 
     // others
     LF, EOF,
+    SPAN,
     ERR,
 }
 

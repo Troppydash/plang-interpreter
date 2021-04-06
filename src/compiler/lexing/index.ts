@@ -188,9 +188,8 @@ class PlLexer implements Lexer {
         }
         if ( singleSymbolMap.hasOwnProperty( c ) ) {
             // parse
-            const t = NewPlToken( singleSymbolMap[c], c, this.currentFileInfo( 1 ) );
             this.advancePointer();
-            return t;
+            return NewPlToken( singleSymbolMap[c], c, this.currentFileInfo( 1 ) );
         }
 
 
