@@ -48,7 +48,7 @@ export function RunFile(filePath: string): number {
     }
 
     const result = RunParser(content, filename);
-    if (result === null) {
+    if (result == null) {
         return 1;
     }
 

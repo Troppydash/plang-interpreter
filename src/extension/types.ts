@@ -27,3 +27,6 @@ export function tonum(c: string): number {
     return (c as any) - ('0' as any);
 }
 
+export function isvariablerest(c) {
+    return isalphanum(c) || c == '?' || c == '_' || c == '!';
+}

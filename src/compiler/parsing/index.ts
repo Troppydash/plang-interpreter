@@ -35,6 +35,9 @@ import {
 import PlToken, {PlTokenType} from "../lexing/token";
 import {PlProblemCode} from "../../problem/codes";
 
+class ErrTokenException {
+
+}
 
 interface Parser {
     readonly lexer: Lexer;
@@ -68,15 +71,30 @@ export class PlAstParser implements Parser {
     }
 
     parseOnce(): ASTStatement | null {
-        return this.pStatement();
+        try {
+            return this.pStatement();
+        } catch (e) {
+            if (e instanceof ErrTokenException) {
+                return null;
+            }
+            // normal error
+            this.newProblem(this.getToken(), "DE0001");
+            return null;
+        }
     }
 
     parseAll(): ASTProgram {
         let statements = [];
         while (true) {
-            const peekToken = this.peekToken();
-            if (peekToken.type == PlTokenType.EOF) {
-                break;
+            // check for end of file
+            try {
+                const peekToken = this.peekToken();
+                if (peekToken.type == PlTokenType.EOF) {
+                    break;
+                }
+            } catch (e) {
+                // the next token is ERR, so we return nothing for error
+                return [];
             }
 
             const statement = this.parseOnce();
@@ -101,7 +119,7 @@ export class PlAstParser implements Parser {
         // do not report null errors, as it is handled in lexer already
         const token = this.getToken();
         if (token.type == PlTokenType.ERR) {
-            return null;
+            throw new ErrTokenException();
         }
         return token;
     }
@@ -110,15 +128,15 @@ export class PlAstParser implements Parser {
         const token = this.getToken();
         this.cacheToken.push(token);
         if (token.type == PlTokenType.ERR) {
-            return null;
+            throw new ErrTokenException();
         }
         return token;
     }
 
-    expectedPeekToken(expected: PlTokenType, code: PlProblemCode, ...args: string[]): PlToken | null {
+    expectedPeekToken(token: PlToken, expected: PlTokenType, code: PlProblemCode, ...args: string[]): PlToken | null {
         const peekToken = this.peekToken();
         if (peekToken.type != expected) {
-            this.problems.push(NewPlProblem(code, peekToken.info, ...args));
+            this.problems.push(NewPlProblem(code, token == null ? peekToken.info : token.info, ...args));
             return null;
         }
         return this.nextToken();
@@ -132,6 +150,17 @@ export class PlAstParser implements Parser {
             }
         }
         return false;
+    }
+
+    clearLF() {
+        while (true) {
+            const token = this.peekToken();
+            if (token.type == PlTokenType.LF) {
+                this.nextToken();
+            } else {
+                break;
+            }
+        }
     }
 
     newProblem(token: PlToken, code: PlProblemCode, ...args: string[]) {
@@ -445,19 +474,29 @@ export class PlAstParser implements Parser {
         while (true) {
             const peekToken = this.peekToken();
             if (peekToken.type == PlTokenType.LPAREN) {
-                // TODO: parse args
-                return left;
+                this.nextToken();
+                const args = this.pArgs("ET0008");
+                if (args == null) {
+                    return null;
+                }
+                left = new ASTCall([peekToken, ...args[1]], left, args[0]);
+                continue;
             }
             if (peekToken.type == PlTokenType.DOT) {
                 this.nextToken();
-                const right = this.pCall();
+                const peek = this.peekToken();
+                if (peek.type != PlTokenType.VARIABLE) {
+                    this.newProblem(peek, "ET0003");
+                    return null;
+                }
+                const right = this.pVariable();
                 if (right == null) {
                     return null;
                 }
-                if (!(right instanceof ASTVariable) && !(right instanceof ASTDot)) {
-                    this.newProblem(right.getSpanToken(), "ET0003");
-                    return null;
-                }
+                // if (!(right instanceof ASTVariable) && !(right instanceof ASTDot)) {
+                //     this.newProblem(right.getSpanToken(), "ET0003");
+                //     return null;
+                // }
                 left = new ASTDot([peekToken], left, peekToken, right);
                 continue;
             }
@@ -482,6 +521,12 @@ export class PlAstParser implements Parser {
                 return this.pBoolean();
             case PlTokenType.NULL:
                 return this.pNull();
+            case PlTokenType.TYPE:
+                return this.pTypes();
+            case PlTokenType.LIST:
+                return this.pList();
+            case PlTokenType.DICT:
+                return this.pDict();
         }
 
         this.newProblem(token, "ET0004", token.content);
@@ -519,18 +564,28 @@ export class PlAstParser implements Parser {
     }
 
     pList(): ASTList | null {
-        return null;
+        let tokens = [this.nextToken()];
+        let peek = this.expectedPeekToken(tokens[0], PlTokenType.LPAREN, "ET0007");
+        if (peek == null) {
+            return null;
+        }
+        tokens.push(peek);
 
+        const result =this.pArgs();
+        if (result == null) {
+            return null;
+        }
+        tokens.push(...result[1]);
+        return new ASTList(tokens, result[0]);
     }
 
     pDict(): ASTDict | null {
         return null;
-
     }
 
     pTypes(): ASTType | null {
-        return null;
-
+        const token = this.nextToken();
+        return new ASTType([token], token.content);
     }
 
     pGroup(): ASTExpression | null {
@@ -539,12 +594,40 @@ export class PlAstParser implements Parser {
         if (expression == null) {
             return null;
         }
-        const right = this.peekToken();
-        if (right.type != PlTokenType.RPAREN) {
-            this.newProblem(left, "CE0002");
+        if (this.expectedPeekToken(left,PlTokenType.RPAREN, "CE0002") == null) {
             return null;
         }
         this.nextToken();
         return expression;
+    }
+
+    pArgs(commaCode: PlProblemCode = "ET0006", endTokenCode: PlProblemCode = "ET0007", endToken: PlTokenType = PlTokenType.RPAREN): [ASTExpression[], PlToken[]] | null {
+        let expressions = [];
+        let tokens = [];
+        while (true) {
+            this.clearLF();
+            const token = this.peekToken();
+            if (token.type == endToken) {
+                break;
+            }
+            const expression = this.pExpression();
+            if (expression == null) {
+                return null;
+            }
+
+            this.clearLF();
+
+            const peekToken = this.peekToken();
+            if (peekToken.type == PlTokenType.COMMA) {
+                this.nextToken();
+            } else if (peekToken.type != PlTokenType.LF && peekToken.type != endToken) {
+                this.newProblem(expression.getSpanToken(), peekToken.type == PlTokenType.EOF ? endTokenCode :commaCode);
+                return null;
+            }
+            tokens.push(peekToken);
+            expressions.push(expression);
+        }
+        tokens.push(this.nextToken());
+        return [expressions, tokens];
     }
 }

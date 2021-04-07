@@ -21,13 +21,12 @@
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/lexing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/extension/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/extension/types.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,13 +110,23 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="run playground/test.plang as" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="run playground/test.plang" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="run" />
       </scripts>
-      <arguments value="playground/test.plang as" />
+      <arguments value="playground/test.plang" />
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
@@ -137,11 +146,13 @@
       <item itemvalue="npm.run-build" />
       <item itemvalue="npm.build-browser" />
       <item itemvalue="npm.build-dist" />
-      <item itemvalue="npm.run playground/test.plang as" />
+      <item itemvalue="npm.run playground/test.plang" />
+      <item itemvalue="npm.build" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.run playground/test.plang as" />
+        <item itemvalue="npm.run playground/test.plang" />
+        <item itemvalue="npm.build" />
         <item itemvalue="npm.build-browser" />
         <item itemvalue="npm.build-dist" />
       </list>
@@ -178,7 +189,14 @@
       <option name="project" value="LOCAL" />
       <updated>1617686782619</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Added basic expression parsing code, the compiler now functions.">
+      <created>1617691560905</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1617691560906</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -199,13 +217,14 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="moved some comments" />
     <MESSAGE value="Backup incase it crashes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Backup incase it crashes" />
+    <MESSAGE value="Added basic expression parsing code, the compiler now functions." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added basic expression parsing code, the compiler now functions." />
   </component>
   <component name="WindowStateProjectService">
-    <state x="250" y="42" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1617691149594">
+    <state x="250" y="42" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1617786046718">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state x="250" y="42" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1617691149594" />
+    <state x="250" y="42" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1617786046718" />
     <state x="517" y="186" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1617690377873">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
@@ -222,74 +241,74 @@
       <screen x="0" y="0" width="1600" height="858" />
     </state>
     <state width="390" height="506" key="DebuggerActiveHint/0.0.1600.858@0.0.1600.858" timestamp="1617681689128" />
-    <state width="788" height="515" key="GridCell.Tab.0.bottom" timestamp="1617691468519">
+    <state width="1577" height="285" key="GridCell.Tab.0.bottom" timestamp="1617786916730">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="788" height="515" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1617691468519" />
-    <state width="788" height="515" key="GridCell.Tab.0.center" timestamp="1617691468519">
+    <state width="1577" height="285" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1617786916730" />
+    <state width="1577" height="285" key="GridCell.Tab.0.center" timestamp="1617786916730">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="788" height="515" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1617691468519" />
-    <state width="788" height="515" key="GridCell.Tab.0.left" timestamp="1617691468519">
+    <state width="1577" height="285" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1617786916730" />
+    <state width="1577" height="285" key="GridCell.Tab.0.left" timestamp="1617786916729">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="788" height="515" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1617691468519" />
-    <state width="788" height="515" key="GridCell.Tab.0.right" timestamp="1617691468519">
+    <state width="1577" height="285" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1617786916729" />
+    <state width="1577" height="285" key="GridCell.Tab.0.right" timestamp="1617786916730">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="788" height="515" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1617691468519" />
-    <state width="1577" height="265" key="GridCell.Tab.1.bottom" timestamp="1617691214977">
+    <state width="1577" height="285" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1617786916730" />
+    <state width="1577" height="265" key="GridCell.Tab.1.bottom" timestamp="1617786501863">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.1.bottom/0.0.1600.858@0.0.1600.858" timestamp="1617691214977" />
-    <state width="1577" height="265" key="GridCell.Tab.1.center" timestamp="1617691214971">
+    <state width="1577" height="265" key="GridCell.Tab.1.bottom/0.0.1600.858@0.0.1600.858" timestamp="1617786501863" />
+    <state width="1577" height="265" key="GridCell.Tab.1.center" timestamp="1617786501860">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.1.center/0.0.1600.858@0.0.1600.858" timestamp="1617691214971" />
-    <state width="1577" height="265" key="GridCell.Tab.1.left" timestamp="1617691214970">
+    <state width="1577" height="265" key="GridCell.Tab.1.center/0.0.1600.858@0.0.1600.858" timestamp="1617786501860" />
+    <state width="1577" height="265" key="GridCell.Tab.1.left" timestamp="1617786501859">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.1.left/0.0.1600.858@0.0.1600.858" timestamp="1617691214970" />
-    <state width="1577" height="265" key="GridCell.Tab.1.right" timestamp="1617691214972">
+    <state width="1577" height="265" key="GridCell.Tab.1.left/0.0.1600.858@0.0.1600.858" timestamp="1617786501859" />
+    <state width="1577" height="265" key="GridCell.Tab.1.right" timestamp="1617786501862">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.1.right/0.0.1600.858@0.0.1600.858" timestamp="1617691214972" />
-    <state width="1577" height="265" key="GridCell.Tab.2.bottom" timestamp="1617691214983">
+    <state width="1577" height="265" key="GridCell.Tab.1.right/0.0.1600.858@0.0.1600.858" timestamp="1617786501862" />
+    <state width="1577" height="265" key="GridCell.Tab.2.bottom" timestamp="1617786501867">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.2.bottom/0.0.1600.858@0.0.1600.858" timestamp="1617691214983" />
-    <state width="1577" height="265" key="GridCell.Tab.2.center" timestamp="1617691214980">
+    <state width="1577" height="265" key="GridCell.Tab.2.bottom/0.0.1600.858@0.0.1600.858" timestamp="1617786501867" />
+    <state width="1577" height="265" key="GridCell.Tab.2.center" timestamp="1617786501865">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.2.center/0.0.1600.858@0.0.1600.858" timestamp="1617691214980" />
-    <state width="1577" height="265" key="GridCell.Tab.2.left" timestamp="1617691214978">
+    <state width="1577" height="265" key="GridCell.Tab.2.center/0.0.1600.858@0.0.1600.858" timestamp="1617786501865" />
+    <state width="1577" height="265" key="GridCell.Tab.2.left" timestamp="1617786501864">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.2.left/0.0.1600.858@0.0.1600.858" timestamp="1617691214978" />
-    <state width="1577" height="265" key="GridCell.Tab.2.right" timestamp="1617691214982">
+    <state width="1577" height="265" key="GridCell.Tab.2.left/0.0.1600.858@0.0.1600.858" timestamp="1617786501864" />
+    <state width="1577" height="265" key="GridCell.Tab.2.right" timestamp="1617786501866">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.2.right/0.0.1600.858@0.0.1600.858" timestamp="1617691214982" />
-    <state width="1577" height="265" key="GridCell.Tab.3.bottom" timestamp="1617691214987">
+    <state width="1577" height="265" key="GridCell.Tab.2.right/0.0.1600.858@0.0.1600.858" timestamp="1617786501866" />
+    <state width="1577" height="265" key="GridCell.Tab.3.bottom" timestamp="1617786501870">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.3.bottom/0.0.1600.858@0.0.1600.858" timestamp="1617691214987" />
-    <state width="1577" height="265" key="GridCell.Tab.3.center" timestamp="1617691214985">
+    <state width="1577" height="265" key="GridCell.Tab.3.bottom/0.0.1600.858@0.0.1600.858" timestamp="1617786501870" />
+    <state width="1577" height="265" key="GridCell.Tab.3.center" timestamp="1617786501868">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.3.center/0.0.1600.858@0.0.1600.858" timestamp="1617691214985" />
-    <state width="1577" height="265" key="GridCell.Tab.3.left" timestamp="1617691214984">
+    <state width="1577" height="265" key="GridCell.Tab.3.center/0.0.1600.858@0.0.1600.858" timestamp="1617786501868" />
+    <state width="1577" height="265" key="GridCell.Tab.3.left" timestamp="1617786501868">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.3.left/0.0.1600.858@0.0.1600.858" timestamp="1617691214984" />
-    <state width="1577" height="265" key="GridCell.Tab.3.right" timestamp="1617691214986">
+    <state width="1577" height="265" key="GridCell.Tab.3.left/0.0.1600.858@0.0.1600.858" timestamp="1617786501868" />
+    <state width="1577" height="265" key="GridCell.Tab.3.right" timestamp="1617786501869">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="265" key="GridCell.Tab.3.right/0.0.1600.858@0.0.1600.858" timestamp="1617691214986" />
-    <state x="-4" y="118" key="Vcs.Push.Dialog.v2" timestamp="1617686784775">
+    <state width="1577" height="265" key="GridCell.Tab.3.right/0.0.1600.858@0.0.1600.858" timestamp="1617786501869" />
+    <state x="388" y="120" key="Vcs.Push.Dialog.v2" timestamp="1617691562949">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state x="-4" y="118" key="Vcs.Push.Dialog.v2/0.0.1600.858@0.0.1600.858" timestamp="1617686784775" />
+    <state x="388" y="120" key="Vcs.Push.Dialog.v2/0.0.1600.858@0.0.1600.858" timestamp="1617691562949" />
     <state x="63" y="166" width="672" height="678" key="search.everywhere.popup" timestamp="1617684402594">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
@@ -300,9 +319,9 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/compiler/parsing/index.ts</url>
-          <line>537</line>
+          <line>237</line>
           <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="7" />
+          <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

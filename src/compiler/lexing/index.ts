@@ -1,7 +1,7 @@
 import { PlFile } from "../../inout/file";
 import PlToken, { NewPlToken, PlTokenType } from "./token";
 import { NewFileInfo, PlFileInfo } from "./info";
-import { isalpha, isalphanum, isblank, iscap, isnum, isws } from "../../extension/types";
+import {isalpha, isalphanum, isblank, iscap, isnum, isvariablerest, isws} from "../../extension/types";
 import { NewPlProblem, PlProblem } from "../../problem/problem";
 import { PlProblemCode } from "../../problem/codes";
 
@@ -114,7 +114,7 @@ class PlLexer implements Lexer {
             this.charPointer -= i;
             return null;
         }
-        if ( !this.isEOF() && !isws( this.currentChar() ) ) {
+        if ( !this.isEOF() && isvariablerest( this.currentChar() ) ) {
             this.currentCol -= i;
             this.charPointer -= i;
             return null;
@@ -182,7 +182,7 @@ class PlLexer implements Lexer {
             '}': PlTokenType.RBRACE,
             '(': PlTokenType.LPAREN,
             ')': PlTokenType.RPAREN,
-            ',': PlTokenType.RPAREN,
+            ',': PlTokenType.COMMA,
             ':': PlTokenType.COLON,
             ';': PlTokenType.SEMICOLON,
         }
@@ -515,7 +515,7 @@ class PlLexer implements Lexer {
                 content += c;
                 this.advancePointer();
                 c = this.currentChar();
-            } while ( !this.isEOF() && (isalphanum( c ) || c === '?' || c === '!' || c === '_') );
+            } while ( !this.isEOF() && isvariablerest(c) );
             return NewPlToken( PlTokenType.VARIABLE, content, this.currentFileInfo( this.currentCol - oldCol ) );
         }
 

@@ -204,7 +204,7 @@ export class ASTMatch extends ASTStatement {
 }
 
 export class ASTAssign extends ASTExpression {
-    pre?: ASTExpression; // this can only be a call
+    pre?: ASTExpression; // this can only be a call or dot chain
     variable: ASTVariable;
     value: ASTExpression;
 
@@ -213,6 +213,14 @@ export class ASTAssign extends ASTExpression {
         this.pre = pre;
         this.variable = variable;
         this.value = value;
+    }
+
+    firstToken(): PlToken {
+        return this.pre == null ? this.variable.getSpanToken() :this.pre.getSpanToken();
+    }
+
+    lastToken(): PlToken {
+        return this.value.getSpanToken();
     }
 }
 
