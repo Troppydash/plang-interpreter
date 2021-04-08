@@ -306,8 +306,10 @@ export class ASTList extends ASTExpression {
     }
 }
 
+export type ASTDictKey = ASTVariable | ASTNumber;
+
 export class ASTDict extends ASTExpression {
-    keys: (ASTVariable | ASTNumber)[];
+    keys: ASTDictKey[];
     values: ASTExpression[];
 
     constructor(tokens: PlToken[], keys: (ASTVariable | ASTNumber)[], values: ASTExpression[]) {

@@ -21,11 +21,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/extension/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/extension/types.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -79,7 +76,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run-build">
+  <component name="RunManager" selected="npm.run-build playground/test.plang">
     <configuration name="build-browser" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -131,19 +128,20 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="run-build" type="js.build_tools.npm" nameIsGenerated="true">
+    <configuration name="run-build playground/test.plang" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="run-build" />
       </scripts>
+      <arguments value="playground/test.plang" />
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
     </configuration>
     <list>
       <item itemvalue="npm.build-cli" />
-      <item itemvalue="npm.run-build" />
+      <item itemvalue="npm.run-build playground/test.plang" />
       <item itemvalue="npm.build-browser" />
       <item itemvalue="npm.build-dist" />
       <item itemvalue="npm.run playground/test.plang" />
@@ -196,7 +194,14 @@
       <option name="project" value="LOCAL" />
       <updated>1617691560906</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added lists and call parsing.">
+      <created>1617787080073</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1617787080074</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -218,13 +223,14 @@
     <MESSAGE value="moved some comments" />
     <MESSAGE value="Backup incase it crashes" />
     <MESSAGE value="Added basic expression parsing code, the compiler now functions." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added basic expression parsing code, the compiler now functions." />
+    <MESSAGE value="Added lists and call parsing." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added lists and call parsing." />
   </component>
   <component name="WindowStateProjectService">
-    <state x="250" y="42" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1617786046718">
+    <state x="250" y="42" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1617845306561">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state x="250" y="42" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1617786046718" />
+    <state x="250" y="42" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1617845306561" />
     <state x="517" y="186" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1617690377873">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
@@ -241,22 +247,22 @@
       <screen x="0" y="0" width="1600" height="858" />
     </state>
     <state width="390" height="506" key="DebuggerActiveHint/0.0.1600.858@0.0.1600.858" timestamp="1617681689128" />
-    <state width="1577" height="285" key="GridCell.Tab.0.bottom" timestamp="1617786916730">
+    <state width="1577" height="394" key="GridCell.Tab.0.bottom" timestamp="1617845152363">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="285" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1617786916730" />
-    <state width="1577" height="285" key="GridCell.Tab.0.center" timestamp="1617786916730">
+    <state width="1577" height="394" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1617845152363" />
+    <state width="1577" height="394" key="GridCell.Tab.0.center" timestamp="1617845152361">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="285" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1617786916730" />
-    <state width="1577" height="285" key="GridCell.Tab.0.left" timestamp="1617786916729">
+    <state width="1577" height="394" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1617845152361" />
+    <state width="1577" height="394" key="GridCell.Tab.0.left" timestamp="1617845152360">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="285" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1617786916729" />
-    <state width="1577" height="285" key="GridCell.Tab.0.right" timestamp="1617786916730">
+    <state width="1577" height="394" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1617845152360" />
+    <state width="1577" height="394" key="GridCell.Tab.0.right" timestamp="1617845152362">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="285" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1617786916730" />
+    <state width="1577" height="394" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1617845152362" />
     <state width="1577" height="265" key="GridCell.Tab.1.bottom" timestamp="1617786501863">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
@@ -305,26 +311,14 @@
       <screen x="0" y="0" width="1600" height="858" />
     </state>
     <state width="1577" height="265" key="GridCell.Tab.3.right/0.0.1600.858@0.0.1600.858" timestamp="1617786501869" />
-    <state x="388" y="120" key="Vcs.Push.Dialog.v2" timestamp="1617691562949">
+    <state x="384" y="96" key="Vcs.Push.Dialog.v2" timestamp="1617787081520">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state x="388" y="120" key="Vcs.Push.Dialog.v2/0.0.1600.858@0.0.1600.858" timestamp="1617691562949" />
+    <state x="384" y="96" key="Vcs.Push.Dialog.v2/0.0.1600.858@0.0.1600.858" timestamp="1617787081520" />
     <state x="63" y="166" width="672" height="678" key="search.everywhere.popup" timestamp="1617684402594">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
     <state x="63" y="166" width="672" height="678" key="search.everywhere.popup/0.0.1600.858@0.0.1600.858" timestamp="1617684402594" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/compiler/parsing/index.ts</url>
-          <line>237</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="18" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

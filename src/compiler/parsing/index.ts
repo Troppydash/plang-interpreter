@@ -8,7 +8,7 @@ import {
     ASTCall,
     ASTClosure,
     ASTContinue,
-    ASTDict,
+    ASTDict, ASTDictKey,
     ASTDot,
     ASTEach,
     ASTExport,
@@ -72,6 +72,7 @@ export class PlAstParser implements Parser {
 
     parseOnce(): ASTStatement | null {
         try {
+            this.clearLF();
             return this.pStatement();
         } catch (e) {
             if (e instanceof ErrTokenException) {
@@ -250,6 +251,7 @@ export class PlAstParser implements Parser {
         let tokens = [this.nextToken()];
         let statements = [];
         while (true) {
+            this.clearLF();
             const peekToken = this.peekToken();
             if (peekToken.type == PlTokenType.RBRACE) {
                 break;
@@ -348,7 +350,7 @@ export class PlAstParser implements Parser {
                 while (right.right instanceof ASTDot) {
                     right = right.right;
                 }
-                pre = left; // TODO: think about how to sort out the left side
+                pre = left.left;
                 variable = right.right;
             } else {
                 this.newProblem(left.getSpanToken(), "ET0002");
@@ -465,7 +467,7 @@ export class PlAstParser implements Parser {
         return left;
     }
 
-    pCall(): ASTCall | ASTDot | ASTExpression | null {
+    pCall(): ASTExpression | null {
         let left = this.pPrimary();
         if (left == null) {
             return null;
@@ -493,10 +495,6 @@ export class PlAstParser implements Parser {
                 if (right == null) {
                     return null;
                 }
-                // if (!(right instanceof ASTVariable) && !(right instanceof ASTDot)) {
-                //     this.newProblem(right.getSpanToken(), "ET0003");
-                //     return null;
-                // }
                 left = new ASTDot([peekToken], left, peekToken, right);
                 continue;
             }
@@ -505,7 +503,6 @@ export class PlAstParser implements Parser {
         return left;
     }
 
-    // too much stuff here
     pPrimary(): ASTExpression | null {
         const token = this.peekToken();
         switch (token.type) {
@@ -571,7 +568,7 @@ export class PlAstParser implements Parser {
         }
         tokens.push(peek);
 
-        const result =this.pArgs();
+        const result = this.pArgs();
         if (result == null) {
             return null;
         }
@@ -580,7 +577,45 @@ export class PlAstParser implements Parser {
     }
 
     pDict(): ASTDict | null {
-        return null;
+        let tokens = [this.nextToken()];
+        let peek = this.expectedPeekToken(tokens[0], PlTokenType.LPAREN, "ET0010");
+        if (peek == null) {
+            return null;
+        }
+        tokens.push(peek);
+
+        let keys = [];
+        let values = [];
+        // parse arguments
+        while (true) {
+            this.clearLF();
+            const token = this.peekToken();
+            if (token.type == PlTokenType.RPAREN) {
+                break;
+            }
+            // need to bind this for some damn reason or this is not defined
+            const result = this.pPair();
+            if (result == null) {
+                return null;
+            }
+
+            this.clearLF();
+
+            const peekToken = this.peekToken();
+            if (peekToken.type == PlTokenType.COMMA) {
+                this.nextToken();
+            } else if (peekToken.type != PlTokenType.LF && peekToken.type != PlTokenType.RPAREN) {
+                this.newProblem(result[2].getSpanToken(), peekToken.type == PlTokenType.EOF ? "ET0010" : "ET0012");
+                return null;
+            }
+            keys.push(result[0]);
+            tokens.push(result[1])
+            values.push(result[2]);
+        }
+        // push the last rparen
+        tokens.push(this.nextToken());
+
+        return new ASTDict(tokens, keys, values);
     }
 
     pTypes(): ASTType | null {
@@ -594,14 +629,42 @@ export class PlAstParser implements Parser {
         if (expression == null) {
             return null;
         }
-        if (this.expectedPeekToken(left,PlTokenType.RPAREN, "CE0002") == null) {
+        if (this.expectedPeekToken(left, PlTokenType.RPAREN, "CE0002") == null) {
             return null;
         }
         this.nextToken();
         return expression;
     }
 
-    pArgs(commaCode: PlProblemCode = "ET0006", endTokenCode: PlProblemCode = "ET0007", endToken: PlTokenType = PlTokenType.RPAREN): [ASTExpression[], PlToken[]] | null {
+
+    // this is only used for dict() parsing
+    pPair(): [ASTDictKey, PlToken, ASTExpression] | null {
+        const token = this.peekToken();
+        if (token.type != PlTokenType.VARIABLE && token.type != PlTokenType.NUMBER) {
+            this.newProblem(token, "ET0009");
+            return null;
+        }
+        const key = this.pPrimary();
+        if (key == null) {
+            return null;
+        }
+        const colon = this.expectedPeekToken(token, PlTokenType.COLON, "ET0011");
+        if (colon == null) {
+            return null;
+        }
+        const value = this.pExpression();
+        if (value == null) {
+            return null;
+        }
+        return [key as ASTDictKey, colon, value];
+    }
+
+    // this is only used for call args and list item
+    pArgs(
+        commaCode: PlProblemCode = "ET0006",
+        endTokenCode: PlProblemCode = "ET0007",
+        endToken: PlTokenType = PlTokenType.RPAREN
+    ): [ASTExpression[], PlToken[]] | null {
         let expressions = [];
         let tokens = [];
         while (true) {
@@ -610,6 +673,7 @@ export class PlAstParser implements Parser {
             if (token.type == endToken) {
                 break;
             }
+            // need to bind this for some damn reason or this is not defined
             const expression = this.pExpression();
             if (expression == null) {
                 return null;
@@ -621,7 +685,7 @@ export class PlAstParser implements Parser {
             if (peekToken.type == PlTokenType.COMMA) {
                 this.nextToken();
             } else if (peekToken.type != PlTokenType.LF && peekToken.type != endToken) {
-                this.newProblem(expression.getSpanToken(), peekToken.type == PlTokenType.EOF ? endTokenCode :commaCode);
+                this.newProblem(expression.getSpanToken(), peekToken.type == PlTokenType.EOF ? endTokenCode : commaCode);
                 return null;
             }
             tokens.push(peekToken);
@@ -629,5 +693,10 @@ export class PlAstParser implements Parser {
         }
         tokens.push(this.nextToken());
         return [expressions, tokens];
+    }
+
+    // this is used for function param parsing
+    pParam() {
+
     }
 }
