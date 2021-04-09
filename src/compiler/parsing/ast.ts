@@ -125,12 +125,12 @@ export class ASTContinue extends ASTStatement {
 }
 
 export class ASTIf extends ASTStatement {
-    conditions: ASTExpression; // all the conditions
+    conditions: ASTExpression[]; // all the conditions
     blocks: ASTBlock[]; // all the 'then' blocks
     other?: ASTBlock; // else block
 
 
-    constructor(tokens: PlToken[], conditions: ASTExpression, blocks: ASTBlock[], other?: ASTBlock) {
+    constructor(tokens: PlToken[], conditions: ASTExpression[], blocks: ASTBlock[], other?: ASTBlock) {
         super(tokens);
         this.conditions = conditions;
         this.blocks = blocks;
