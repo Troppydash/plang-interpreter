@@ -140,14 +140,17 @@ export class ASTIf extends ASTStatement {
 
 export class ASTEach extends ASTStatement {
     value: ASTVariable;
-    index?: ASTVariable;
+    key?: ASTVariable;
     iterator: ASTExpression;
+    block: ASTBlock;
 
-    constructor(tokens: PlToken[], value: ASTVariable, iterator: ASTExpression, index?: ASTVariable) {
+
+    constructor(tokens: PlToken[], value: ASTVariable, iterator: ASTExpression, block: ASTBlock, key?: ASTVariable ) {
         super(tokens);
         this.value = value;
-        this.index = index;
+        this.key = key;
         this.iterator = iterator;
+        this.block = block;
     }
 }
 

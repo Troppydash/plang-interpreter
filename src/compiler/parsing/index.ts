@@ -1,4 +1,4 @@
-import {NewPlProblem, PlProblem} from "../../problem/problem";
+import {NewPlProblem, NewPlProblemAt, PlHereType, PlProblem} from "../../problem/problem";
 import {Lexer} from "../lexing";
 import {
     ASTAssign,
@@ -137,9 +137,8 @@ export class PlAstParser implements Parser {
     }
 
     expectedPeekToken(token: PlToken, expected: PlTokenType, code: PlProblemCode, ...args: string[]): PlToken | null {
-        const peekToken = this.peekToken();
-        if (peekToken.type != expected) {
-            this.problems.push(NewPlProblem(code, token == null ? peekToken.info : token.info, ...args));
+        const result = this.tryPeekToken(expected, code, token, ...args);
+        if (result == null) {
             return null;
         }
         return this.nextToken();
@@ -148,7 +147,11 @@ export class PlAstParser implements Parser {
     tryPeekToken(expected: PlTokenType, code: PlProblemCode, errorToken: PlToken | null, ...args: string[]): PlToken | null {
         const peekToken = this.peekToken();
         if (peekToken.type != expected) {
-            this.problems.push(NewPlProblem(code, errorToken == null ? peekToken.info : errorToken.info, ...args));
+            if (errorToken == null) {
+                this.problems.push(NewPlProblem(code, peekToken.info, ...args));
+            } else {
+                this.problems.push(NewPlProblemAt(code, errorToken.info, "after", ...args));
+            }
             return null;
         }
         return peekToken;
@@ -165,7 +168,11 @@ export class PlAstParser implements Parser {
             }
         }
         if (!found) {
-            this.problems.push(NewPlProblem(code, errorToken == null ? peekToken.info : errorToken.info, ...args));
+            if (errorToken == null) {
+                this.problems.push(NewPlProblem(code, peekToken.info, ...args));
+            } else {
+                this.problems.push(NewPlProblemAt(code, errorToken.info, "after", ...args));
+            }
             return null;
         }
         return peekToken;
@@ -194,6 +201,11 @@ export class PlAstParser implements Parser {
 
     newProblem(token: PlToken, code: PlProblemCode, ...args: string[]) {
         this.problems.push(NewPlProblem(code, token.info, ...args));
+        return this;
+    }
+
+    newProblemAt(token: PlToken, code: PlProblemCode, here: PlHereType, ...args: string[]) {
+        this.problems.push(NewPlProblemAt(code, token.info, here, ...args));
         return this;
     }
 
@@ -263,7 +275,7 @@ export class PlAstParser implements Parser {
         const peekToken = this.peekToken();
         if (peekToken.type != PlTokenType.LF) {
             if (peekToken.type != PlTokenType.EOF) {
-                this.newProblem(statement.getSpanToken(), "ET0001");
+                this.newProblemAt(statement.getSpanToken(), "ET0001", "after");
                 return null;
             }
         } else {
@@ -431,7 +443,42 @@ export class PlAstParser implements Parser {
     }
 
     pEach(): ASTEach | null {
-        return null;
+        const tokens = [this.nextToken()]
+        if (this.tryPeekToken(PlTokenType.VARIABLE, "ET0024", null) == null) {
+            return null;
+        }
+        const value = this.pVariable();
+        let key = null;
+        if (this.peekToken().type == PlTokenType.COMMA) {
+            tokens.push(this.nextToken());
+            if (this.tryPeekToken(PlTokenType.VARIABLE, "ET0024", null) == null) {
+                return null;
+            }
+            key = this.pVariable();
+            if (key == null) {
+                return null;
+            }
+        }
+
+        if (this.tryPeekToken(PlTokenType.IN, "ET0025", key == null ? value.getSpanToken() : key.getSpanToken()) == null) {
+            return null;
+        }
+        tokens.push(this.nextToken());
+        const array = this.pExpression();
+        if (array == null) {
+            return null;
+        }
+
+        if (this.tryPeekToken(PlTokenType.LBRACE, "ET0025", array.getSpanToken()) == null) {
+            return null;
+        }
+
+        const block = this.pBlock();
+        if (block == null) {
+            return null;
+        }
+
+        return new ASTEach(tokens, value, array, block, key);
     }
 
     pLoop(): ASTLoop | null {

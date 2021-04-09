@@ -1,4 +1,4 @@
-import {PlProblem} from "./problem";
+import {HTMessage, PlProblem} from "./problem";
 import {PCFullName, PCHint} from "./codes";
 import inout from "../inout";
 import {colors} from "../inout/color";
@@ -67,7 +67,7 @@ export function LogProblem(problem: PlProblem, content: string) {
     // add current line and ^^ pointers
     buffer.push(startLine.toString().padStart(largestLineNumberLength) + '| ' + targetLine[0]);
     ++startLine;
-    buffer.push(' '.repeat(largestLineNumberLength) + colors.grey('| ') + ' '.repeat(actualCol) + colors.red('^'.repeat(fileInfo.length) + ' ' + here));
+    buffer.push(' '.repeat(largestLineNumberLength) + colors.grey('| ') + ' '.repeat(actualCol) + colors.red('^'.repeat(fileInfo.length) + ' ' + HTMessage(here)));
     // add all the lines below
     for (const line of linesDown) {
         if (line !== null) {

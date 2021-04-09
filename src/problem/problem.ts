@@ -4,9 +4,13 @@ import {escapeString} from "../extension";
 
 export type PlHereType = keyof typeof hereMessage;
 const hereMessage = {
-    before: "",
-    here: "",
-    after: "",
+    before: "before here",
+    here: "here",
+    after: "after here",
+}
+
+export function HTMessage(hereType: PlHereType) {
+    return hereMessage[hereType];
 }
 
 export interface PlProblem {
