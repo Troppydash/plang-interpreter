@@ -79,7 +79,7 @@ export function LogProblem(problem: PlProblem, content: string) {
     buffer.push('');
 
     // hints
-    buffer.push(`${colors.yellow("Hint")}: ${PCHint(code)}`);
+    buffer.push(`${colors.yellow("Hint")}: ${PCHint(code).split("\n").join("\n      ")}`);
     // error
     buffer.push(`${colors.cyan(PCFullName(code))}: ${message}`);
 

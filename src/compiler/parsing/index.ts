@@ -1,5 +1,5 @@
-import {NewPlProblem, NewPlProblemAt, PlHereType, PlProblem} from "../../problem/problem";
-import {Lexer} from "../lexing";
+import { NewPlProblem, NewPlProblemAt, PlHereType, PlProblem } from "../../problem/problem";
+import { Lexer } from "../lexing";
 import {
     ASTAssign,
     ASTBinary,
@@ -34,8 +34,8 @@ import {
     ASTVariable,
     ASTWhile
 } from "./ast";
-import PlToken, {PlTokenType} from "../lexing/token";
-import {PlProblemCode} from "../../problem/codes";
+import PlToken, { PlTokenType } from "../lexing/token";
+import { PlProblemCode } from "../../problem/codes";
 
 class ErrTokenException {
 
@@ -136,7 +136,7 @@ export class PlAstParser implements Parser {
         return token;
     }
 
-    expectedPeekToken(token: PlToken, expected: PlTokenType, code: PlProblemCode, ...args: string[]): PlToken | null {
+    expectedPeekToken(token: PlToken | null, expected: PlTokenType, code: PlProblemCode, ...args: string[]): PlToken | null {
         const result = this.tryPeekToken(expected, code, token, ...args);
         if (result == null) {
             return null;
@@ -342,7 +342,44 @@ export class PlAstParser implements Parser {
     }
 
     pImpl(): ASTImpl | null {
-        return null;
+        const tokens = [this.nextToken()];
+        if (this.tryPeekToken(PlTokenType.VARIABLE, "ET0027", null) == null) {
+            return null;
+        }
+        const name = this.pVariable();
+        if (name == null) {
+            return null;
+        }
+
+        if (this.expectedPeekToken(name.getSpanToken(), PlTokenType.LPAREN, "ET0028") == null) {
+            return null;
+        }
+
+        const param = this.pParam();
+        if (param == null) {
+            return null;
+        }
+
+        const lastParen = param[1][param[1].length - 1];
+        const forToken = this.expectedPeekToken(lastParen, PlTokenType.FOR, "ET0029");
+        if (forToken == null) {
+            return null;
+        }
+
+        const type = this.pExpression();
+        if (type == null) {
+            return null;
+        }
+
+        if (this.tryPeekToken(PlTokenType.LBRACE, "ET0030", type.getSpanToken()) == null) {
+            return null;
+        }
+        const block = this.pBlock();
+        if (block == null) {
+            return null;
+        }
+
+        return new ASTImpl([...tokens, ...param[1], forToken], name, param[0], type, block);
     }
 
     pImport(): ASTImport | null {

@@ -20,8 +20,8 @@ const templates = {
     ET0012: "expected commas between dictionary pairs",
     ET0013: "expected variable name in a function definition",
     ET0014: "expected parenthesis around the function parameters",
-    ET0015: "expected function parameter to be variables",
-    ET0016: "expected commas between function parameters",
+    ET0015: "expected function or impl parameter to be variables",
+    ET0016: "expected commas between function or impl parameters",
     ET0017: "expected a left brace '{' after function parameters",
     ET0018: "expected a left brace after loop keyword or amount",
     ET0019: "expected a left brace after while loop conditions",
@@ -32,6 +32,10 @@ const templates = {
     ET0024: "expected the value or key in an each statement to be a variable",
     ET0025: "expected the keyword in after the each value and keys",
     ET0026: "expected a left brace '{' after each..in statement",
+    ET0027: "expected a variable as the impl name",
+    ET0028: "expected parenthesis '(' or ')' around impl parameters",
+    ET0029: "expected the keyword for after the impl parameters",
+    ET0030: "expected a left brace '{' after impl definitions",
 
     CE0001: "reached EOF with an unclosed '}'",
     CE0002: "reached LF with an unclosed ')'",
@@ -49,9 +53,9 @@ const hints: Record<PlProblemCode, string> = {
     LE0002: 'did you forget to close your strings?',
     LE0003: "if you intended to type '\\', write two forward-slashes '\\\\' to escape the first slash",
 
-    ET0001: "statements have to be on different lines, simply press 'enter' after where 'here' is pointing to",
+    ET0001: "statements have to be on different lines, simply press 'enter' after where 'here' is pointing to.\nthis often occurs when there is an syntax error",
     ET0002: "you cannot assign to an rvalue, maybe check your spelling?",
-    ET0003: "you cannot access a key that is a non variable, try using 3the .get() method",
+    ET0003: "you cannot access a key that is a non variable, try using the .get() method",
     ET0004: "the syntax here is wrong, this is likely to occur if you forgot to complete a statement",
     ET0005: "you cannot increase/decrease a rvalue, maybe check your spelling?",
     ET0006: "simply put a comma ',' after where 'here' is pointing to",
@@ -75,6 +79,10 @@ const hints: Record<PlProblemCode, string> = {
     ET0024: "a variable begins with a letter or an underscore",
     ET0025: "maybe check the syntax for an each..in statement: each value, key in array {}",
     ET0026: simplyPutA("left brace '{'"),
+    ET0027: "",
+    ET0028: "",
+    ET0029: "",
+    ET0030: "",
 
     CE0001: "did you forget to close a block?",
     CE0002: "did you forget to close a group?",
@@ -91,7 +99,11 @@ const problemFullName = {
 }
 
 export function PCHint(pc: PlProblemCode): string {
-    return hints[pc];
+    const hint = hints[pc];
+    if (hint.length == 0) {
+        return "there are no hints";
+    }
+    return hint;
 }
 
 export function PCFullName(pc: PlProblemCode): string {
