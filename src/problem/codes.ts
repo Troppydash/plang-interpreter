@@ -37,6 +37,9 @@ const templates = {
     ET0029: "expected the keyword for after the impl parameters",
     ET0030: "expected a left brace '{' after impl definitions",
 
+    ET0031: "expected semicolons between for loop pre-condition-post expressions",
+    ET0032: "expected a left brace '{' after for loop expressions",
+
     CE0001: "reached EOF with an unclosed '}'",
     CE0002: "reached LF with an unclosed ')'",
 
@@ -83,6 +86,8 @@ const hints: Record<PlProblemCode, string> = {
     ET0028: "",
     ET0029: "",
     ET0030: "",
+    ET0031: "",
+    ET0032: "",
 
     CE0001: "did you forget to close a block?",
     CE0002: "did you forget to close a group?",

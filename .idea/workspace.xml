@@ -23,7 +23,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/printer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +56,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/playground/test.plang" />
-    <property name="javascript.nodejs.core.library.configured.version" value="12.20.1" />
+    <property name="javascript.nodejs.core.library.configured.version" value="12.16.3" />
     <property name="javascript.nodejs.core.library.typings.version" value="12.20.7" />
     <property name="last_opened_file_path" value="$USER_HOME$/Folder2020/NodeProjects/jsproxy" />
     <property name="nodejs_interpreter_path" value="D:/SoftwareDevelopmentKits/Node/Node12-16-3/node" />
@@ -76,7 +75,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run-build playground/test.plang">
+  <component name="RunManager" selected="npm.run playground/test.plang">
     <configuration name="build-browser" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -161,14 +160,14 @@
     <recent_temporary>
       <list>
         <item itemvalue="npm.run playground/test.plang" />
+        <item itemvalue="npm.build-browser" />
         <item itemvalue="npm.build" />
         <item itemvalue="npm.watch-build" />
-        <item itemvalue="npm.build-browser" />
         <item itemvalue="npm.build-dist" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="false" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -184,6 +183,8 @@
       <workItem from="1617491472354" duration="19076000" />
       <workItem from="1617525317901" duration="3152000" />
       <workItem from="1617598611195" duration="7459000" />
+      <workItem from="1618008122697" duration="4888000" />
+      <workItem from="1618057562168" duration="1794000" />
     </task>
     <task id="LOCAL-00001" summary="moved some comments">
       <created>1617620767259</created>
@@ -227,7 +228,14 @@
       <option name="project" value="LOCAL" />
       <updated>1617940818219</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Added impl parsing">
+      <created>1617960611621</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1617960611621</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -252,7 +260,20 @@
     <MESSAGE value="Added lists and call parsing." />
     <MESSAGE value="Added dict parsing" />
     <MESSAGE value="Added if and export parsing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added if and export parsing" />
+    <MESSAGE value="Added impl parsing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added impl parsing" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/compiler/parsing/index.ts</url>
+          <line>564</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

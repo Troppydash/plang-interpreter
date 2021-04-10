@@ -136,7 +136,7 @@ export class PlAstParser implements Parser {
         return token;
     }
 
-    expectedPeekToken(token: PlToken | null, expected: PlTokenType, code: PlProblemCode, ...args: string[]): PlToken | null {
+    expectedPeekToken(expected: PlTokenType, code: PlProblemCode, token: PlToken | null, ...args: string[]): PlToken | null {
         const result = this.tryPeekToken(expected, code, token, ...args);
         if (result == null) {
             return null;
@@ -318,7 +318,7 @@ export class PlAstParser implements Parser {
             return null;
         }
         const name = this.pVariable();
-        if (this.expectedPeekToken(nameToken, PlTokenType.LPAREN, "ET0014") == null) {
+        if (this.expectedPeekToken(PlTokenType.LPAREN, "ET0014", nameToken) == null) {
             return null;
         }
         // parse parameters
@@ -351,7 +351,7 @@ export class PlAstParser implements Parser {
             return null;
         }
 
-        if (this.expectedPeekToken(name.getSpanToken(), PlTokenType.LPAREN, "ET0028") == null) {
+        if (this.expectedPeekToken(PlTokenType.LPAREN, "ET0028", name.getSpanToken()) == null) {
             return null;
         }
 
@@ -361,7 +361,7 @@ export class PlAstParser implements Parser {
         }
 
         const lastParen = param[1][param[1].length - 1];
-        const forToken = this.expectedPeekToken(lastParen, PlTokenType.FOR, "ET0029");
+        const forToken = this.expectedPeekToken(PlTokenType.FOR, "ET0029", lastParen);
         if (forToken == null) {
             return null;
         }
@@ -557,7 +557,55 @@ export class PlAstParser implements Parser {
     }
 
     pFor(): ASTFor | null {
-        return null;
+        let tokens = [this.nextToken()];
+        let pre = null;
+        let condition = null;
+        let post = null;
+
+        if (this.peekToken().type == PlTokenType.SEMICOLON) {
+            tokens.push(this.nextToken());
+        } else {
+            pre = this.pExpression();
+            if (pre == null) {
+                return null;
+            }
+            const semi = this.expectedPeekToken(PlTokenType.SEMICOLON, "ET0031", pre.getSpanToken());
+            if (semi == null) {
+                return null;
+            }
+            tokens.push(semi);
+        }
+
+        if (this.peekToken().type == PlTokenType.SEMICOLON) {
+            tokens.push(this.nextToken());
+        } else {
+            condition = this.pExpression();
+            if (condition == null) {
+                return null;
+            }
+            const semi = this.expectedPeekToken(PlTokenType.SEMICOLON, "ET0031", condition.getSpanToken());
+            if (semi == null) {
+                return null;
+            }
+            tokens.push(semi);
+        }
+
+        if (this.peekToken().type != PlTokenType.LBRACE) {
+            post = this.pExpression();
+            if (post == null) {
+                return null;
+            }
+            if (this.tryPeekToken(PlTokenType.LBRACE, "ET0032", post.getSpanToken()) == null) {
+                return null;
+            }
+        }
+
+        let block = this.pBlock();
+        if (block == null) {
+            return null;
+        }
+
+        return new ASTFor(tokens, block, pre, condition, post);
     }
 
     pMatch(): ASTMatch | null {
@@ -762,6 +810,8 @@ export class PlAstParser implements Parser {
                 return this.pList();
             case PlTokenType.DICT:
                 return this.pDict();
+            case PlTokenType.FUNC:
+                return this.pClosure();
         }
 
         this.newProblem(token, "ET0004", token.content);
@@ -769,8 +819,27 @@ export class PlAstParser implements Parser {
     }
 
     pClosure(): ASTClosure | null {
-        return null;
+        const token = this.nextToken();
+        if (this.expectedPeekToken(PlTokenType.LPAREN, "ET0014", token) == null) {
+            return null;
+        }
 
+        const param = this.pParam();
+        if (param == null) {
+            return null;
+        }
+
+        const lastParen = param[1][param[1].length - 1];
+
+        if (this.tryPeekToken(PlTokenType.LBRACE, "ET0017", lastParen) == null) {
+            return null;
+        }
+
+        const block = this.pBlock();
+        if (block == null) {
+            return null;
+        }
+        return new ASTClosure([token, ...param[1]], param[0], block);
     }
 
     pVariable(): ASTVariable | null {
@@ -800,7 +869,7 @@ export class PlAstParser implements Parser {
 
     pList(): ASTList | null {
         let tokens = [this.nextToken()];
-        let peek = this.expectedPeekToken(tokens[0], PlTokenType.LPAREN, "ET0007");
+        let peek = this.expectedPeekToken(PlTokenType.LPAREN, "ET0007", tokens[0]);
         if (peek == null) {
             return null;
         }
@@ -816,7 +885,7 @@ export class PlAstParser implements Parser {
 
     pDict(): ASTDict | null {
         let tokens = [this.nextToken()];
-        let peek = this.expectedPeekToken(tokens[0], PlTokenType.LPAREN, "ET0010");
+        let peek = this.expectedPeekToken(PlTokenType.LPAREN, "ET0010", tokens[0]);
         if (peek == null) {
             return null;
         }
@@ -867,7 +936,7 @@ export class PlAstParser implements Parser {
         if (expression == null) {
             return null;
         }
-        if (this.expectedPeekToken(left, PlTokenType.RPAREN, "CE0002") == null) {
+        if (this.expectedPeekToken(PlTokenType.RPAREN, "CE0002", left) == null) {
             return null;
         }
         return expression;
@@ -884,7 +953,7 @@ export class PlAstParser implements Parser {
         if (key == null) {
             return null;
         }
-        const colon = this.expectedPeekToken(token, PlTokenType.COLON, "ET0011");
+        const colon = this.expectedPeekToken(PlTokenType.COLON, "ET0011", token);
         if (colon == null) {
             return null;
         }
