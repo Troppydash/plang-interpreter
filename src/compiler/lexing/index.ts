@@ -1,15 +1,18 @@
 import { PlFile } from "../../inout/file";
 import PlToken, { NewPlToken, PlTokenType } from "./token";
 import { NewFileInfo, PlFileInfo } from "./info";
-import {isalpha, isalphanum, isblank, iscap, isnum, isvariablerest, isws} from "../../extension/types";
+import { isalpha, isalphanum, isblank, iscap, isnum, isvariablerest, isws } from "../../extension/types";
 import { NewPlProblem, PlProblem } from "../../problem/problem";
 import { PlProblemCode } from "../../problem/codes";
 
 
 export interface Lexer {
     readonly filename: string;
+
     nextToken(): PlToken;
+
     parseAll(): PlToken[];
+
     getProblems(): PlProblem[];
 }
 
@@ -271,7 +274,7 @@ class PlLexer implements Lexer {
                 break;
             }
             case 'a': {
-                for ( const pair of [ [ "as", PlTokenType.AS ], [ "all", PlTokenType.ALL ], [ "and", PlTokenType.AND ] ] ) {
+                for ( const pair of [ [ "as", PlTokenType.AS ], [ "and", PlTokenType.AND ] ] ) {
                     const [ str, type ] = (pair as [ string, PlTokenType ]);
                     const token = this.testNextKeyword( str, type );
                     if ( token ) {
@@ -281,7 +284,7 @@ class PlLexer implements Lexer {
                 break;
             }
             case 't': {
-                for ( const pair of [ [ "take", PlTokenType.TAKE ], [ "true", PlTokenType.BOOLEAN ] ] ) {
+                for ( const pair of [ [ "true", PlTokenType.BOOLEAN ] ] ) {
                     const [ str, type ] = (pair as [ string, PlTokenType ]);
                     const token = this.testNextKeyword( str, type );
                     if ( token ) {
@@ -382,6 +385,16 @@ class PlLexer implements Lexer {
             }
             case 'n': {
                 for ( const pair of [ [ "not", PlTokenType.NOT ], [ "null", PlTokenType.NULL ] ] ) {
+                    const [ str, type ] = (pair as [ string, PlTokenType ]);
+                    const token = this.testNextKeyword( str, type );
+                    if ( token ) {
+                        return token;
+                    }
+                }
+                break;
+            }
+            case 's': {
+                for ( const pair of [ [ "select", PlTokenType.SELECT ] ] ) {
                     const [ str, type ] = (pair as [ string, PlTokenType ]);
                     const token = this.testNextKeyword( str, type );
                     if ( token ) {
@@ -515,7 +528,7 @@ class PlLexer implements Lexer {
                 content += c;
                 this.advancePointer();
                 c = this.currentChar();
-            } while ( !this.isEOF() && isvariablerest(c) );
+            } while ( !this.isEOF() && isvariablerest( c ) );
             return NewPlToken( PlTokenType.VARIABLE, content, this.currentFileInfo( this.currentCol - oldCol ) );
         }
 

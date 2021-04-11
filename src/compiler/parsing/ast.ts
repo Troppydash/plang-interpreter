@@ -87,7 +87,6 @@ export class ASTImpl extends ASTStatement {
     }
 }
 
-
 export class ASTImport extends ASTStatement {
     path: ASTVariable[];
     alias?: ASTVariable;

@@ -45,6 +45,12 @@ const templates = {
     ET0034: "expected the keyword case, default, or a left brace '{' inside a match statement",
     ET0035: "expected a left brace '{' after a keyword default or a case expression",
 
+    ET0036: "expected a correct path in an import statement",
+    ET0037: "expected the keyword select, as, or newline after an import path",
+    ET0038: "expected a variable name for an import alias",
+    ET0039: "expected commas between import select variables",
+    ET0040: "expected variables for import select items",
+    ET0041: "expected at least one select item in an import statement",
 
     CE0001: "reached EOF with an unclosed '}'",
     CE0002: "reached LF with an unclosed ')'",
@@ -99,7 +105,13 @@ const hints: Record<PlProblemCode, string> = {
     ET0032: simplyPutA("left brace '{'"),
     ET0033: simplyPutA("left brace '{'"),
     ET0034: "check your match statement syntax, there is likely an unexpected token where the keywords are",
-    ET0035: simplyPutA("left brace '{'"),
+    ET0035: "",
+    ET0036: "",
+    ET0037: "",
+    ET0038: "",
+    ET0039: "",
+    ET0040: "",
+    ET0041: "",
 
     CE0001: "did you forget to close a block?",
     CE0002: "did you forget to close a group?",

@@ -5,7 +5,7 @@ export enum PlTokenType {
     // keywords
     FUNC,
     IMPL,
-    IMPORT, AS, TAKE, ALL,
+    IMPORT, AS, SELECT,
     EXPORT,
     RETURN, BREAK, CONTINUE,
     IF, ELIF, ELSE,
