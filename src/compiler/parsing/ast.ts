@@ -12,6 +12,14 @@ export function ASTProgramToString(program: ASTProgram): string {
     return statements.map((str, line) => `Line ${line + 1}| ${str}`).join('\n');
 }
 
+export function CreateSpanToken(firstToken: PlToken, lastToken: PlToken, content: string | null = null) {
+    if (content == null) {
+        content = firstToken.content + lastToken.content;
+    }
+    return NewPlToken(PlTokenType.SPAN, content,
+        NewFileInfo(firstToken.info.row, lastToken.info.col, lastToken.info.col - firstToken.info.col + firstToken.info.length, firstToken.info.filename));
+}
+
 export abstract class ASTNode {
     readonly tokens: PlToken[];
 
@@ -31,8 +39,7 @@ export abstract class ASTNode {
         // TODO: this might break if the tokens span multiple lines
         const firstToken = this.firstToken();
         const lastToken = this.lastToken(); // maybe make this the last token on the same line?
-        return NewPlToken(PlTokenType.SPAN, this.tokens.map(t => t.content).join(''),
-            NewFileInfo(firstToken.info.row, lastToken.info.col, lastToken.info.col - firstToken.info.col + firstToken.info.length, firstToken.info.filename));
+        return CreateSpanToken(firstToken, lastToken, this.tokens.map(t => t.content).join(''));
     }
 }
 
@@ -192,12 +199,12 @@ export class ASTFor extends ASTStatement {
 }
 
 export class ASTMatch extends ASTStatement {
-    value: ASTExpression;
+    value?: ASTExpression;
     cases: ASTExpression[];
     blocks: ASTBlock[];
     other?: ASTBlock;
 
-    constructor(tokens: PlToken[], value: ASTExpression, cases: ASTExpression[], blocks: ASTBlock[], other?: ASTBlock) {
+    constructor(tokens: PlToken[], value: ASTExpression | null, cases: ASTExpression[], blocks: ASTBlock[], other?: ASTBlock) {
         super(tokens);
         this.value = value;
         this.cases = cases;

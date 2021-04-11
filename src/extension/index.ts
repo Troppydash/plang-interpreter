@@ -43,5 +43,9 @@ export function chunkString(str, n) {
         ret.push(str.substr(i, n))
     }
 
+    if (ret.length == 0) {
+        ret.push('');
+    }
+
     return ret
 }

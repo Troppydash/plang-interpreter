@@ -32,6 +32,7 @@ const templates = {
     ET0024: "expected the value or key in an each statement to be a variable",
     ET0025: "expected the keyword in after the each value and keys",
     ET0026: "expected a left brace '{' after each..in statement",
+
     ET0027: "expected a variable as the impl name",
     ET0028: "expected parenthesis '(' or ')' around impl parameters",
     ET0029: "expected the keyword for after the impl parameters",
@@ -40,8 +41,16 @@ const templates = {
     ET0031: "expected semicolons between for loop pre-condition-post expressions",
     ET0032: "expected a left brace '{' after for loop expressions",
 
+    ET0033: "expected a left brace '{' after match or match value",
+    ET0034: "expected the keyword case, default, or a left brace '{' inside a match statement",
+    ET0035: "expected a left brace '{' after a keyword default or a case expression",
+
+
     CE0001: "reached EOF with an unclosed '}'",
     CE0002: "reached LF with an unclosed ')'",
+
+    LP0001: "found two or more default options in a match statement",
+    LP0002: "an impl statement must have at least one parameter",
 
     DE0001: "an exception occurred during compiling"
 }
@@ -82,15 +91,21 @@ const hints: Record<PlProblemCode, string> = {
     ET0024: "a variable begins with a letter or an underscore",
     ET0025: "maybe check the syntax for an each..in statement: each value, key in array {}",
     ET0026: simplyPutA("left brace '{'"),
-    ET0027: "",
-    ET0028: "",
-    ET0029: "",
-    ET0030: "",
-    ET0031: "",
-    ET0032: "",
+    ET0027: "a variable begins with a letter or an underscore",
+    ET0028: simplyPutA("parenthesis '(' or ')'"),
+    ET0029: simplyPutA("keyword for"),
+    ET0030: simplyPutA("left brace '{'"),
+    ET0031: "the conditions of a for loop needs to be separated by semicolons ';', simply put one after 'here'",
+    ET0032: simplyPutA("left brace '{'"),
+    ET0033: simplyPutA("left brace '{'"),
+    ET0034: "check your match statement syntax, there is likely an unexpected token where the keywords are",
+    ET0035: simplyPutA("left brace '{'"),
 
     CE0001: "did you forget to close a block?",
     CE0002: "did you forget to close a group?",
+
+    LP0001: "there can be only one default block in a match statement, try removing all other default blocks in the match",
+    LP0002: "the first parameter in an impl statement is by convention 'self'",
 
     DE0001: "the developer made a mistake, either tell him or find a workaround"
 
@@ -100,6 +115,7 @@ const problemFullName = {
     LE: "LexerError",
     ET: "UnexpectedToken",
     CE: "ClosingError",
+    LP: "LogicalProblem",
     DE: "DeveloperError"
 }
 

@@ -32,7 +32,7 @@ import {
     ASTType,
     ASTUnary,
     ASTVariable,
-    ASTWhile
+    ASTWhile, CreateSpanToken
 } from "./ast";
 import PlToken, { PlTokenType } from "../lexing/token";
 import { PlProblemCode } from "../../problem/codes";
@@ -360,6 +360,11 @@ export class PlAstParser implements Parser {
             return null;
         }
 
+        if (param[0].length == 0) {
+            this.newProblem(CreateSpanToken(param[1][0], param[1][param[1].length-1]), "LP0002");
+            return null;
+        }
+
         const lastParen = param[1][param[1].length - 1];
         const forToken = this.expectedPeekToken(PlTokenType.FOR, "ET0029", lastParen);
         if (forToken == null) {
@@ -609,7 +614,86 @@ export class PlAstParser implements Parser {
     }
 
     pMatch(): ASTMatch | null {
-        return null;
+        let tokens = [this.nextToken()];
+        let value = null;
+        let expressions = [];
+        let blocks = [];
+        let other = null;
+
+        if (this.peekToken().type != PlTokenType.LBRACE) {
+            value = this.pExpression();
+            if (value == null) {
+                return null;
+            }
+        }
+
+        const lbrace = this.expectedPeekToken(PlTokenType.LBRACE, "ET0033", value == null ? tokens[0] : value.getSpanToken());
+        if (lbrace == null) {
+            return;
+        }
+        tokens.push(lbrace);
+
+        // case parsing
+        while (true) {
+            this.clearLF();
+
+            let exitWhile = false;
+
+            const nextToken = this.peekToken();
+            switch ( nextToken.type ) {
+                case PlTokenType.CASE: {
+                    tokens.push(this.nextToken());
+
+                    const expression = this.pExpression();
+                    if (expression == null) {
+                        return null;
+                    }
+
+                    if (this.tryPeekToken(PlTokenType.LBRACE, "ET0035", expression.getSpanToken()) == null) {
+                        return null;
+                    }
+                    const block = this.pBlock();
+                    if (block == null) {
+                        return null;
+                    }
+                    expressions.push(expression);
+                    blocks.push(block);
+                    break;
+                }
+                case PlTokenType.DEFAULT: {
+                    if (other != null) {
+                        this.newProblem(nextToken, "LP0001");
+                        return null;
+                    }
+
+                    tokens.push(this.nextToken());
+
+                    if (this.tryPeekToken(PlTokenType.LBRACE, "ET0035", nextToken) == null) {
+                        return null;
+                    }
+                    const block = this.pBlock();
+                    if (block == null) {
+                        return null;
+                    }
+                    other = block;
+                    break;
+                }
+                case PlTokenType.RBRACE: {
+                    tokens.push(this.nextToken());
+                    exitWhile = true;
+                    break;
+                }
+                default: {
+                    this.newProblem(nextToken, "ET0034");
+                    return null;
+                }
+            }
+            if (exitWhile) {
+                break;
+            }
+        }
+
+        return new ASTMatch(tokens, value, expressions, blocks, other);
     }
 
 
