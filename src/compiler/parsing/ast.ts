@@ -199,11 +199,11 @@ export class ASTFor extends ASTStatement {
 
 export class ASTMatch extends ASTStatement {
     value?: ASTExpression;
-    cases: ASTExpression[];
+    cases: ASTExpression[][];
     blocks: ASTBlock[];
     other?: ASTBlock;
 
-    constructor(tokens: PlToken[], value: ASTExpression | null, cases: ASTExpression[], blocks: ASTBlock[], other?: ASTBlock) {
+    constructor(tokens: PlToken[], value: ASTExpression | null, cases: ASTExpression[][], blocks: ASTBlock[], other?: ASTBlock) {
         super(tokens);
         this.value = value;
         this.cases = cases;
@@ -315,7 +315,7 @@ export class ASTList extends ASTExpression {
     }
 }
 
-export type ASTDictKey = ASTVariable | ASTNumber;
+export type ASTDictKey = ASTVariable | ASTNumber | ASTString;
 
 export class ASTDict extends ASTExpression {
     keys: ASTDictKey[];

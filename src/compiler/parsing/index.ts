@@ -492,6 +492,7 @@ export class PlAstParser implements Parser {
         if ( block == null ) {
             return null;
         }
+        blocks.push(block);
 
         while ( true ) {
             const token = this.peekToken();
@@ -694,19 +695,17 @@ export class PlAstParser implements Parser {
                 case PlTokenType.CASE: {
                     tokens.push( this.nextToken() );
 
-                    const expression = this.pExpression();
-                    if ( expression == null ) {
+                    const args = this.pArgs("ET0042", "ET0035", PlTokenType.LBRACE);
+                    if (args == null) {
                         return null;
                     }
 
-                    if ( this.tryPeekToken( PlTokenType.LBRACE, "ET0035", expression.getSpanToken() ) == null ) {
-                        return null;
-                    }
                     const block = this.pBlock();
                     if ( block == null ) {
                         return null;
                     }
-                    expressions.push( expression );
+                    tokens.push(...args[1]);
+                    expressions.push( args[0] );
                     blocks.push( block );
                     break;
                 }
@@ -1079,7 +1078,7 @@ export class PlAstParser implements Parser {
 
     // this is only used for dict() parsing
     pPair(): [ ASTDictKey, PlToken, ASTExpression ] | null {
-        const token = this.tryPeekTokens( [ PlTokenType.VARIABLE, PlTokenType.NUMBER ], "ET0009", null );
+        const token = this.tryPeekTokens( [ PlTokenType.VARIABLE, PlTokenType.NUMBER, PlTokenType.STR ], "ET0009", null );
         if ( token == null ) {
             return null;
         }
@@ -1123,7 +1122,7 @@ export class PlAstParser implements Parser {
             if ( peekToken.type == PlTokenType.COMMA ) {
                 this.nextToken();
             } else if ( peekToken.type != endToken ) {
-                this.newProblem( expression.getSpanToken(), peekToken.type == PlTokenType.EOF ? endTokenCode : commaCode );
+                this.newProblemAt( expression.getSpanToken(), peekToken.type == PlTokenType.EOF ? endTokenCode : commaCode , "after");
                 return null;
             }
             tokens.push( peekToken );
@@ -1163,7 +1162,7 @@ export class PlAstParser implements Parser {
             if ( peekToken.type == PlTokenType.COMMA ) {
                 this.nextToken();
             } else if ( peekToken.type != endToken ) {
-                this.newProblem( variableToken, commaError );
+                this.newProblemAt( variableToken, commaError, "after");
                 return null;
             }
             tokens.push( peekToken );

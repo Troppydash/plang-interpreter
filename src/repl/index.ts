@@ -1,5 +1,6 @@
 import inout, { isNode } from "../inout";
 import {RunLinker, RunParser} from "../linking";
+import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
 
 export function StartREPL( filename: string ): number {
     inout.print("Welcome to the Plang Interactive console");
@@ -28,7 +29,7 @@ export function StartREPL( filename: string ): number {
         const tree = RunParser(message, filename);
         // inout.print(ASTProgramToString(tree));
         if (tree != null) {
-            console.log(tree);
+            inout.print(AttemptPrettyPrint(tree));
         }
     }
 

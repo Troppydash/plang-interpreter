@@ -52,6 +52,8 @@ const templates = {
     ET0040: "expected variables for import select items",
     ET0041: "expected at least one select item in an import statement",
 
+    ET0042: "expected commas between case expressions in a match",
+
     CE0001: "reached EOF with an unclosed '}'",
     CE0002: "reached LF with an unclosed ')'",
 
@@ -112,6 +114,7 @@ const hints: Record<PlProblemCode, string> = {
     ET0039: "",
     ET0040: "",
     ET0041: "",
+    ET0042: "",
 
     CE0001: "did you forget to close a block?",
     CE0002: "did you forget to close a group?",

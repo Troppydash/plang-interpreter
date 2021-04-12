@@ -5,6 +5,7 @@ import { NewPlFile } from "../inout/file";
 import inout from "../inout";
 import {ASTProgram, ASTStatement} from "../compiler/parsing/ast";
 import {PlAstParser} from "../compiler/parsing";
+import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
 
 export function RunLinker( content: string, filename: string): PlToken[] | null {
     const lexer = new PlLexer(NewPlFile(filename, content));
@@ -52,7 +53,9 @@ export function RunFile(filePath: string): number {
         return 1;
     }
 
-    console.log(result);
+    inout.print(AttemptPrettyPrint(result));
+
+    // console.log(result);
     inout.flush();
     return 0;
 }
