@@ -1216,7 +1216,8 @@ export class PlAstParser implements Parser {
                 }
                 case PlTokenType.AS:
                 case PlTokenType.SELECT:
-                case PlTokenType.LF: {
+                case PlTokenType.LF:
+                case PlTokenType.EOF: {
                     breakSwitch = true;
                     break;
                 }

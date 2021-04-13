@@ -6,7 +6,7 @@ import {
     ASTDict,
     ASTDot, ASTEach, ASTExport, ASTFor, ASTFunction, ASTIf, ASTImpl, ASTImport,
     ASTList, ASTLoop, ASTMatch,
-    ASTNode,
+    ASTNode, ASTNumber,
     ASTProgram, ASTReturn, ASTString,
     ASTUnary, ASTWhile
 } from "./ast";
@@ -20,6 +20,7 @@ let c = {
     kw: colors.magenta,
     sr: colors.green,
     mt: colors.yellow,
+    nu: colors.cyan,
 };
 
 export function AttemptPrettyPrint(program: ASTProgram): string {
@@ -131,7 +132,10 @@ function ats(node: ASTNode | null): string {
         return c.sr(`"${node.content}"`);
     } else if (node instanceof ASTClosure) {
         return `${c.kw('func')}(${atss(node.args)}) ${ats(node.block)}`;
-    } else {
+    } else if (node instanceof ASTNumber) {
+        return c.nu(''+node.value);
+    }
+    else {
         return node.getSpanToken().content;
     }
 }
