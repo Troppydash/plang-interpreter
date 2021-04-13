@@ -334,7 +334,7 @@ class PlLexer implements Lexer {
                 break;
             }
             case 'l': {
-                for ( const pair of [ [ "loop", PlTokenType.LOOP ], [ "list", PlTokenType.LIST ] ] ) {
+                for ( const pair of [ [ "loop", PlTokenType.LOOP ]] ) {
                     const [ str, type ] = (pair as [ string, PlTokenType ]);
                     const token = this.testNextKeyword( str, type );
                     if ( token ) {
@@ -364,7 +364,7 @@ class PlLexer implements Lexer {
                 break;
             }
             case 'd': {
-                for ( const pair of [ [ "default", PlTokenType.DEFAULT ], [ "dict", PlTokenType.DICT ] ] ) {
+                for ( const pair of [ [ "default", PlTokenType.DEFAULT ]] ) {
                     const [ str, type ] = (pair as [ string, PlTokenType ]);
                     const token = this.testNextKeyword( str, type );
                     if ( token ) {

@@ -52,8 +52,8 @@ export enum PlTokenType {
     BOOLEAN,
     VARIABLE,
     NULL,
-    LIST,
-    DICT,
+    // LIST,
+    // DICT,
     STR,
 
     // others

@@ -1,6 +1,6 @@
 export type PlProblemCode = keyof typeof templates;
 
-
+// TODO: Better CE errors, for repl and stuff
 const templates = {
     LE0001: "found an unknown character '%0'",
     LE0002: "reached EOF or LF with an unclosed double quote",
@@ -56,6 +56,7 @@ const templates = {
 
     CE0001: "reached EOF with an unclosed '}'",
     CE0002: "reached LF with an unclosed ')'",
+    CE0003: "reached EOF with an unclosed ')'",
 
     LP0001: "found two or more default options in a match statement",
     LP0002: "an impl statement must have at least one parameter",
@@ -118,6 +119,7 @@ const hints: Record<PlProblemCode, string> = {
 
     CE0001: "did you forget to close a block?",
     CE0002: "did you forget to close a group?",
+    CE0003: "did you forget to close a dict or list?",
 
     LP0001: "there can be only one default block in a match statement, try removing all other default blocks in the match",
     LP0002: "the first parameter in an impl statement is by convention 'self'",

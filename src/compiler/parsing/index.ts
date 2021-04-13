@@ -128,13 +128,17 @@ export class PlAstParser implements Parser {
         return token;
     }
 
-    peekToken(): PlToken | null {
+     peekToken(): PlToken | null {
         const token = this.getToken();
         this.cacheToken.push( token );
         if ( token.type == PlTokenType.ERR ) {
             throw new ErrTokenException();
         }
         return token;
+    }
+
+    pushToken(token: PlToken) {
+        this.cacheToken.push(token);
     }
 
     expectedPeekToken( expected: PlTokenType, code: PlProblemCode, token: PlToken | null, ...args: string[] ): PlToken | null {
@@ -927,8 +931,29 @@ export class PlAstParser implements Parser {
         switch ( token.type ) {
             case PlTokenType.LPAREN:
                 return this.pGroup();
-            case PlTokenType.VARIABLE:
-                return this.pVariable();
+            case PlTokenType.VARIABLE: {
+                this.nextToken();
+                let type = "";
+                if (token.content == "list") {
+                    if (this.peekToken().type == PlTokenType.LPAREN) {
+                        type = "l";
+                    }
+                } else if (token.content == "dict") {
+                    if (this.peekToken().type == PlTokenType.LPAREN) {
+                        type = "d";
+                    }
+                }
+                this.pushToken(token);
+
+                switch (type) {
+                    case 'l':
+                        return this.pList();
+                    case 'd':
+                        return this.pDict();
+                    default:
+                        return this.pVariable();
+                }
+            }
             case PlTokenType.NUMBER:
                 return this.pNumber();
             case PlTokenType.STR:
@@ -939,10 +964,6 @@ export class PlAstParser implements Parser {
                 return this.pNull();
             case PlTokenType.TYPE:
                 return this.pTypes();
-            case PlTokenType.LIST:
-                return this.pList();
-            case PlTokenType.DICT:
-                return this.pDict();
             case PlTokenType.FUNC:
                 return this.pClosure();
         }
@@ -1008,7 +1029,7 @@ export class PlAstParser implements Parser {
         }
         tokens.push( peek );
 
-        const result = this.pArgs();
+        const result = this.pArgs("ET0006", "CE0003");
         if ( result == null ) {
             return null;
         }
@@ -1033,6 +1054,10 @@ export class PlAstParser implements Parser {
             if ( token.type == PlTokenType.RPAREN ) {
                 break;
             }
+            if (token.type == PlTokenType.EOF) {
+                this.newProblem( peek, "CE0003");
+                return null;
+            }
             // need to bind this for some damn reason or this is not defined
             const result = this.pPair();
             if ( result == null ) {
@@ -1045,7 +1070,7 @@ export class PlAstParser implements Parser {
             if ( peekToken.type == PlTokenType.COMMA ) {
                 this.nextToken();
             } else if ( peekToken.type != PlTokenType.RPAREN ) {
-                this.newProblem( result[2].getSpanToken(), peekToken.type == PlTokenType.EOF ? "ET0010" : "ET0012" );
+                this.newProblem( result[2].getSpanToken(), peekToken.type == PlTokenType.EOF ? "CE0003" : "ET0012" );
                 return null;
             }
             keys.push( result[0] );
@@ -1098,6 +1123,7 @@ export class PlAstParser implements Parser {
     }
 
     // this is only used for call args and list item
+    // TODO: added lparen token for error
     pArgs(
         commaCode: PlProblemCode = "ET0006",
         endTokenCode: PlProblemCode = "ET0007",
@@ -1111,6 +1137,11 @@ export class PlAstParser implements Parser {
             if ( token.type == endToken ) {
                 break;
             }
+            if (token.type == PlTokenType.EOF) {
+                this.newProblem(token, endTokenCode);
+                return null;
+            }
+
             const expression = this.pExpression();
             if ( expression == null ) {
                 return null;
