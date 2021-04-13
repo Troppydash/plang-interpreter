@@ -20,14 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/compiler/parsing/visualizer.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/constants.txt" beforeDir="false" afterPath="$PROJECT_DIR$/constants.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/visualizer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/visualizer.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,10 +55,10 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/playground/test.plang" />
-    <property name="javascript.nodejs.core.library.configured.version" value="12.16.3" />
+    <property name="javascript.nodejs.core.library.configured.version" value="12.20.1" />
     <property name="javascript.nodejs.core.library.typings.version" value="12.20.7" />
     <property name="last_opened_file_path" value="$USER_HOME$/Folder2020/NodeProjects/jsproxy" />
-    <property name="nodejs_interpreter_path" value="D:/SoftwareDevelopmentKits/Node/Node12-16-3/node" />
+    <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -80,7 +74,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.build-cli">
+  <component name="RunManager" selected="npm.run playground/test.plang">
     <configuration name="build-browser" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -164,15 +158,15 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.build-browser" />
         <item itemvalue="npm.run playground/test.plang" />
+        <item itemvalue="npm.build-browser" />
         <item itemvalue="npm.build" />
         <item itemvalue="npm.watch-build" />
         <item itemvalue="npm.build-dist" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -192,6 +186,7 @@
       <workItem from="1618057562168" duration="1794000" />
       <workItem from="1618092618631" duration="12813000" />
       <workItem from="1618215515043" duration="7008000" />
+      <workItem from="1618293656768" duration="368000" />
     </task>
     <task id="LOCAL-00001" summary="moved some comments">
       <created>1617620767259</created>
@@ -260,7 +255,7 @@
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
+    <option name="version" value="2" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -286,6 +281,24 @@
     <MESSAGE value="Added import parsing" />
     <option name="LAST_COMMIT_MESSAGE" value="Added import parsing" />
   </component>
+  <component name="WindowStateProjectService">
+    <state width="1577" height="459" key="GridCell.Tab.0.bottom" timestamp="1618294024564">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="459" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1618294024564" />
+    <state width="1577" height="459" key="GridCell.Tab.0.center" timestamp="1618294024563">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="459" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1618294024563" />
+    <state width="1577" height="459" key="GridCell.Tab.0.left" timestamp="1618294024562">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="459" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1618294024562" />
+    <state width="1577" height="459" key="GridCell.Tab.0.right" timestamp="1618294024564">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="459" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1618294024564" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -297,7 +310,6 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/linking/index.ts</url>
           <line>57</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
