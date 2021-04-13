@@ -20,6 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/compiler/parsing/ops.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/visualizer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/visualizer.ts" afterDir="false" />
     </list>
@@ -55,7 +56,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/playground/test.plang" />
-    <property name="javascript.nodejs.core.library.configured.version" value="12.20.1" />
+    <property name="javascript.nodejs.core.library.configured.version" value="12.16.3" />
     <property name="javascript.nodejs.core.library.typings.version" value="12.20.7" />
     <property name="last_opened_file_path" value="$USER_HOME$/Folder2020/NodeProjects/jsproxy" />
     <property name="nodejs_interpreter_path" value="node" />
@@ -166,7 +167,7 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="false" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -280,24 +281,6 @@
     <MESSAGE value="Added match parsing" />
     <MESSAGE value="Added import parsing" />
     <option name="LAST_COMMIT_MESSAGE" value="Added import parsing" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state width="1577" height="459" key="GridCell.Tab.0.bottom" timestamp="1618294024564">
-      <screen x="0" y="0" width="1600" height="858" />
-    </state>
-    <state width="1577" height="459" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1618294024564" />
-    <state width="1577" height="459" key="GridCell.Tab.0.center" timestamp="1618294024563">
-      <screen x="0" y="0" width="1600" height="858" />
-    </state>
-    <state width="1577" height="459" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1618294024563" />
-    <state width="1577" height="459" key="GridCell.Tab.0.left" timestamp="1618294024562">
-      <screen x="0" y="0" width="1600" height="858" />
-    </state>
-    <state width="1577" height="459" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1618294024562" />
-    <state width="1577" height="459" key="GridCell.Tab.0.right" timestamp="1618294024564">
-      <screen x="0" y="0" width="1600" height="858" />
-    </state>
-    <state width="1577" height="459" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1618294024564" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

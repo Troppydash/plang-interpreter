@@ -12,6 +12,7 @@ import {
 } from "./ast";
 import {PlTokenType} from "../lexing/token";
 import {colors} from "../../inout/color";
+import { IsPreLower } from "./ops";
 
 const PPINDENT = 4;
 
@@ -39,6 +40,12 @@ function ats(node: ASTNode | null): string {
     } else if (node instanceof ASTBinary) {
         const left = ats(node.left);
         const right = ats(node.right);
+        if (node.right instanceof ASTBinary) {
+            if (IsPreLower(node.operator.type, node.right.operator.type)) {
+                return `${left} ${node.operator.content} (${right})`;
+            }
+        }
+
         return `${left} ${node.operator.content} ${right}`;
     } else if (node instanceof ASTUnary) {
         const value = ats(node.value);
