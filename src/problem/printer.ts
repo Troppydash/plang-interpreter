@@ -48,7 +48,7 @@ export function LogProblem(problem: PlProblem, content: string) {
 
     // add header
     // buffer.push(`[${code}] In "${fileInfo.filename}" at ${fileInfo.row + 1}:${actualCol + 1}`);
-    buffer.push( `[${code}] In "${fileInfo.filename}" on line ${fileInfo.row + 1}` );
+    buffer.push(`[${code}] In "${fileInfo.filename}" on line ${fileInfo.row + 1}`);
 
     // lines and stuff
     const contentLines = content.split('\n');

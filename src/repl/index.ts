@@ -11,6 +11,7 @@ export function StartREPL( filename: string ): number {
     if ( isNode ) {
         const os = require( 'os' );
         inout.print( `Running on ${os.platform()}-${os.arch()}. Hello ${os.hostname()}!` );
+        inout.print( `Press Ctrl+C to quit` );
     }
 
     outer:
@@ -22,20 +23,20 @@ export function StartREPL( filename: string ): number {
             completer:
             while ( true ) {
                 let out = first ? `${filename}> ` : `${' '.repeat( filename.length )}: `;
-                if (first)
-                    first = false;
 
                 const message = inout.input( out );
                 if ( message === null ) {
-                    inout.print( "Input terminated, goodbye" );
-                    break outer;
-                }
-                content += message;
-
-                if (message == '') {
+                    if (first) {
+                        inout.print( "Input terminated, goodbye" );
+                        break outer;
+                    }
                     break;
                 }
 
+                content += message;
+                if (first) {
+                    first = false;
+                }
                 const outcome = TryRunParser(content, filename);
                 content += '\n';
 
@@ -49,41 +50,6 @@ export function StartREPL( filename: string ): number {
 
                 break;
             }
-
-            // const nested: Record<string, number> = {
-            //     '{': 0,
-            //     ')': 0,
-            // };
-            //
-            // while ( true ) {
-            //     let out = objCount(nested) == 0 ? `${filename}> ` : `${' '.repeat( filename.length )}: `;
-            //     const message = inout.input( out );
-            //     if ( message === null ) {
-            //         inout.print( "Input terminated, goodbye" );
-            //         break outer;
-            //     }
-            //     if (message == '') {
-            //         break;
-            //     }
-            //     content += `${message}\n`;
-            //
-            //     const striped = content.trimEnd();
-            //     const last = striped[striped.length-1];
-            //     if ( last == '{' || last == '(' ) {
-            //         nested[last] += 1;
-            //         continue;
-            //     }
-            //
-            //     if ( last == '}' || last == ')' ) {
-            //         const map = last == '}' ? '{' : '(';
-            //         if (nested[map] > 0)
-            //             nested[map] -= 1;
-            //     }
-            //
-            //     if ( objCount(nested) <= 0 ) {
-            //         break;
-            //     }
-            // }
 
             let tree = RunParser( content, filename );
             if ( tree != null ) {

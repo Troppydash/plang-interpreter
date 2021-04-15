@@ -20,14 +20,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/token.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/token.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/visualizer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/visualizer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/inout/nodeInout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/nodeInout.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/printer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +61,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/playground/test.plang" />
-    <property name="javascript.nodejs.core.library.configured.version" value="12.16.3" />
+    <property name="javascript.nodejs.core.library.configured.version" value="12.20.1" />
     <property name="javascript.nodejs.core.library.typings.version" value="12.20.7" />
     <property name="last_opened_file_path" value="$USER_HOME$/Folder2020/NodeProjects/jsproxy" />
     <property name="nodejs_interpreter_path" value="node" />
@@ -69,7 +69,7 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.JavaScript" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -80,7 +80,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run playground/test.plang as">
+  <component name="RunManager" selected="npm.run playground/test.plang">
     <configuration name="build-browser" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -121,13 +121,13 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="run playground/test.plang as" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="run playground/test.plang" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="run" />
       </scripts>
-      <arguments value="playground/test.plang as" />
+      <arguments value="playground/test.plang" />
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
@@ -158,13 +158,13 @@
       <item itemvalue="npm.run-build playground/test.plang as" />
       <item itemvalue="npm.build-browser" />
       <item itemvalue="npm.build-dist" />
-      <item itemvalue="npm.run playground/test.plang as" />
+      <item itemvalue="npm.run playground/test.plang" />
       <item itemvalue="npm.build" />
       <item itemvalue="npm.watch-build" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.run playground/test.plang as" />
+        <item itemvalue="npm.run playground/test.plang" />
         <item itemvalue="npm.build-browser" />
         <item itemvalue="npm.build" />
         <item itemvalue="npm.watch-build" />
@@ -172,7 +172,7 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="false" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -193,6 +193,7 @@
       <workItem from="1618092618631" duration="12813000" />
       <workItem from="1618215515043" duration="7008000" />
       <workItem from="1618293656768" duration="368000" />
+      <workItem from="1618428352928" duration="4058000" />
     </task>
     <task id="LOCAL-00001" summary="moved some comments">
       <created>1617620767259</created>
@@ -303,6 +304,32 @@
     <MESSAGE value="Added Error codes and some bug fixes" />
     <option name="LAST_COMMIT_MESSAGE" value="Added Error codes and some bug fixes" />
   </component>
+  <component name="WindowStateProjectService">
+    <state x="250" y="38" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1618367953916">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state x="250" y="38" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1618367953916" />
+    <state width="1577" height="288" key="GridCell.Tab.0.bottom" timestamp="1618372161283">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="288" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1618372161283" />
+    <state width="1577" height="288" key="GridCell.Tab.0.center" timestamp="1618372161281">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="288" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1618372161281" />
+    <state width="1577" height="288" key="GridCell.Tab.0.left" timestamp="1618372161279">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="288" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1618372161279" />
+    <state width="1577" height="288" key="GridCell.Tab.0.right" timestamp="1618372161282">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="288" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1618372161282" />
+    <state x="285" y="-9" key="SettingsEditor" timestamp="1618372188313">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state x="285" y="-9" key="SettingsEditor/0.0.1600.858@0.0.1600.858" timestamp="1618372188313" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -313,14 +340,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/compiler/parsing/index.ts</url>
-          <line>1138</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/compiler/parsing/index.ts</url>
           <line>970</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="12" />
         </line-breakpoint>
       </breakpoints>

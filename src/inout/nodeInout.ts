@@ -2,7 +2,10 @@ import { PathType } from "./path";
 import * as fs from 'fs';
 import * as path from 'path';
 import { PlBuffer } from "./buffer";
-const prompt = require( 'prompt-sync' )();
+
+const prompt = require('prompt-sync')({
+    history: require('prompt-sync-history')()
+});
 
 // stream buffering
 const buffer = new PlBuffer();
