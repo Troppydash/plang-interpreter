@@ -87,3 +87,7 @@ export function LogProblem(problem: PlProblem, content: string) {
     // print
     inout.print(buffer.join('\n'));
 }
+
+export function LogProblemShort(problem: PlProblem) {
+    return `${colors.cyan(PCFullName(problem.code))}: ${problem.message}`;
+}

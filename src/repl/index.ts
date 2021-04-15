@@ -1,10 +1,8 @@
 import inout, { isNode } from "../inout";
 import { RunParser, TryRunParser } from "../linking";
 import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
-
-function objCount(obj: Record<string, number>) {
-    return Object.values(obj).reduce((prev, curr) => prev + curr);
-}
+import { LogProblemShort } from "../problem/printer";
+import { colors } from "../inout/color";
 
 export function StartREPL( filename: string ): number {
     inout.print( "Welcome to the Plang Interactive console" );
@@ -17,28 +15,31 @@ export function StartREPL( filename: string ): number {
     outer:
         while ( true ) {
             let content = "";
-
-            let first = true;
+            let firstPrompt = true;
 
             completer:
             while ( true ) {
-                let out = first ? `${filename}> ` : `${' '.repeat( filename.length )}: `;
+                let out = firstPrompt ? `${filename}> ` : `${' '.repeat( filename.length )}: `;
 
                 const message = inout.input( out );
                 if ( message === null ) {
-                    if (first) {
+                    if (firstPrompt) {
                         inout.print( "Input terminated, goodbye" );
                         break outer;
                     }
                     break;
                 }
 
+                let oldContent = content;
                 content += message;
-                if (first) {
-                    first = false;
-                }
+
                 const outcome = TryRunParser(content, filename);
                 content += '\n';
+
+                let oldFirstPrompt = firstPrompt;
+                if (firstPrompt) {
+                    firstPrompt = false;
+                }
 
                 if (outcome != null) {
                     for (const problem of outcome) {
@@ -46,8 +47,15 @@ export function StartREPL( filename: string ): number {
                             continue completer;
                         }
                     }
+                    if (!oldFirstPrompt) {
+                        inout.print(`${LogProblemShort(outcome[0])}`);
+                        const result = inout.input(colors.magenta('Continue? ') + '[y/n]: ');
+                        if (result != 'y') {
+                            content = oldContent;
+                            continue completer;
+                        }
+                    }
                 }
-
                 break;
             }
 

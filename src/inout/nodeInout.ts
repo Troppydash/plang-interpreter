@@ -2,30 +2,48 @@ import { PathType } from "./path";
 import * as fs from 'fs';
 import * as path from 'path';
 import { PlBuffer } from "./buffer";
+import * as ps from 'prompt-sync';
 
-const prompt = require('prompt-sync')({
-    history: require('prompt-sync-history')()
-});
+
+function complete( commands ) {
+    return function ( str ) {
+        let ret = [];
+        for ( let i = 0; i < commands.length; i++ ) {
+            if (commands[i] == str) {
+                return [];
+            }
+            if ( commands[i].indexOf( str ) == 0 )
+                ret.push( commands[i] );
+        }
+        return ret;
+    };
+}
+
+// list of common keywords
+const ac = "func impl import for as select export return break continue if elif else each loop while match case default and or not in print input list dict true false null Int Str Null List Dict Func Type";
+const prompt = ps( {
+    autocomplete: complete( ac.split( ' ' ) )
+} );
 
 // stream buffering
 const buffer = new PlBuffer();
 
 export function print( message ) {
-    const exceed = buffer.push(message);
-    if (exceed) {
-        console.log(buffer.empty().join('\n'));
+    const exceed = buffer.push( message );
+    if ( exceed ) {
+        console.log( buffer.empty().join( '\n' ) );
     }
 }
 
 export function flush() {
-    if (!buffer.isEmpty()) {
-        console.log(buffer.empty().join('\n'));
+    if ( !buffer.isEmpty() ) {
+        console.log( buffer.empty().join( '\n' ) );
     }
 }
 
 export function input( message ) {
     flush();
-    return prompt(message);
+    return prompt( message );
 }
 
 export let paths = {
@@ -34,14 +52,14 @@ export let paths = {
     rootPath: process.execPath
 }
 
-export function setRootPath(rootFile: string) {
-    paths.rootPath = path.join(paths.cliPath, path.dirname(rootFile));
+export function setRootPath( rootFile: string ) {
+    paths.rootPath = path.join( paths.cliPath, path.dirname( rootFile ) );
 }
 
-export function readFile(filePath: string, type: PathType) {
+export function readFile( filePath: string, type: PathType ) {
     try {
-        const absPath = path.join(paths[type], filePath);
-        return fs.readFileSync(absPath, {encoding: 'utf8', flag: 'r'});
+        const absPath = path.join( paths[type], filePath );
+        return fs.readFileSync( absPath, { encoding: 'utf8', flag: 'r' } );
     } catch {
         return null;
     }

@@ -20,14 +20,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/extension/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/extension/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/inout/nodeInout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/nodeInout.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/problem/printer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +81,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run playground/test.plang">
+  <component name="RunManager" selected="npm.build-browser">
     <configuration name="build-browser" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -164,15 +165,15 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.run playground/test.plang" />
         <item itemvalue="npm.build-browser" />
+        <item itemvalue="npm.run playground/test.plang" />
         <item itemvalue="npm.build" />
         <item itemvalue="npm.watch-build" />
         <item itemvalue="npm.build-dist" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="false" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -304,32 +305,6 @@
     <MESSAGE value="Added Error codes and some bug fixes" />
     <option name="LAST_COMMIT_MESSAGE" value="Added Error codes and some bug fixes" />
   </component>
-  <component name="WindowStateProjectService">
-    <state x="250" y="38" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1618367953916">
-      <screen x="0" y="0" width="1600" height="858" />
-    </state>
-    <state x="250" y="38" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1618367953916" />
-    <state width="1577" height="288" key="GridCell.Tab.0.bottom" timestamp="1618372161283">
-      <screen x="0" y="0" width="1600" height="858" />
-    </state>
-    <state width="1577" height="288" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1618372161283" />
-    <state width="1577" height="288" key="GridCell.Tab.0.center" timestamp="1618372161281">
-      <screen x="0" y="0" width="1600" height="858" />
-    </state>
-    <state width="1577" height="288" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1618372161281" />
-    <state width="1577" height="288" key="GridCell.Tab.0.left" timestamp="1618372161279">
-      <screen x="0" y="0" width="1600" height="858" />
-    </state>
-    <state width="1577" height="288" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1618372161279" />
-    <state width="1577" height="288" key="GridCell.Tab.0.right" timestamp="1618372161282">
-      <screen x="0" y="0" width="1600" height="858" />
-    </state>
-    <state width="1577" height="288" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1618372161282" />
-    <state x="285" y="-9" key="SettingsEditor" timestamp="1618372188313">
-      <screen x="0" y="0" width="1600" height="858" />
-    </state>
-    <state x="285" y="-9" key="SettingsEditor/0.0.1600.858@0.0.1600.858" timestamp="1618372188313" />
-  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -337,11 +312,6 @@
           <url>file://$PROJECT_DIR$/src/linking/index.ts</url>
           <line>71</line>
           <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/compiler/parsing/index.ts</url>
-          <line>970</line>
-          <option name="timeStamp" value="12" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
