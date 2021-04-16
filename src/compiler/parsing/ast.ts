@@ -4,6 +4,8 @@ import {NewFileInfo} from "../lexing/info";
 // Classes so we can use the visitor pattern
 export type ASTProgram = ASTStatement[];
 
+// TODO: make each class have an enum type so we can use a switch and not instanceof
+
 export function ASTProgramToString(program: ASTProgram): string {
     let statements = [];
     for (const statement of program) {
@@ -40,6 +42,10 @@ export abstract class ASTNode {
         const firstToken = this.firstToken();
         const lastToken = this.lastToken(); // maybe make this the last token on the same line?
         return CreateSpanToken(firstToken, lastToken, this.tokens.map(t => t.content).join(''));
+    }
+
+    is(type): boolean {
+        return this instanceof type;
     }
 }
 

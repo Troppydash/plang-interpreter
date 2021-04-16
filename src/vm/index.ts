@@ -19,7 +19,7 @@ and also native JS binding need to be passed here.
 
 Although there will be no exception handling, a traceback will be thrown.
 Objects will not be reference counted, and the js garbage collector will be fully in play here.
-A stack and a heap will be made. All objects will pass by value - even arrays and dictionaries and functions.
+A stack and a heap will be made. All objects will pass by value - except for arrays and dictionaries and functions.
 Scoping rules are the same with JS.
 
 
@@ -37,6 +37,7 @@ javascript.on(List).forEach(func(value, index) {
 })
 
 javascript calling plang functions will be implemented later.
+a converter class or module is required to convert between pl and js types
 
 maybe abstract this for the browser or something.
 
@@ -50,10 +51,6 @@ plang.exe
 will contain the standard libraries.
 
 lib/buitlin/ will be imported at startup, and error of this will stop the program as DeveloperError.
-
-
-
-
-
-
  */
+
+

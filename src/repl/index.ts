@@ -1,5 +1,5 @@
 import inout, { isNode } from "../inout";
-import { RunParser, TryRunParser } from "../linking";
+import { RunParser, RunVM, TryRunParser } from "../linking";
 import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
 import { LogProblemShort } from "../problem/printer";
 import { colors } from "../inout/color";
@@ -62,10 +62,11 @@ export function StartREPL( filename: string ): number {
                 break;
             }
 
-            let tree = RunParser( content, filename );
-            if ( tree != null ) {
-                inout.print( AttemptPrettyPrint( tree ) );
-            }
+            RunVM(content, filename);
+            // let tree = RunParser( content, filename );
+            // if ( tree != null ) {
+            //     inout.print( AttemptPrettyPrint( tree ) );
+            // }
         }
 
     inout.flush();

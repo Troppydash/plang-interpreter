@@ -7,6 +7,8 @@ import { ASTProgram, ASTStatement } from "../compiler/parsing/ast";
 import { PlAstParser } from "../compiler/parsing";
 import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
 import { PlProblem } from "../problem/problem";
+import { EmitProgram, EmitStatement } from "../vm/emitter";
+import { ProgramToPlb } from "../vm/bytecode";
 
 export function RunLinker( content: string, filename: string ): PlToken[] | null {
     const lexer = new PlLexer( NewPlFile( filename, content ) );
@@ -48,6 +50,16 @@ export function RunParser( content: string, filename: string ): ASTProgram | nul
     }
 
     return result;
+}
+
+export function RunVM(content: string, filename: string): null {
+    const ast = RunParser(content, filename);
+    if (ast == null) {
+        return null;
+    }
+
+    const program = EmitProgram(ast);
+    inout.print(ProgramToPlb(program));
 }
 
 export function RunFile( filePath: string ): number {
