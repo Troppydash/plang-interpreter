@@ -16,10 +16,12 @@ export function StartREPL( filename: string ): number {
         while ( true ) {
             let content = "";
             let firstPrompt = true;
+            let linenum = 1;
 
             completer:
             while ( true ) {
-                let out = firstPrompt ? `${filename}> ` : `${' '.repeat( filename.length )}: `;
+                let out = firstPrompt ? `${filename}> ` : `${(''+linenum).padStart( filename.length, ' ')}| `;
+                linenum += 1;
 
                 const message = inout.input( out );
                 if ( message === null ) {
@@ -49,8 +51,9 @@ export function StartREPL( filename: string ): number {
                     }
                     if (!oldFirstPrompt) {
                         inout.print(`${LogProblemShort(outcome[0])}`);
-                        const result = inout.input(colors.magenta('Continue? ') + '[y/n]: ');
-                        if (result != 'y') {
+                        const result = inout.input(colors.magenta(`Undo line ${linenum-1}? `) + '[y/n]: ');
+                        if (result != 'n') {
+                            linenum -= 1;
                             content = oldContent;
                             continue completer;
                         }

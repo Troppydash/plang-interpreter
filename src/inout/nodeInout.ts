@@ -3,10 +3,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { PlBuffer } from "./buffer";
 import * as ps from 'prompt-sync';
-
+import * as psh from 'prompt-sync-history';
 
 function complete( commands ) {
     return function ( str ) {
+        if (str.length == 0) {
+            return [];
+        }
         let ret = [];
         for ( let i = 0; i < commands.length; i++ ) {
             if (commands[i] == str) {
@@ -22,6 +25,7 @@ function complete( commands ) {
 // list of common keywords
 const ac = "func impl import for as select export return break continue if elif else each loop while match case default and or not in print input list dict true false null Int Str Null List Dict Func Type";
 const prompt = ps( {
+    history: psh(),
     autocomplete: complete( ac.split( ' ' ) )
 } );
 

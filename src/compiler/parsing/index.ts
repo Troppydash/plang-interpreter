@@ -90,9 +90,9 @@ export class PlAstParser implements Parser {
     parseAll(): ASTProgram {
         let statements = [];
         while ( true ) {
-            this.clearLF();
             // check for end of file
             try {
+                this.clearLF();
                 const peekToken = this.peekToken();
                 if ( peekToken.type == PlTokenType.EOF ) {
                     break;
@@ -1135,7 +1135,6 @@ export class PlAstParser implements Parser {
     }
 
     // this is only used for call args and list item
-    // TODO: added lparen token for error
     pArgs(
         startToken: PlToken,
         commaCode: PlProblemCode,

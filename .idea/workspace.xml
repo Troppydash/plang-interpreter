@@ -23,11 +23,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/extension/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/extension/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/inout/nodeInout.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/nodeInout.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/printer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -81,7 +78,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.build-browser">
+  <component name="RunManager" selected="npm.run-build playground/test.plang as">
     <configuration name="build-browser" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -122,13 +119,13 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="run playground/test.plang" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="run playground/test.plang as" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="run" />
       </scripts>
-      <arguments value="playground/test.plang" />
+      <arguments value="playground/test.plang as" />
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
@@ -159,21 +156,21 @@
       <item itemvalue="npm.run-build playground/test.plang as" />
       <item itemvalue="npm.build-browser" />
       <item itemvalue="npm.build-dist" />
-      <item itemvalue="npm.run playground/test.plang" />
+      <item itemvalue="npm.run playground/test.plang as" />
       <item itemvalue="npm.build" />
       <item itemvalue="npm.watch-build" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.run playground/test.plang as" />
         <item itemvalue="npm.build-browser" />
-        <item itemvalue="npm.run playground/test.plang" />
         <item itemvalue="npm.build" />
         <item itemvalue="npm.watch-build" />
         <item itemvalue="npm.build-dist" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="false" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -304,6 +301,32 @@
     <MESSAGE value="Fixed printing operator precedence" />
     <MESSAGE value="Added Error codes and some bug fixes" />
     <option name="LAST_COMMIT_MESSAGE" value="Added Error codes and some bug fixes" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="242" y="-10" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1618541998156">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state x="242" y="-10" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1618541998156" />
+    <state width="1577" height="681" key="GridCell.Tab.0.bottom" timestamp="1618541960385">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="681" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1618541960385" />
+    <state width="1577" height="681" key="GridCell.Tab.0.center" timestamp="1618541960382">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="681" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1618541960382" />
+    <state width="1577" height="681" key="GridCell.Tab.0.left" timestamp="1618541960380">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="681" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1618541960380" />
+    <state width="1577" height="681" key="GridCell.Tab.0.right" timestamp="1618541960383">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="681" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1618541960383" />
+    <state x="463" y="165" width="672" height="678" key="search.everywhere.popup" timestamp="1618519079888">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state x="463" y="165" width="672" height="678" key="search.everywhere.popup/0.0.1600.858@0.0.1600.858" timestamp="1618519079888" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

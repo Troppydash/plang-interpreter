@@ -1,6 +1,5 @@
 export type PlProblemCode = keyof typeof templates;
 
-// TODO: Change Match Error
 const templates = {
     // lexer errors
     LE0001: "found an unknown character '%0'",
