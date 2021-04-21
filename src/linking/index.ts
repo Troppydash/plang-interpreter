@@ -79,7 +79,10 @@ export function RunFile( filePath: string ): number {
         return 1;
     }
 
+
+
     inout.print( AttemptPrettyPrint( result ) );
+    RunVM(content, filename);
 
     // console.log(result);
     inout.flush();

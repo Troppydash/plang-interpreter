@@ -12,6 +12,7 @@ if (!isNode || process.argv.length !== 3) {
     process.exit(result);
 } else {
     // run file
+
     const result = RunFile(process.argv[2]);
     process.exit(result);
 }
