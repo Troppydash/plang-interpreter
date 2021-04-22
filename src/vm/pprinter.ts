@@ -19,7 +19,7 @@ export function ProgramWithDebugToString(program: PlProgramWithDebug): string {
 
     // append debug information
     for (const debug of program.debug) {
-        const {endLine, length, name} = debug;
+        const {endLine, length} = debug;
         const startLine = endLine - length;
 
         // get max lines length
@@ -30,7 +30,7 @@ export function ProgramWithDebugToString(program: PlProgramWithDebug): string {
                 max = length;
         }
 
-        const append = ` + ${PlDebugToString(debug)}`;
+        const append = ` + ${PlDebugToString(debug)} `;
         const remain = ' |' + ' '.repeat(append.length - 2);
 
         // add lines

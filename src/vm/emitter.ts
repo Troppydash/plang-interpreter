@@ -5,11 +5,13 @@ import {
     ASTBlock,
     ASTBoolean,
     ASTCall,
-    ASTClosure, ASTDict,
-    ASTDot,
+    ASTClosure,
+    ASTDict,
+    ASTDot, ASTExport, ASTFor,
     ASTFunction,
-    ASTImpl,
-    ASTList,
+    ASTIf,
+    ASTImpl, ASTImport,
+    ASTList, ASTLoop, ASTMatch,
     ASTNode,
     ASTNull,
     ASTNumber,
@@ -19,9 +21,9 @@ import {
     ASTString,
     ASTType,
     ASTUnary,
-    ASTVariable
+    ASTVariable, ASTWhile
 } from "../compiler/parsing/ast";
-import {NewPlDebugStretch, PlDebug, PlDebugProgram} from "./debug";
+import {NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram} from "./debug";
 import {PlTokenType} from "../compiler/lexing/token";
 
 const METHOD_SEP = '@';
@@ -62,35 +64,42 @@ class ProgramBuilder {
             d.endLine += this.line;
         })
         this.debug.push(...pair.debug);
+        this.line += pair.program.length;
         if (debug) {
             debug.endLine += this.line;
             this.debug.push(debug);
         }
-        this.line += pair.program.length;
         return this;
     }
 
     addPWDStretch(program: PlProgramWithDebug, node: ASTNode) {
-        return this.addPWD(program, NewPlDebugStretch(node, this.code.length));
+        return this.addPWD(program, NewPlDebugStretch(node, this.code.length + program.program.length));
     }
 
     addBytecode(bc: PlBytecode, debug?: PlDebug) {
         this.code.push(bc);
+        this.line += 1;
         if (debug) {
             debug.endLine += this.line;
             this.debug.push(debug);
         }
-        this.line += 1;
         return this;
     }
 
 
     addBytecodeStretch(bc: PlBytecode, node: ASTNode) {
-        return this.addBytecode(bc, NewPlDebugStretch(node, this.code.length));
+        return this.addBytecode(bc, NewPlDebugStretch(node, this.code.length + 1));
     }
 
     addEmpty() {
         return this.addBytecode(NewBytecode(PlBytecodeType.DEFETY));
+    }
+
+    addStretch(node: ASTNode) {
+        let debug = NewPlDebugStretch(node, this.code.length);
+        debug.endLine += this.line;
+        this.debug.push(debug);
+        return this;
     }
 
     toProgram(): PlProgramWithDebug {
@@ -117,21 +126,20 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             programBuilder.addPWD(traverseAST(item));
         }
         return programBuilder
-            .addBytecode(NewBytecode(PlBytecodeType.DEFNUM, ""+node.values.length))
+            .addBytecode(NewBytecode(PlBytecodeType.DEFNUM, "" + node.values.length))
             .addBytecodeStretch(NewBytecode(PlBytecodeType.DEFLST), node)
             .toProgram();
     } else if (node instanceof ASTDict) {
         let programBuilder = new ProgramBuilder();
-        for (let i = node.keys.length-1; i >= 0; --i) {
+        for (let i = node.keys.length - 1; i >= 0; --i) {
             programBuilder.addPWD(traverseAST(node.values[i]));
             programBuilder.addPWD(traverseAST(node.keys[i]));
         }
         return programBuilder
-            .addBytecode(NewBytecode(PlBytecodeType.DEFNUM, ""+node.keys.length))
+            .addBytecode(NewBytecode(PlBytecodeType.DEFNUM, "" + node.keys.length))
             .addBytecodeStretch(NewBytecode(PlBytecodeType.DEFDIC), node)
             .toProgram();
-    }
-    else if (node instanceof ASTAssign) {
+    } else if (node instanceof ASTAssign) {
         let programBuilder = new ProgramBuilder();
         programBuilder.addPWD(traverseAST(node.value));
         if (node.pre) {
@@ -192,17 +200,17 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             .addBytecode(NewBytecode(PlBytecodeType.DEFVAR, node.operator.content))
             .addBytecodeStretch(NewBytecode(PlBytecodeType.DOCALL), node)
             .toProgram();
-    }
-    else if (node instanceof ASTReturn) {
+    } else if (node instanceof ASTReturn) {
         let programBuilder = new ProgramBuilder();
         if (node.content) {
             programBuilder.addPWD(traverseAST(node.content));
         } else {
             programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFNUL));
         }
-        programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DORETN), node);
-        programBuilder.addEmpty();
-        return programBuilder.toProgram();
+        return programBuilder.addBytecode(NewBytecode(PlBytecodeType.DORETN))
+            .addEmpty()
+            .addStretch(node)
+            .toProgram();
     } else if (node instanceof ASTFunction) {
         let programBuilder = new ProgramBuilder();
         programBuilder.addPWD(makeBlock(node.block));
@@ -248,6 +256,56 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             .addPWD(traverseAST(node.target))
             .addBytecodeStretch(NewBytecode(PlBytecodeType.DOCALL), node);
         return programBuilder.toProgram();
+    } else if (node instanceof ASTBlock) {
+        return (new ProgramBuilder())
+            .addPWD(makeEvalBlock(node))
+            .addEmpty()
+            .addStretch(node)
+            .toProgram();
+    } else if (node instanceof ASTIf) {
+        let programBuilder = new ProgramBuilder();
+        for (let i = 0; i < node.conditions.length; ++i) {
+            let condition = traverseAST(node.conditions[i]);
+            let block = makeEvalBlock(node.blocks[i]);
+
+            // emit continuous jumps for success conditions
+            if (i != 0) {
+                programBuilder
+                    .addBytecode(NewBytecode(PlBytecodeType.JMPREL, '' + (condition.program.length + 1 + block.program.length)));
+            }
+
+            let length = block.program.length + 1; // skip the jmprel in the next condition or 'else'
+            if (node.conditions.length - i == 1 && !node.other) {
+                length -= 1; // don't skip the jmprel if there is no next condition or 'else'
+            }
+
+            programBuilder
+                .addPWD(condition, NewPlDebugSingle(node.conditions[i]))
+                .addBytecode(NewBytecode(PlBytecodeType.JMPICF, '' + length))
+                .addPWD(block);
+        }
+        if (node.other) {
+            let other = makeEvalBlock(node.other);
+            programBuilder
+                .addBytecode(NewBytecode(PlBytecodeType.JMPREL, '' + other.program.length))
+                .addPWD(other);
+        }
+        programBuilder
+            .addEmpty()
+            .addStretch(node);
+        return programBuilder.toProgram();
+    } else if (node instanceof ASTFor) {
+
+    } else if (node instanceof ASTWhile) {
+
+    } else if (node instanceof ASTLoop) {
+
+    } else if (node instanceof ASTImport) {
+
+    } else if (node instanceof ASTExport) {
+
+    } else if (node instanceof ASTMatch) {
+
     }
 
     console.log("DEBUG WARNING!");
@@ -285,9 +343,17 @@ function makeType(node: ASTType) {
 }
 
 function makeBlock(node: ASTBlock): PlProgramWithDebug {
+    let statements = EmitProgramWithDebug(node.statements);
     return (new ProgramBuilder())
-        .addBytecode(NewBytecode(PlBytecodeType.DEFOBL))
+        .addBytecode(NewBytecode(PlBytecodeType.BLOCRT, '' + statements.program.length))
+        .addPWDStretch(EmitProgramWithDebug(node.statements), node)
+        .toProgram();
+}
+
+function makeEvalBlock(node: ASTBlock): PlProgramWithDebug {
+    return (new ProgramBuilder())
+        .addBytecode(NewBytecode(PlBytecodeType.BLOENT))
         .addPWD(EmitProgramWithDebug(node.statements))
-        .addBytecodeStretch(NewBytecode(PlBytecodeType.DEFCBL), node)
+        .addBytecode(NewBytecode(PlBytecodeType.BLOEXT))
         .toProgram();
 }

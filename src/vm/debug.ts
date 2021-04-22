@@ -20,11 +20,11 @@ export function NewPlDebug(node: ASTNode, endLine: number, length: number): PlDe
 }
 
 export function NewPlDebugSingle(node: ASTNode): PlDebug {
-    return NewPlDebug(node, 1, 1);
+    return NewPlDebug(node, 0, 1);
 }
 
 export function NewPlDebugStretch(node: ASTNode, length: number) {
-    return NewPlDebug(node, 1, length+1);
+    return NewPlDebug(node, 0, length);
 }
 
 export function PlDebugToString(debug: PlDebug): string {
