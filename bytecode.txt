@@ -9,6 +9,8 @@ defety - Define Empty
 defobl - Open Block
 defcbl - Close Block
 deffun - Define Function/Closure
+deflst - Define List
+defdic - Define Dictionary
 
 Jumps:
 jmpift - Jump if the top of the stack is true
@@ -20,8 +22,8 @@ Dos:
 docall - Call functions
 dofind - Access members
 doretn - Return expression
-dooinc - Increment
-doodec - Decrement
+dooinc - Postfix increment
+doodec - Postfix decrement
 
 Stack:
 stkpop - Pop stack

@@ -379,7 +379,10 @@ export class PlAstParser implements Parser {
             return null;
         }
 
-        const type = this.pExpression();
+        if (this.tryPeekToken(PlTokenType.TYPE, "ET0043", forToken) == null) {
+            return null;
+        }
+        const type = this.pTypes();
         if ( type == null ) {
             return null;
         }

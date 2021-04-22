@@ -63,6 +63,7 @@ const templates = {
     ET0028: "expected left parenthesis '(' around impl parameters",
     ET0029: "expected the keyword for after the impl parameters",
     ET0030: "expected a left brace '{' after impl definitions",
+    ET0043: "expected a type in an impl definition",
 
     // for loop
     ET0031: "expected semicolons between for loop pre-condition-post expressions",
@@ -151,6 +152,7 @@ const hints: Record<PlProblemCode, string> = {
     ET0040: "import select variables must be valid variables",
     ET0041: "you cannot select no variables, if importing all variables are needed, try the 'select *' syntax",
     ET0042: "check your match statement syntax, there is likely an unexpected token where the keywords are",
+    ET0043: "an imply statement targets a type only, check the expression after the 'for' keyword here",
 
     CE0001: "did you forget to close a block?",
     CE0002: "did you forget to close a group?",

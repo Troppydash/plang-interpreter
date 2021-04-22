@@ -5,9 +5,11 @@ import {
     ASTBlock,
     ASTBoolean,
     ASTCall,
-    ASTClosure,
+    ASTClosure, ASTDict,
     ASTDot,
     ASTFunction,
+    ASTImpl,
+    ASTList,
     ASTNode,
     ASTNull,
     ASTNumber,
@@ -16,11 +18,14 @@ import {
     ASTStatement,
     ASTString,
     ASTType,
+    ASTUnary,
     ASTVariable
 } from "../compiler/parsing/ast";
 import {NewPlDebugStretch, PlDebug, PlDebugProgram} from "./debug";
 import {PlTokenType} from "../compiler/lexing/token";
 
+const METHOD_SEP = '@';
+const ARITY_SEP = '/';
 
 export type PlProgramWithDebug = { program: PlProgram, debug: PlDebugProgram };
 
@@ -106,7 +111,27 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
         return (new ProgramBuilder()).addBytecode(makeString(node)).toProgram();
     } else if (node instanceof ASTType) {
         return (new ProgramBuilder()).addBytecode(makeType(node)).toProgram();
-    } else if (node instanceof ASTAssign) {
+    } else if (node instanceof ASTList) {
+        let programBuilder = new ProgramBuilder();
+        for (const item of node.values.reverse()) {
+            programBuilder.addPWD(traverseAST(item));
+        }
+        return programBuilder
+            .addBytecode(NewBytecode(PlBytecodeType.DEFNUM, ""+node.values.length))
+            .addBytecodeStretch(NewBytecode(PlBytecodeType.DEFLST), node)
+            .toProgram();
+    } else if (node instanceof ASTDict) {
+        let programBuilder = new ProgramBuilder();
+        for (let i = node.keys.length-1; i >= 0; --i) {
+            programBuilder.addPWD(traverseAST(node.values[i]));
+            programBuilder.addPWD(traverseAST(node.keys[i]));
+        }
+        return programBuilder
+            .addBytecode(NewBytecode(PlBytecodeType.DEFNUM, ""+node.keys.length))
+            .addBytecodeStretch(NewBytecode(PlBytecodeType.DEFDIC), node)
+            .toProgram();
+    }
+    else if (node instanceof ASTAssign) {
         let programBuilder = new ProgramBuilder();
         programBuilder.addPWD(traverseAST(node.value));
         if (node.pre) {
@@ -149,7 +174,26 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             .addBytecode(NewBytecode(PlBytecodeType.DEFVAR, node.operator.content))
             .addBytecodeStretch(NewBytecode(PlBytecodeType.DOCALL), node)
             .toProgram();
-    } else if (node instanceof ASTReturn) {
+    } else if (node instanceof ASTUnary) {
+        if (node.operator.type == PlTokenType.INC) {
+            return (new ProgramBuilder())
+                .addBytecode(makeVariable(node.value as ASTVariable))
+                .addBytecodeStretch(NewBytecode(PlBytecodeType.DOOINC), node)
+                .toProgram();
+        } else if (node.operator.type == PlTokenType.DEC) {
+            return (new ProgramBuilder())
+                .addBytecode(makeVariable(node.value as ASTVariable))
+                .addBytecodeStretch(NewBytecode(PlBytecodeType.DOODEC), node)
+                .toProgram();
+        }
+        return (new ProgramBuilder())
+            .addPWD(traverseAST(node.value))
+            .addBytecode(NewBytecode(PlBytecodeType.DEFNUM, '1'))
+            .addBytecode(NewBytecode(PlBytecodeType.DEFVAR, node.operator.content))
+            .addBytecodeStretch(NewBytecode(PlBytecodeType.DOCALL), node)
+            .toProgram();
+    }
+    else if (node instanceof ASTReturn) {
         let programBuilder = new ProgramBuilder();
         if (node.content) {
             programBuilder.addPWD(traverseAST(node.content));
@@ -163,33 +207,47 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
         let programBuilder = new ProgramBuilder();
         programBuilder.addPWD(makeBlock(node.block));
         for (const param of node.args) {
-            programBuilder.addBytecode(makeEvalVariable(param));
+            programBuilder.addBytecode(makeVariable(param));
         }
         programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFNUM, '' + node.args.length));
-        programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DEFFUN), node);
+        programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFFUN));
         programBuilder.addEmpty();
-        programBuilder.addBytecode(makeVariable(node.name));
+        const value = `${node.name.content}${ARITY_SEP}${node.args.length}`;
+        programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFSTR, value));
         programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DOASGN), node);
         return programBuilder.toProgram();
     } else if (node instanceof ASTClosure) {
         let programBuilder = new ProgramBuilder();
         programBuilder.addPWD(makeBlock(node.block));
         for (const param of node.args) {
-            programBuilder.addBytecode(makeEvalVariable(param));
+            programBuilder.addBytecode(makeVariable(param));
         }
         programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFNUM, '' + node.args.length));
         programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DEFFUN), node);
         return programBuilder.toProgram();
-    } else if (node instanceof ASTCall) {
-        let pairBuilder = new ProgramBuilder();
-        for (const arg of node.args) {
-            pairBuilder.addPWD(traverseAST(arg));
+    } else if (node instanceof ASTImpl) {
+        let programBuilder = new ProgramBuilder();
+        programBuilder.addPWD(makeBlock(node.block));
+        for (const param of node.args) {
+            programBuilder.addBytecode(makeVariable(param));
         }
-        pairBuilder
+        programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFNUM, '' + node.args.length));
+        programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFFUN));
+        programBuilder.addEmpty();
+        const value = `${node.target.content}${node.name.content.startsWith(METHOD_SEP) ? '' : METHOD_SEP}${node.name.content}${ARITY_SEP}${node.args.length}`;
+        programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFSTR, value));
+        programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DOASGN), node);
+        return programBuilder.toProgram();
+    } else if (node instanceof ASTCall) {
+        let programBuilder = new ProgramBuilder();
+        for (const arg of node.args) {
+            programBuilder.addPWD(traverseAST(arg));
+        }
+        programBuilder
             .addBytecode(NewBytecode(PlBytecodeType.DEFNUM, '' + node.args.length))
             .addPWD(traverseAST(node.target))
             .addBytecodeStretch(NewBytecode(PlBytecodeType.DOCALL), node);
-        return pairBuilder.toProgram();
+        return programBuilder.toProgram();
     }
 
     console.log("DEBUG WARNING!");
@@ -197,8 +255,6 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
         .addBytecode(NewBytecode(PlBytecodeType.DEFNUL))
         .addBytecode(NewBytecode(PlBytecodeType.DORETN))).toProgram();
 }
-
-// TODO: Write AND and OR using jumps
 
 function makeNumber(node: ASTNumber) {
     return NewBytecode(PlBytecodeType.DEFNUM, '' + node.value);

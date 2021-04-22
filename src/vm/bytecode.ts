@@ -12,7 +12,8 @@ export enum PlBytecodeType {
     DEFETY,
     DEFOBL,
     DEFCBL,
-
+    DEFLST,
+    DEFDIC,
 
     JMPIFT,
     JMPIFF,

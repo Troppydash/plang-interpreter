@@ -81,10 +81,10 @@ export class ASTFunction extends ASTStatement {
 export class ASTImpl extends ASTStatement {
     name: ASTVariable;
     args: ASTVariable[];
-    target: ASTExpression;
+    target: ASTType;
     block: ASTBlock;
 
-    constructor(tokens: PlToken[], name: ASTVariable, args: ASTVariable[], target: ASTExpression, block: ASTBlock) {
+    constructor(tokens: PlToken[], name: ASTVariable, args: ASTVariable[], target: ASTType, block: ASTBlock) {
         super(tokens);
         this.name = name;
         this.args = args;
