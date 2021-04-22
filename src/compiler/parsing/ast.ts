@@ -242,9 +242,9 @@ export class ASTAssign extends ASTExpression {
 export class ASTDot extends ASTExpression {
     left: ASTExpression;
     operator: PlToken;
-    right: ASTVariable | ASTDot;
+    right: ASTVariable;
 
-    constructor(tokens: PlToken[], left: ASTExpression, operator: PlToken, right: ASTVariable | ASTDot) {
+    constructor(tokens: PlToken[], left: ASTExpression, operator: PlToken, right: ASTVariable) {
         super(tokens);
         this.left = left;
         this.operator = operator;

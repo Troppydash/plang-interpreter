@@ -1,0 +1,27 @@
+Defines:
+defvar - Define Variable, Evaluates it
+defnum - Define Number
+defnul - Define Null
+defbol - Define Bool
+defstr - Define String
+deftyp - Define Type
+defety - Define Empty
+defobl - Open Block
+defcbl - Close Block
+deffun - Define Function/Closure
+
+Jumps:
+jmpift - Jump if the top of the stack is true
+jmpiff - Jump if the top of the stack is false
+jmpict - Jump if the top of the stack is true, consume the top
+jmpicf - Jump if the top of the stack is false, consume the top
+
+Dos:
+docall - Call functions
+dofind - Access members
+doretn - Return expression
+dooinc - Increment
+doodec - Decrement
+
+Stack:
+stkpop - Pop stack

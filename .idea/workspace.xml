@@ -20,9 +20,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Started writing the virtual machine">
+      <change afterPath="$PROJECT_DIR$/bytecode.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/vm/debug.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/vm/pprinter.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/bytecode.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/bytecode.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/emitter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter.ts" afterDir="false" />
@@ -59,7 +61,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/playground/test.plang" />
-    <property name="javascript.nodejs.core.library.configured.version" value="12.16.3" />
+    <property name="javascript.nodejs.core.library.configured.version" value="12.20.1" />
     <property name="javascript.nodejs.core.library.typings.version" value="12.20.10" />
     <property name="last_opened_file_path" value="$USER_HOME$/Folder2020/NodeProjects/jsproxy" />
     <property name="nodejs_interpreter_path" value="node" />
@@ -78,7 +80,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run-build playground/test.plang">
+  <component name="RunManager" selected="npm.run playground/test.plang">
     <configuration name="build-browser" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -119,13 +121,13 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="run playground/test.plang as" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="run playground/test.plang" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="run" />
       </scripts>
-      <arguments value="playground/test.plang as" />
+      <arguments value="playground/test.plang" />
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
@@ -156,13 +158,13 @@
       <item itemvalue="npm.run-build playground/test.plang" />
       <item itemvalue="npm.build-browser" />
       <item itemvalue="npm.build-dist" />
-      <item itemvalue="npm.run playground/test.plang as" />
+      <item itemvalue="npm.run playground/test.plang" />
       <item itemvalue="npm.build" />
       <item itemvalue="npm.watch-build" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.run playground/test.plang as" />
+        <item itemvalue="npm.run playground/test.plang" />
         <item itemvalue="npm.build-browser" />
         <item itemvalue="npm.build" />
         <item itemvalue="npm.watch-build" />
@@ -170,7 +172,7 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -316,6 +318,88 @@
     <MESSAGE value="Added Error codes and some bug fixes" />
     <MESSAGE value="Started writing the virtual machine" />
     <option name="LAST_COMMIT_MESSAGE" value="Started writing the virtual machine" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="246" y="18" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1619048662647">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state x="246" y="18" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1619048662646" />
+    <state x="520" y="186" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1619063202950">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state x="520" y="186" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1600.858@0.0.1600.858" timestamp="1619063202950" />
+    <state x="684" y="321" key="#xdebugger.evaluate" timestamp="1619047911092">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state x="684" y="321" key="#xdebugger.evaluate/0.0.1600.858@0.0.1600.858" timestamp="1619047911092" />
+    <state width="1577" height="573" key="GridCell.Tab.0.bottom" timestamp="1619066717549">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="573" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619066717549" />
+    <state width="1577" height="573" key="GridCell.Tab.0.center" timestamp="1619066717547">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="573" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1619066717547" />
+    <state width="1577" height="573" key="GridCell.Tab.0.left" timestamp="1619066717546">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="573" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1619066717546" />
+    <state width="1577" height="573" key="GridCell.Tab.0.right" timestamp="1619066717549">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="573" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1619066717549" />
+    <state width="1577" height="265" key="GridCell.Tab.1.bottom" timestamp="1619047953388">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.1.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619047953388" />
+    <state width="1577" height="265" key="GridCell.Tab.1.center" timestamp="1619047953387">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.1.center/0.0.1600.858@0.0.1600.858" timestamp="1619047953387" />
+    <state width="1577" height="265" key="GridCell.Tab.1.left" timestamp="1619047953386">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.1.left/0.0.1600.858@0.0.1600.858" timestamp="1619047953386" />
+    <state width="1577" height="265" key="GridCell.Tab.1.right" timestamp="1619047953388">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.1.right/0.0.1600.858@0.0.1600.858" timestamp="1619047953388" />
+    <state width="1577" height="265" key="GridCell.Tab.2.bottom" timestamp="1619047953392">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.2.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619047953392" />
+    <state width="1577" height="265" key="GridCell.Tab.2.center" timestamp="1619047953390">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.2.center/0.0.1600.858@0.0.1600.858" timestamp="1619047953390" />
+    <state width="1577" height="265" key="GridCell.Tab.2.left" timestamp="1619047953389">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.2.left/0.0.1600.858@0.0.1600.858" timestamp="1619047953389" />
+    <state width="1577" height="265" key="GridCell.Tab.2.right" timestamp="1619047953391">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.2.right/0.0.1600.858@0.0.1600.858" timestamp="1619047953391" />
+    <state width="1577" height="265" key="GridCell.Tab.3.bottom" timestamp="1619047953395">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.3.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619047953395" />
+    <state width="1577" height="265" key="GridCell.Tab.3.center" timestamp="1619047953393">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.3.center/0.0.1600.858@0.0.1600.858" timestamp="1619047953393" />
+    <state width="1577" height="265" key="GridCell.Tab.3.left" timestamp="1619047953392">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.3.left/0.0.1600.858@0.0.1600.858" timestamp="1619047953392" />
+    <state width="1577" height="265" key="GridCell.Tab.3.right" timestamp="1619047953394">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.3.right/0.0.1600.858@0.0.1600.858" timestamp="1619047953394" />
+    <state x="581" y="299" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1619051864823">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state x="581" y="299" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1600.858@0.0.1600.858" timestamp="1619051864823" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
