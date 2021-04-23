@@ -23,6 +23,7 @@ blocrt - Create block
 Dos:
 docall - Call functions
 doasgn - Assignment
+docret - Assignment but creation only
 dofind - Access members
 doretn - Return expression
 dooinc - Postfix increment

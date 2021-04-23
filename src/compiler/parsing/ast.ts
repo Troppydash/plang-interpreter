@@ -239,6 +239,10 @@ export class ASTAssign extends ASTExpression {
     }
 }
 
+export class ASTCreate extends ASTAssign {
+
+}
+
 export class ASTDot extends ASTExpression {
     left: ASTExpression;
     right: ASTVariable;

@@ -63,10 +63,6 @@ export function StartREPL( filename: string ): number {
             }
 
             RunVM(content, filename);
-            // let tree = RunParser( content, filename );
-            // if ( tree != null ) {
-            //     inout.print( AttemptPrettyPrint( tree ) );
-            // }
         }
 
     inout.flush();

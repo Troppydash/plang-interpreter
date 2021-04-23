@@ -21,10 +21,9 @@
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Started writing the virtual machine">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/token.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/token.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bytecode.txt" beforeDir="false" afterPath="$PROJECT_DIR$/bytecode.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/bytecode.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/bytecode.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/emitter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -78,7 +77,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run playground/test.plang">
+  <component name="RunManager" selected="npm.build-cli">
     <configuration name="build-browser" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -198,7 +197,7 @@
       <workItem from="1618897650424" duration="1753000" />
       <workItem from="1618984222113" duration="125000" />
       <workItem from="1618984593976" duration="6100000" />
-      <workItem from="1619077667357" duration="22287000" />
+      <workItem from="1619077667357" duration="24053000" />
     </task>
     <task id="LOCAL-00001" summary="moved some comments">
       <created>1617620767259</created>
@@ -312,7 +311,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619138656718</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Added Loop and Each bytecode emitter">
+      <created>1619146415373</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1619146415373</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -347,7 +353,8 @@
     <MESSAGE value="Added more bytecodes" />
     <MESSAGE value="If statements can emit bytecodes now" />
     <MESSAGE value="Added For and While loop bytecode emitter" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added For and While loop bytecode emitter" />
+    <MESSAGE value="Added Loop and Each bytecode emitter" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Loop and Each bytecode emitter" />
   </component>
   <component name="WindowStateProjectService">
     <state x="258" y="59" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1619077924674">
@@ -362,22 +369,22 @@
       <screen x="0" y="0" width="1600" height="858" />
     </state>
     <state x="684" y="321" key="#xdebugger.evaluate/0.0.1600.858@0.0.1600.858" timestamp="1619047911092" />
-    <state width="1577" height="334" key="GridCell.Tab.0.bottom" timestamp="1619145726161">
+    <state width="1577" height="560" key="GridCell.Tab.0.bottom" timestamp="1619147133254">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="334" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619145726161" />
-    <state width="1577" height="334" key="GridCell.Tab.0.center" timestamp="1619145726161">
+    <state width="1577" height="560" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619147133254" />
+    <state width="1577" height="560" key="GridCell.Tab.0.center" timestamp="1619147133253">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="334" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1619145726161" />
-    <state width="1577" height="334" key="GridCell.Tab.0.left" timestamp="1619145726160">
+    <state width="1577" height="560" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1619147133253" />
+    <state width="1577" height="560" key="GridCell.Tab.0.left" timestamp="1619147133252">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="334" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1619145726160" />
-    <state width="1577" height="334" key="GridCell.Tab.0.right" timestamp="1619145726161">
+    <state width="1577" height="560" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1619147133252" />
+    <state width="1577" height="560" key="GridCell.Tab.0.right" timestamp="1619147133253">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="334" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1619145726161" />
+    <state width="1577" height="560" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1619147133253" />
     <state width="1577" height="265" key="GridCell.Tab.1.bottom" timestamp="1619071461133">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
@@ -426,10 +433,10 @@
       <screen x="0" y="0" width="1600" height="858" />
     </state>
     <state width="1577" height="265" key="GridCell.Tab.3.right/0.0.1600.858@0.0.1600.858" timestamp="1619071461137" />
-    <state x="376" y="48" key="Vcs.Push.Dialog.v2" timestamp="1619138657964">
+    <state x="372" y="24" key="Vcs.Push.Dialog.v2" timestamp="1619146416641">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state x="376" y="48" key="Vcs.Push.Dialog.v2/0.0.1600.858@0.0.1600.858" timestamp="1619138657964" />
+    <state x="372" y="24" key="Vcs.Push.Dialog.v2/0.0.1600.858@0.0.1600.858" timestamp="1619146416641" />
     <state x="581" y="299" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1619051864823">
       <screen x="0" y="0" width="1600" height="858" />
     </state>

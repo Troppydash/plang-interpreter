@@ -1,4 +1,4 @@
-import PlToken from "../compiler/lexing/token";
+import PlToken from "../../compiler/lexing/token";
 
 export enum PlBytecodeType {
 
@@ -25,6 +25,7 @@ export enum PlBytecodeType {
     DOCALL,
     DORETN,
     DOASGN,
+    DOCRET,
     DOFIND,
     DOOINC,
     DOODEC,

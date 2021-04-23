@@ -1,5 +1,5 @@
-import {ASTNode} from "../compiler/parsing/ast";
-import PlToken from "../compiler/lexing/token";
+import {ASTNode} from "../../compiler/parsing/ast";
+import PlToken from "../../compiler/lexing/token";
 
 export type PlDebugProgram = PlDebug[];
 
