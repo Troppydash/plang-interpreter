@@ -1,8 +1,8 @@
 import {
     ASTAssign,
     ASTBinary,
-    ASTBlock,
-    ASTCall, ASTClosure,
+    ASTBlock, ASTBreak,
+    ASTCall, ASTClosure, ASTContinue,
     ASTDict,
     ASTDot, ASTEach, ASTExport, ASTFor, ASTFunction, ASTIf, ASTImpl, ASTImport,
     ASTList, ASTLoop, ASTMatch,
@@ -146,6 +146,8 @@ function ats( node: ASTNode | null ): string {
         return `${c.kw( 'func' )}(${atss( node.args )}) ${ats( node.block )}`;
     } else if ( node instanceof ASTNumber ) {
         return c.nu( '' + node.value );
+    } else if (node instanceof ASTBreak || node instanceof ASTContinue) {
+        return c.kw(node.getSpanToken().content);
     } else {
         return node.getSpanToken().content;
     }

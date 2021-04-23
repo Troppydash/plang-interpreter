@@ -5,11 +5,11 @@ import { LogProblemShort } from "../problem/printer";
 import { colors } from "../inout/color";
 
 export function StartREPL( filename: string ): number {
-    inout.print( "Welcome to the Plang Interactive console" );
+    inout.print( "Welcome to the Plang interactive console" );
     if ( isNode ) {
         const os = require( 'os' );
         inout.print( `Running on ${os.platform()}-${os.arch()}. Hello ${os.hostname()}!` );
-        inout.print( `Press Ctrl+C to quit` );
+        inout.print( `Press ctrl+c to quit` );
     }
 
     outer:
