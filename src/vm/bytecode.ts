@@ -28,6 +28,8 @@ export enum PlBytecodeType {
     DOFIND,
     DOOINC,
     DOODEC,
+    DOBRAK,
+    DOCONT,
 
     STKPOP,
 
