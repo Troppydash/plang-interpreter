@@ -933,7 +933,7 @@ export class PlAstParser implements Parser {
                 if ( right == null ) {
                     return null;
                 }
-                left = new ASTDot( [ peekToken ], left, peekToken, right );
+                left = new ASTDot( [ peekToken ], left, right );
                 continue;
             }
             break;
