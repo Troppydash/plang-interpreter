@@ -22,7 +22,7 @@ export function NewPlStuff(type: PlStuffType, value: any): PlStuff {
 }
 
 export function PlStuffToTypeString(stuffType: PlStuffType): string {
-    switch ( stuffType ) {
+    switch (stuffType) {
         case PlStuffType.NUMBER:
             return "Int";
         case PlStuffType.TYPE:

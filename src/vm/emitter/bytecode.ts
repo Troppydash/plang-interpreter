@@ -27,12 +27,16 @@ export enum PlBytecodeType {
     DOFIND,
     DOOINC,
     DOODEC,
+    DONEGT,
+    DOLNOT,
     DOBRAK,
     DOCONT,
 
     STKPOP,
 
 }
+
+// TODO: Think about how to deal with the unary operators and remove overloading
 
 // https://stackoverflow.com/questions/18111657/how-to-get-names-of-enum-entries
 const allEnumKeys = [];

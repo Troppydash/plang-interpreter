@@ -110,7 +110,7 @@ export function RunFile( filePath: string ): number {
 
 
     // inout.print( AttemptPrettyPrint( result ) );
-    // RunEmitter(content, filename);
+    RunEmitter(content, filename);
     RunVM(content, filename);
 
     // console.log(result);

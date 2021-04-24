@@ -28,6 +28,8 @@ dofind - Access members
 doretn - Return expression
 dooinc - Postfix increment
 doodec - Postfix decrement
+donegt - Negate operator
+dolnot - Logical not
 dobrak - Ghost break
 docont - Ghost continue
 

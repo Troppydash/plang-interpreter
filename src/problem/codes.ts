@@ -101,7 +101,9 @@ const templates = {
     DE0002: "an exception occurred during interpreting",
 
     RE0001: "found an unknown bytecode with type '%0'",
-    RE0002: "cannot find the variable or function called '%0'",
+    RE0002: "no debug information found for problem on bytecode line '%0'",
+    RE0003: "cannot find the variable or function called '%0'",
+    RE0004: "there exists no operator '%0' on type '%1'",
 }
 
 // because I am lazy
@@ -175,7 +177,9 @@ const hints: Record<PlProblemCode, string> = {
     DE0002: "the developer made a mistake, either tell him or find a workaround",
 
     RE0001: "unknown bytecode is produced from the emitter, a developer problem at the core",
-    RE0002: "is the variable or function defined?",
+    RE0002: "you are on your own here",
+    RE0003: "is the variable or function defined?",
+    RE0004: "the operator is not a valid operation on this type"
 }
 
 const problemFullName = {

@@ -14,7 +14,7 @@ export namespace PlConverter {
                 return object.value;
             }
             case PlStuffType.BOOLEAN: {
-                return !!object.value;
+                return object.value;
             }
             case PlStuffType.NULL: {
                 return null;
