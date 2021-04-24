@@ -19,15 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Started writing the virtual machine">
+    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="backup">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/constants.txt" beforeDir="false" afterPath="$PROJECT_DIR$/constants.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/emitter/bytecode.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/bytecode.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/emitter/emitter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/emitter/pprinter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/pprinter.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/emitter/debug.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/debug.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/emitter/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,7 +78,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run-build playground/test.plang">
+  <component name="RunManager" selected="npm.build-cli">
     <configuration name="build-browser" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -202,7 +199,7 @@
       <workItem from="1618984222113" duration="125000" />
       <workItem from="1618984593976" duration="6100000" />
       <workItem from="1619077667357" duration="26200000" />
-      <workItem from="1619220219970" duration="3243000" />
+      <workItem from="1619220219970" duration="6342000" />
     </task>
     <task id="LOCAL-00001" summary="moved some comments">
       <created>1617620767259</created>
@@ -330,7 +327,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619148065822</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="backup">
+      <created>1619224271077</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1619224271077</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -367,7 +371,8 @@
     <MESSAGE value="Added For and While loop bytecode emitter" />
     <MESSAGE value="Added Loop and Each bytecode emitter" />
     <MESSAGE value="Added scoping variable create bytecode and moved the emitter package" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added scoping variable create bytecode and moved the emitter package" />
+    <MESSAGE value="backup" />
+    <option name="LAST_COMMIT_MESSAGE" value="backup" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

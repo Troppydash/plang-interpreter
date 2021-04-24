@@ -1,9 +1,9 @@
-import PlToken, { PlTokenToString } from "../compiler/lexing/token";
+import PlToken from "../compiler/lexing/token";
 import PlLexer from "../compiler/lexing";
 import { ReportProblem, ReportProblems } from "../problem";
 import { NewPlFile } from "../inout/file";
 import inout from "../inout";
-import { ASTProgram, ASTStatement } from "../compiler/parsing/ast";
+import { ASTProgram } from "../compiler/parsing/ast";
 import { PlAstParser } from "../compiler/parsing";
 import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
 import { PlProblem } from "../problem/problem";
@@ -58,7 +58,7 @@ export function RunVM(content: string, filename: string): null {
         return null;
     }
 
-    const program = EmitProgram(ast, true);
+    const program = EmitProgram(ast);
     inout.print(ProgramWithDebugToString(program));
     inout.print(`Emitted ${program.program.length} instructions, with ${program.debug.length} debug messages`);
     // inout.print(ProgramToPlb(program.program));

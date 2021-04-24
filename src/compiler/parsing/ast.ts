@@ -38,13 +38,16 @@ export abstract class ASTNode {
     }
 
     getSpanToken() {
-        // TODO: this might break if the tokens span multiple lines
-        if (this.tokens.length == 0) {
-            return NewFakePlToken(PlTokenType.SPAN, '');
+        try {
+            // TODO: this might break if the tokens span multiple lines
+            const firstToken = this.firstToken();
+            const lastToken = this.lastToken(); // maybe make this the last token on the same line?
+            return CreateSpanToken(firstToken, lastToken, this.tokens.map(t => t.content).join(''));
+        } catch ( e ) {
+            if (this.tokens.length == 0) {
+                return NewFakePlToken(PlTokenType.SPAN, '');
+            }
         }
-        const firstToken = this.firstToken();
-        const lastToken = this.lastToken(); // maybe make this the last token on the same line?
-        return CreateSpanToken(firstToken, lastToken, this.tokens.map(t => t.content).join(''));
     }
 
     is(type): boolean {

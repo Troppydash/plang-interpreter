@@ -28,5 +28,5 @@ export function NewPlDebugStretch(node: ASTNode, length: number) {
 }
 
 export function PlDebugToString(debug: PlDebug): string {
-    return debug.name;
+    return `${debug.name}@${debug.span.info.row}:${debug.span.info.col}`;
 }
