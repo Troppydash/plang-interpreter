@@ -91,24 +91,31 @@ export class PlAstParser implements Parser {
         let statements = [];
         while ( true ) {
             // check for end of file
-            try {
-                this.clearLF();
-                const peekToken = this.peekToken();
-                if ( peekToken.type == PlTokenType.EOF ) {
-                    break;
-                }
-            } catch ( e ) {
-                // the next token is ERR, so we return nothing for error
-                return [];
+            if (this.isEOF()) {
+                break;
             }
 
             const statement = this.parseOnce();
             if ( statement == null ) {
-                return [];
+                break;
             }
             statements.push( statement );
         }
         return statements;
+    }
+
+    isEOF() {
+        try {
+            this.clearLF();
+            const peekToken = this.peekToken();
+            if ( peekToken.type == PlTokenType.EOF ) {
+                return true;
+            }
+        } catch ( e ) {
+            // the next token is ERR, so we return nothing for error
+            return true;
+        }
+        return false;
     }
 
     // helper methods

@@ -19,11 +19,16 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="backup">
+    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Working emitter completed, the import and export instructions will be done later">
+      <change afterPath="$PROJECT_DIR$/src/vm/machine/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/vm/machine/memory.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/vm/machine/native.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/vm/machine/stuff.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bytecode.txt" beforeDir="false" afterPath="$PROJECT_DIR$/bytecode.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/constants.txt" beforeDir="false" afterPath="$PROJECT_DIR$/constants.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/emitter/debug.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/debug.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/emitter/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -199,7 +204,7 @@
       <workItem from="1618984222113" duration="125000" />
       <workItem from="1618984593976" duration="6100000" />
       <workItem from="1619077667357" duration="26200000" />
-      <workItem from="1619220219970" duration="6342000" />
+      <workItem from="1619220219970" duration="15289000" />
     </task>
     <task id="LOCAL-00001" summary="moved some comments">
       <created>1617620767259</created>
@@ -334,7 +339,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619224271077</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Working emitter completed, the import and export instructions will be done later">
+      <created>1619227929942</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1619227929942</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -372,7 +384,8 @@
     <MESSAGE value="Added Loop and Each bytecode emitter" />
     <MESSAGE value="Added scoping variable create bytecode and moved the emitter package" />
     <MESSAGE value="backup" />
-    <option name="LAST_COMMIT_MESSAGE" value="backup" />
+    <MESSAGE value="Working emitter completed, the import and export instructions will be done later" />
+    <option name="LAST_COMMIT_MESSAGE" value="Working emitter completed, the import and export instructions will be done later" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -13,8 +13,8 @@ defdic - Define Dictionary
 Control Flow:
 jmpift - Jump if the top of the stack is true
 jmpiff - Jump if the top of the stack is false
-jmpict - Jump if the top of the stack is true, consume the top
-jmpicf - Jump if the top of the stack is false, consume the top
+jmpict - Jump if the top of the stack is true, consume the stack
+jmpicf - Jump if the top of the stack is false, consume the stack
 jmprel - Force jump
 bloent - Enter block
 bloext - Exit block

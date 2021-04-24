@@ -36,11 +36,11 @@ import {
 import { NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram } from "./debug";
 import { NewFakePlToken, PlTokenType } from "../../compiler/lexing/token";
 
-const METHOD_SEP = '@';
-const ARITY_SEP = '/';
-const LOOP_INDEX = 'i@';
-const EACH_ITER = 'iter@';
-const MATCH_VALUE = 'value@';
+export const METHOD_SEP = '@';
+export const ARITY_SEP = '/';
+export const LOOP_INDEX = 'i@';
+export const EACH_ITER = 'iter@';
+export const MATCH_VALUE = 'value@';
 
 export type PlProgramWithDebug = { program: PlProgram, debug: PlDebugProgram };
 
@@ -612,14 +612,13 @@ function makeBool( node: ASTBoolean ) {
 }
 
 function makeString( node: ASTString ) {
-    return NewBytecode( PlBytecodeType.DEFSTR, `"${node.content}"` );
+    return NewBytecode( PlBytecodeType.DEFSTR, `${node.content}` );
 }
 
 function makeType( node: ASTType ) {
-    return NewBytecode( PlBytecodeType.DEFTYP, `'${node.content}'` );
+    return NewBytecode( PlBytecodeType.DEFTYP, `${node.content}` );
 }
 
-/// Blocks will always generate debug information
 function makeBlock( node: ASTBlock ): PlProgramWithDebug {
     let statements = EmitProgram( node.statements );
     return (new ProgramBuilder())

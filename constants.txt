@@ -12,4 +12,5 @@ METHOD_SEP: method name scrabbling for impl functions
 ARITY_SEP: function call overloading for all functions
 LOOP_INDEX: name of inaccessible variable for 'loop' and 'each' statements
 EACH_ITER: name of inaccessible variable for 'each' statements
+MATCH_VALUE: name of inaccessible variable for 'match' statements with a value
 
