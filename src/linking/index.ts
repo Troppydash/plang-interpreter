@@ -7,7 +7,7 @@ import { ASTProgram, ASTStatement } from "../compiler/parsing/ast";
 import { PlAstParser } from "../compiler/parsing";
 import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
 import { PlProblem } from "../problem/problem";
-import {EmitProgram} from "../vm/emitter/emitter";
+import {EmitProgram} from "../vm/emitter/";
 import {ProgramWithDebugToString} from "../vm/emitter/pprinter";
 
 export function RunLinker( content: string, filename: string ): PlToken[] | null {
@@ -58,8 +58,9 @@ export function RunVM(content: string, filename: string): null {
         return null;
     }
 
-    const program = EmitProgram(ast);
+    const program = EmitProgram(ast, true);
     inout.print(ProgramWithDebugToString(program));
+    inout.print(`Emitted ${program.program.length} instructions, with ${program.debug.length} debug messages`);
     // inout.print(ProgramToPlb(program.program));
 }
 

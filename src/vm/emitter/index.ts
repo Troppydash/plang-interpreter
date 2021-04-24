@@ -1,4 +1,4 @@
-import {NewBytecode, PlBytecode, PlBytecodeType, PlProgram} from "./bytecode";
+import { NewBytecode, PlBytecode, PlBytecodeType, PlProgram } from "./bytecode";
 import {
     ASTAssign,
     ASTBinary,
@@ -7,7 +7,8 @@ import {
     ASTBreak,
     ASTCall,
     ASTClosure,
-    ASTContinue, ASTCreate,
+    ASTContinue,
+    ASTCreate,
     ASTDict,
     ASTDot,
     ASTEach,
@@ -32,17 +33,17 @@ import {
     ASTVariable,
     ASTWhile
 } from "../../compiler/parsing/ast";
-import {NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram} from "./debug";
-import {NewFakePlToken, PlTokenType} from "../../compiler/lexing/token";
+import { NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram } from "./debug";
+import { NewFakePlToken, PlTokenType } from "../../compiler/lexing/token";
 
 const METHOD_SEP = '@';
 const ARITY_SEP = '/';
-const LOOP_INDEX = 'i@'; // we can't use @ in the body of a variable so the user can never access it
+const LOOP_INDEX = 'i@';
 const EACH_ITER = 'iter@';
 
 export type PlProgramWithDebug = { program: PlProgram, debug: PlDebugProgram };
 
-export function EmitProgram(ast: ASTProgram, debug: boolean = true): PlProgramWithDebug {
+export function EmitProgram(ast: ASTProgram, debug: boolean): PlProgramWithDebug {
     let programBuilder = new ProgramBuilder(debug);
     for (const statement of ast) {
         programBuilder.addPWD(EmitStatement(statement, debug));
@@ -50,8 +51,8 @@ export function EmitProgram(ast: ASTProgram, debug: boolean = true): PlProgramWi
     return programBuilder.toProgram();
 }
 
-export function EmitStatement(statement: ASTStatement, debug: boolean = true): PlProgramWithDebug {
-    return (new ProgramBuilder())
+export function EmitStatement(statement: ASTStatement, debug: boolean): PlProgramWithDebug {
+    return (new ProgramBuilder(debug))
         .addPWD(traverseAST(statement, debug))
         .addBytecode(NewBytecode(PlBytecodeType.STKPOP))
         .toProgram();
@@ -132,7 +133,7 @@ class ProgramBuilder {
     }
 
     toProgram(): PlProgramWithDebug {
-        return {program: this.code, debug: this.debugs};
+        return {program: this.code, debug: this.debug ? this.debugs : []};
     }
 }
 
@@ -252,7 +253,7 @@ function traverseAST(node: ASTNode, debug: boolean = true): PlProgramWithDebug {
             .addStretch(node)
             .toProgram();
     } else if (node instanceof ASTFunction) {
-        programBuilder.addPWD(makeBlock(node.block, debug));
+        programBuilder.addPWD(makeBlock(node.block));
         for (const param of node.args) {
             programBuilder.addBytecode(makeVariable(param));
         }
@@ -264,7 +265,7 @@ function traverseAST(node: ASTNode, debug: boolean = true): PlProgramWithDebug {
         programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DOASGN), node);
         return programBuilder.toProgram();
     } else if (node instanceof ASTClosure) {
-        programBuilder.addPWD(makeBlock(node.block, debug));
+        programBuilder.addPWD(makeBlock(node.block));
         for (const param of node.args) {
             programBuilder.addBytecode(makeVariable(param));
         }
@@ -272,7 +273,7 @@ function traverseAST(node: ASTNode, debug: boolean = true): PlProgramWithDebug {
         programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DEFFUN), node);
         return programBuilder.toProgram();
     } else if (node instanceof ASTImpl) {
-        programBuilder.addPWD(makeBlock(node.block, debug));
+        programBuilder.addPWD(makeBlock(node.block));
         for (const param of node.args) {
             programBuilder.addBytecode(makeVariable(param));
         }
@@ -294,7 +295,7 @@ function traverseAST(node: ASTNode, debug: boolean = true): PlProgramWithDebug {
         return programBuilder.toProgram();
     } else if (node instanceof ASTBlock) {
         return programBuilder
-            .addPWD(makeEvalBlock(node, debug))
+            .addPWD(makeEvalBlock(node))
             .addEmpty()
             .addStretch(node)
             .toProgram();
@@ -304,7 +305,7 @@ function traverseAST(node: ASTNode, debug: boolean = true): PlProgramWithDebug {
 
         for (let i = 0; i < node.conditions.length; ++i) {
             let condition = traverseAST(node.conditions[i], debug);
-            let block = makePureBlock(node.blocks[i], debug);
+            let block = makePureBlock(node.blocks[i]);
 
             // emit continuous jumps for success conditions
             if (i != 0) {
@@ -323,7 +324,7 @@ function traverseAST(node: ASTNode, debug: boolean = true): PlProgramWithDebug {
                 .addPWD(block);
         }
         if (node.other) {
-            let other = makePureBlock(node.other, debug);
+            let other = makePureBlock(node.other);
             programBuilder
                 .addBytecode(NewBytecode(PlBytecodeType.JMPREL, '' + other.program.length))
                 .addPWD(other);
@@ -357,7 +358,7 @@ function traverseAST(node: ASTNode, debug: boolean = true): PlProgramWithDebug {
             after = traverseAST(node.after, debug);
             afterLength = after.program.length + 1;
         }
-        let block = makePureBlock(node.block, debug);
+        let block = makePureBlock(node.block);
 
         // replace break and continue
         for (let i = 0; i < block.program.length; ++i) {
@@ -411,7 +412,7 @@ function traverseAST(node: ASTNode, debug: boolean = true): PlProgramWithDebug {
         programBuilder.addBytecode(NewBytecode(PlBytecodeType.BLOENT))
 
         let cond = traverseAST(node.condition, debug);
-        let block = makePureBlock(node.block, debug);
+        let block = makePureBlock(node.block);
 
         // replace breaks and continues
         for (let i = 0; i < block.program.length; ++i) {
@@ -435,7 +436,7 @@ function traverseAST(node: ASTNode, debug: boolean = true): PlProgramWithDebug {
     } else if (node instanceof ASTLoop) {
         programBuilder.addBytecode(NewBytecode(PlBytecodeType.BLOENT));
 
-        let block = makePureBlock(node.block, debug);
+        let block = makePureBlock(node.block);
         let bodySize = block.program.length;
 
         // emit counter variable and compare
@@ -484,6 +485,28 @@ function traverseAST(node: ASTNode, debug: boolean = true): PlProgramWithDebug {
 
         // TODO: Write this sometime later
 
+        // get conditions
+        let conditions = [];
+        for (const cases of node.cases) {
+            let cond = null;
+            for (const c of cases) {
+                if (cond == null) {
+                    cond = c;
+                } else {
+                    cond = new ASTBinary([], cond, c, NewFakePlToken(PlTokenType.OR, 'or'));
+                }
+            }
+            conditions.push(cond);
+        }
+
+        const astIf = new ASTIf([], conditions, node.blocks, node.other);
+
+
+        return programBuilder
+            .addPWD(traverseAST(astIf))
+            .addEmpty()
+            .addStretch(node)
+            .toProgram();
     } else if (node instanceof ASTEach) {
         programBuilder
             .addBytecode(NewBytecode(PlBytecodeType.BLOENT));
@@ -524,7 +547,7 @@ function traverseAST(node: ASTNode, debug: boolean = true): PlProgramWithDebug {
 
         const cond = traverseAST(condition, false);
         const kvBlock = makePureBlock(new ASTBlock([], inBlock), false);
-        const block = makePureBlock(node.block, debug);
+        const block = makePureBlock(node.block);
 
         // replace breaks and continues
         for (let i = 0; i < block.program.length; ++i) {
@@ -587,7 +610,8 @@ function makeType(node: ASTType) {
     return NewBytecode(PlBytecodeType.DEFTYP, `'${node.content}'`);
 }
 
-function makeBlock(node: ASTBlock, debug: boolean): PlProgramWithDebug {
+/// Blocks will always generate debug information
+function makeBlock(node: ASTBlock, debug: boolean = true): PlProgramWithDebug {
     let statements = EmitProgram(node.statements, debug);
     return (new ProgramBuilder(debug))
         .addBytecode(NewBytecode(PlBytecodeType.BLOCRT, '' + statements.program.length))
@@ -595,7 +619,7 @@ function makeBlock(node: ASTBlock, debug: boolean): PlProgramWithDebug {
         .toProgram();
 }
 
-function makeEvalBlock(node: ASTBlock, debug: boolean): PlProgramWithDebug {
+function makeEvalBlock(node: ASTBlock, debug: boolean = true): PlProgramWithDebug {
     return (new ProgramBuilder(debug))
         .addBytecode(NewBytecode(PlBytecodeType.BLOENT))
         .addPWD(EmitProgram(node.statements, debug))
@@ -603,7 +627,7 @@ function makeEvalBlock(node: ASTBlock, debug: boolean): PlProgramWithDebug {
         .toProgram();
 }
 
-function makePureBlock(node: ASTBlock, debug: boolean): PlProgramWithDebug {
+function makePureBlock(node: ASTBlock, debug: boolean = true): PlProgramWithDebug {
     return (new ProgramBuilder(debug))
         .addPWD(EmitProgram(node.statements, debug))
         .toProgram();

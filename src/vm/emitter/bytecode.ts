@@ -1,5 +1,3 @@
-import PlToken from "../../compiler/lexing/token";
-
 export enum PlBytecodeType {
 
     DEFNUM,
@@ -15,7 +13,7 @@ export enum PlBytecodeType {
 
     JMPIFT,
     JMPIFF,
-    JMPICT,
+    JMPICT, // unused
     JMPICF,
     JMPREL,
     BLOENT,

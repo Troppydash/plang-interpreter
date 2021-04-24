@@ -31,8 +31,8 @@ can import .plang, packages, or .plb files.
 JS Interop:
 syntax for calling javascript functions from plang are:
 
-javascript.Object.entries(dict())
-javascript.on(List).forEach(func(value, index) {
+js.Object.entries(dict())
+js.on(List).forEach(func(value, index) {
     print(value)
 })
 

@@ -6,3 +6,10 @@ NLINESUP, NLINESDOWN: number of error lines printing that is displayed before th
 
 compiler/parsing/visualizer:
 PPINDENT: number of spaces when pretty printing an AST
+
+vm/emitter/index:
+METHOD_SEP: method name scrabbling for impl functions
+ARITY_SEP: function call overloading for all functions
+LOOP_INDEX: name of inaccessible variable for 'loop' and 'each' statements
+EACH_ITER: name of inaccessible variable for 'each' statements
+
