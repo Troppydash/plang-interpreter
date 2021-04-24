@@ -1,5 +1,5 @@
 import inout, { isNode } from "../inout";
-import { RunParser, RunVM, TryRunParser } from "../linking";
+import { RunEmitter, RunParser, RunVM, TryRunParser } from "../linking";
 import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
 import { LogProblemShort } from "../problem/printer";
 import { colors } from "../inout/color";
@@ -62,7 +62,7 @@ export function StartREPL( filename: string ): number {
                 break;
             }
 
-            RunVM(content, filename);
+            RunEmitter(content, filename);
         }
 
     inout.flush();

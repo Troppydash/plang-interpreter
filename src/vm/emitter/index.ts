@@ -447,7 +447,7 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
             // }
             const cond = new ASTBinary( [],
                 new ASTUnary( [ target ], NewFakePlToken( PlTokenType.DEC, "--" ), new ASTVariable( [], LOOP_INDEX ) ),
-                new ASTNumber( [], 0 ),
+                new ASTNumber( [], '0' ),
                 NewFakePlToken( PlTokenType.GTE, ">=" ) );
 
             programBuilder
@@ -546,11 +546,11 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
 
         let inBlock = [];
         const valueAssign = new ASTCreate( [], undefined, node.value,
-            new ASTCall( [ target ], new ASTDot( [], index, new ASTVariable( [], "get" ) ), [ new ASTNumber( [], 1 ) ] ) );
+            new ASTCall( [ target ], new ASTDot( [], index, new ASTVariable( [], "get" ) ), [ new ASTNumber( [], '1' ) ] ) );
         inBlock.push( valueAssign );
         if ( node.key ) {
             const keyAssign = new ASTCreate( [], undefined, node.key,
-                new ASTCall( [ target ], new ASTDot( [], index, new ASTVariable( [], "get" ) ), [ new ASTNumber( [], 2 ) ] ) );
+                new ASTCall( [ target ], new ASTDot( [], index, new ASTVariable( [], "get" ) ), [ new ASTNumber( [], '2' ) ] ) );
             inBlock.push( keyAssign );
         }
 

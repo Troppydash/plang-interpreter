@@ -19,17 +19,21 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Working emitter completed, the import and export instructions will be done later">
-      <change afterPath="$PROJECT_DIR$/src/vm/machine/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/vm/machine/memory.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/vm/machine/native.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/vm/machine/stuff.ts" afterDir="false" />
+    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Started the stack machine">
+      <change afterPath="$PROJECT_DIR$/src/vm/machine/native/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/vm/machine/native/native.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/vm/machine/scrambler.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bytecode.txt" beforeDir="false" afterPath="$PROJECT_DIR$/bytecode.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/constants.txt" beforeDir="false" afterPath="$PROJECT_DIR$/constants.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/visualizer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/visualizer.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/emitter/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/stuff.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/stuff.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,19 +75,20 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.completion" />
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\vm\machine\native" />
       <recent name="$PROJECT_DIR$/src/vm/emitter" />
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\playground" />
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter" />
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.build-cli">
+  <component name="RunManager" selected="npm.run playground/test.plang as">
     <configuration name="build-browser" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -124,13 +129,13 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="run playground/test.plang" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="run playground/test.plang as" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="run" />
       </scripts>
-      <arguments value="playground/test.plang" />
+      <arguments value="playground/test.plang as" />
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
@@ -161,13 +166,13 @@
       <item itemvalue="npm.run-build playground/test.plang" />
       <item itemvalue="npm.build-browser" />
       <item itemvalue="npm.build-dist" />
-      <item itemvalue="npm.run playground/test.plang" />
+      <item itemvalue="npm.run playground/test.plang as" />
       <item itemvalue="npm.build" />
       <item itemvalue="npm.watch-build" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.run playground/test.plang" />
+        <item itemvalue="npm.run playground/test.plang as" />
         <item itemvalue="npm.build" />
         <item itemvalue="npm.watch-build" />
         <item itemvalue="npm.build-dist" />
@@ -204,7 +209,7 @@
       <workItem from="1618984222113" duration="125000" />
       <workItem from="1618984593976" duration="6100000" />
       <workItem from="1619077667357" duration="26200000" />
-      <workItem from="1619220219970" duration="15289000" />
+      <workItem from="1619220219970" duration="22647000" />
     </task>
     <task id="LOCAL-00001" summary="moved some comments">
       <created>1617620767259</created>
@@ -346,7 +351,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619227929942</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Started the stack machine">
+      <created>1619237371503</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1619237371503</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -385,7 +397,8 @@
     <MESSAGE value="Added scoping variable create bytecode and moved the emitter package" />
     <MESSAGE value="backup" />
     <MESSAGE value="Working emitter completed, the import and export instructions will be done later" />
-    <option name="LAST_COMMIT_MESSAGE" value="Working emitter completed, the import and export instructions will be done later" />
+    <MESSAGE value="Started the stack machine" />
+    <option name="LAST_COMMIT_MESSAGE" value="Started the stack machine" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

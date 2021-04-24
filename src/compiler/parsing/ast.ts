@@ -355,18 +355,18 @@ export class ASTClosure extends ASTExpression {
 }
 
 export class ASTNumber extends ASTExpression {
-    value: number;
+    value: string;
 
-    constructor(tokens: PlToken[], value: number) {
+    constructor(tokens: PlToken[], value: string) {
         super(tokens);
         this.value = value;
     }
 }
 
 export class ASTBoolean extends ASTExpression {
-    value: boolean;
+    value: string;
 
-    constructor(tokens: PlToken[], value: boolean) {
+    constructor(tokens: PlToken[], value: string) {
         super(tokens);
         this.value = value;
     }

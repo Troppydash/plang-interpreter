@@ -91,7 +91,7 @@ export class PlAstParser implements Parser {
         let statements = [];
         while ( true ) {
             // check for end of file
-            if (this.isEOF()) {
+            if ( this.isEOF() ) {
                 break;
             }
 
@@ -386,7 +386,7 @@ export class PlAstParser implements Parser {
             return null;
         }
 
-        if (this.tryPeekToken(PlTokenType.TYPE, "ET0043", forToken) == null) {
+        if ( this.tryPeekToken( PlTokenType.TYPE, "ET0043", forToken ) == null ) {
             return null;
         }
         const type = this.pTypes();
@@ -717,8 +717,8 @@ export class PlAstParser implements Parser {
                         return null;
                     }
 
-                    if (args[0].length == 0) {
-                        this.newProblemAt(nextToken, "LP0003", "after");
+                    if ( args[0].length == 0 ) {
+                        this.newProblemAt( nextToken, "LP0003", "after" );
                         return null;
                     }
 
@@ -755,10 +755,10 @@ export class PlAstParser implements Parser {
                     break;
                 }
                 default: {
-                    if (nextToken.type == PlTokenType.LF || nextToken.type == PlTokenType.EOF) {
+                    if ( nextToken.type == PlTokenType.LF || nextToken.type == PlTokenType.EOF ) {
                         this.newProblem( lbrace, "CE0007" );
                     } else {
-                        this.newProblem(nextToken, "ET0042", nextToken.content);
+                        this.newProblem( nextToken, "ET0042", nextToken.content );
                     }
                     return null;
                 }
@@ -1025,12 +1025,12 @@ export class PlAstParser implements Parser {
 
     pNumber(): ASTNumber | null {
         const token = this.nextToken();
-        return new ASTNumber( [ token ], +token.content );
+        return new ASTNumber( [ token ], token.content );
     }
 
     pBoolean(): ASTBoolean | null {
         const token = this.nextToken();
-        return new ASTBoolean( [ token ], !!token.content );
+        return new ASTBoolean( [ token ], token.content == 'true' ? '1' : '0' );
     }
 
     pNull(): ASTNull | null {

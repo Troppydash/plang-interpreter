@@ -53,43 +53,6 @@ export function RunParser( content: string, filename: string ): ASTProgram | nul
     return result;
 }
 
-export function RunVM(content: string, filename: string) {
-    const lexer = new PlLexer( NewPlFile( filename, content ) );
-    const parser = new PlAstParser( lexer );
-    const vm = new PlStackMachine({
-        input: inout.input,
-        output: inout.print
-    });
-
-    while ( true ) {
-        // exit if finished
-        if (parser.isEOF()) {
-            break;
-        }
-
-        // parse a statement
-        const statement = parser.parseOnce();
-        if ( statement == null ) {
-            break;
-        }
-
-        // exit if error
-        const problems = parser.getProblems();
-        if ( problems.length != 0 ) {
-            ReportProblems( problems, content );
-            break;
-        }
-
-        // emit bytecode
-        const out = EmitStatement(statement); // this will never fail
-
-        // run the bytecode
-        vm.runProgram(out.program, out.debug);
-
-        // exit if error
-    }
-}
-
 export function RunEmitter(content: string, filename: string): null {
     const ast = RunParser(content, filename);
     if (ast == null) {
@@ -100,6 +63,31 @@ export function RunEmitter(content: string, filename: string): null {
     inout.print(ProgramWithDebugToString(program));
     inout.print(`Emitted ${program.program.length} instructions, with ${program.debug.length} debug messages`);
     // inout.print(ProgramToPlb(program.program));
+}
+
+
+export function RunVM(content: string, filename: string) {
+    const lexer = new PlLexer( NewPlFile( filename, content ) );
+    const parser = new PlAstParser( lexer );
+    const ast = parser.parseAll();
+    if (ast == null) {
+        const problems = parser.getProblems();
+        ReportProblems(problems, content);
+        return null;
+    }
+
+    const program = EmitProgram(ast);
+    const vm = new PlStackMachine({
+        input: inout.input,
+        output: inout.print
+    });
+
+    const out = vm.runProgram(program.program, program.debug);
+    if (out == false) {
+        const problems = vm.getProblems();
+        ReportProblems(problems, content);
+        return null;
+    }
 }
 
 export function RunFile( filePath: string ): number {

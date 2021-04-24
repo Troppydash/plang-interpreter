@@ -97,7 +97,11 @@ const templates = {
     LP0002: "an impl statement must have at least one parameter",
     LP0003: "a case statement must have at least one expression",
 
-    DE0001: "an exception occurred during compiling"
+    DE0001: "an exception occurred during compiling",
+    DE0002: "an exception occurred during interpreting",
+
+    RE0001: "found an unknown bytecode with type '%0'",
+    RE0002: "cannot find the variable or function called '%0'",
 }
 
 // because I am lazy
@@ -167,8 +171,11 @@ const hints: Record<PlProblemCode, string> = {
     LP0002: "the first parameter in an impl statement is by convention 'self'",
     LP0003: "a case statement with no expressions will match nothing, if matching nothing is intended, try the 'default {}' syntax",
 
-    DE0001: "the developer made a mistake, either tell him or find a workaround"
+    DE0001: "the developer made a mistake, either tell him or find a workaround",
+    DE0002: "the developer made a mistake, either tell him or find a workaround",
 
+    RE0001: "unknown bytecode is produced from the emitter, a developer problem at the core",
+    RE0002: "is the variable or function defined?",
 }
 
 const problemFullName = {
@@ -176,7 +183,8 @@ const problemFullName = {
     ET: "UnexpectedToken",
     CE: "ClosingError",
     LP: "LogicalProblem",
-    DE: "DeveloperError"
+    DE: "DeveloperError",
+    RE: "RuntimeError",
 }
 
 export function PCHint(pc: PlProblemCode): string {

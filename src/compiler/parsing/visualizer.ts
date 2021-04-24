@@ -145,7 +145,7 @@ function ats( node: ASTNode | null ): string {
     } else if ( node instanceof ASTClosure ) {
         return `${c.kw( 'func' )}(${atss( node.args )}) ${ats( node.block )}`;
     } else if ( node instanceof ASTNumber ) {
-        return c.nu( '' + node.value );
+        return c.nu( node.value );
     } else if (node instanceof ASTBreak || node instanceof ASTContinue) {
         return c.kw(node.getSpanToken().content);
     } else {
