@@ -11,18 +11,10 @@ export function ReportProblem(problem: PlProblem, content: string) {
     inout.flush();
 }
 
-// export function ReportProblems(problems: PlProblem[], content: string) {
-//     inout.print(colors.red("Problem(s) Occurred"));
-//     for (const problem of problems) {
-//         LogProblem(problem, content);
-//     }
-//     inout.flush();
-// }
-
 export function ReportProblems(content: string, problems: PlProblem[], trace?: PlTrace) {
     inout.print(colors.red("Problem(s) Occurred"));
     if (trace) {
-        inout.print(colors.red('\nTraceback (Most Recent Last)'));
+        inout.print(colors.red('\nCallframes (Most Recent Last)'));
         LogTrace(trace);
         inout.print('');
     }

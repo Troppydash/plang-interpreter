@@ -99,7 +99,7 @@ export function LogTrace(trace: PlTrace) {
     for (const frame of trace) {
         let text = `In frame '${frame.name}'`;
         if (frame.info) {
-            text += ` on line ${frame.info.row+1}, file "${frame.info.filename}"`;
+            text += ` on line ${frame.info.row+1}, inside file "${frame.info.filename}"`;
         }
         buffer.push(text);
     }

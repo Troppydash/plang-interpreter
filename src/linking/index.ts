@@ -80,13 +80,12 @@ export function RunVM(content: string, filename: string) {
     const vm = new PlStackMachine({
         input: inout.input,
         output: inout.print
-    }, filename);
+    });
 
     const out = vm.runProgram(program);
-    if (out == false) {
+    if (out == null) {
         const trace = vm.getTrace();
         const problems = vm.getProblems();
-        trace.reverse();
         ReportProblems(content, problems, trace);
         return null;
     }

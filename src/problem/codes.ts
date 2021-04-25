@@ -106,7 +106,11 @@ const templates = {
     RE0004: "there exists no operator '%0' on type '%1'",
     RE0005: "expect a number to negate with, got type '%0'",
     RE0006: "incorrect arity for a function call, needed %0 but got %1",
-    RE0007: "%0",
+    RE0007: "panic '%0'",
+    RE0008: "attempted to call an uncallable value of type '%0'",
+    RE0009: "cannot use 'continue' or 'break' outside a loop",
+    RE0010: "cannot jump, top of the stack is not a boolean",
+    RE0011: "cannot decrease or increase a non variable of type '%0'",
 }
 
 // because I am lazy
@@ -184,8 +188,12 @@ const hints: Record<PlProblemCode, string> = {
     RE0003: "is the variable defined?",
     RE0004: "the operator is not a valid operation on this type",
     RE0005: "only numbers can be negated",
-    RE0006: "check the number of arguments for the function call, there might be a few missing",
-    RE0007: "afsd"
+    RE0006: "check the number of arguments for the function call, there might be a few missing or a few extras",
+    RE0007: "a function panicked, try reading the message below",
+    RE0008: "you can only call a function, check the value that is stored in the variable?",
+    RE0009: "is this statement surrounded by a loop?",
+    RE0010: "not a boolean",
+    RE0011: "",
 }
 
 const problemFullName = {

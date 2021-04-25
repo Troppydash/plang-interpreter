@@ -1,19 +1,34 @@
-import { PlProgram } from "../emitter/bytecode";
 import { PlStuff } from "./stuff";
-import { PlDebugProgram } from "../emitter/debug";
 import { PlProgramWithDebug } from "../emitter";
 import { PlTraceFrame } from "../../problem/trace";
+import { PlFileInfo } from "../../compiler/lexing/info";
 
 
 export class PlStackFrame {
-    trace: PlTraceFrame;
     values: Record<string, PlStuff>;
     outer: PlStackFrame | null;
+    trace: PlTraceFrame | null;
 
-    constructor(outer: PlStackFrame | null, info: PlTraceFrame) {
+    constructor(outer: PlStackFrame | null, info: PlTraceFrame | null = null) {
         this.trace = info;
         this.outer = outer;
         this.values = {};
+    }
+
+    setTraceName(name: string) {
+        if (this.trace == null) {
+            return this;
+        }
+        this.trace.name = name;
+        return this;
+    }
+
+    setTraceInfo(info: PlFileInfo) {
+        if (this.trace == null) {
+            return this;
+        }
+        this.trace.info = info;
+        return this;
     }
 
     findValue(key: string): PlStuff | null {

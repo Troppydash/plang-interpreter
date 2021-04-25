@@ -1,12 +1,27 @@
 import { ScrambleFunction } from "../scrambler";
 import { PlStuffType } from "../stuff";
 
-export const natives = {
-    [ScrambleFunction( "+",  PlStuffType.NUMBER )]: (l, r) => l + r,
-    [ScrambleFunction( "-",  PlStuffType.NUMBER )]: (l, r) => l - r,
-    [ScrambleFunction( "*",  PlStuffType.NUMBER )]: (l, r) => l * r,
-    [ScrambleFunction( "/",  PlStuffType.NUMBER )]: (l, r) => l / r,
+function assertType( value: any, type: string, message: string ) {
+    if ( typeof value != type ) {
+        throw message;
+    }
+}
 
-    [ScrambleFunction( "+", PlStuffType.STRING )]: (l, r) => l + r,
-    [ScrambleFunction( "*", PlStuffType.STRING )]: (l, r) => l.repeat(r),
+export const natives = {
+    [ScrambleFunction( "+", PlStuffType.NUMBER )]: ( l, r ) => l + r,
+    [ScrambleFunction( "-", PlStuffType.NUMBER )]: ( l, r ) => l - r,
+    [ScrambleFunction( "*", PlStuffType.NUMBER )]: ( l, r ) => l * r,
+    [ScrambleFunction( "/", PlStuffType.NUMBER )]: ( l, r ) => l / r,
+    [ScrambleFunction( "==", PlStuffType.NUMBER )]: ( l, r ) => l == r,
+    [ScrambleFunction( "/=", PlStuffType.NUMBER )]: ( l, r ) => l != r,
+    [ScrambleFunction( ">", PlStuffType.NUMBER )]: ( l, r ) => l > r,
+    [ScrambleFunction( "<", PlStuffType.NUMBER )]: ( l, r ) => l < r,
+    [ScrambleFunction( ">=", PlStuffType.NUMBER )]: ( l, r ) => l >= r,
+    [ScrambleFunction( "<=", PlStuffType.NUMBER )]: ( l, r ) => l <= r,
+
+    [ScrambleFunction( "+", PlStuffType.STRING )]: ( l, r ) => l + r,
+    [ScrambleFunction( "*", PlStuffType.STRING )]: ( l, r ) => {
+        assertType( r, "number", "string can only multiply with numbers" );
+        return l.repeat( r );
+    },
 }

@@ -254,6 +254,7 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             .toProgram();
     } else if (node instanceof ASTFunction) {
         const block = makePureBlock(node.block);
+        node.args.reverse();
         for (const param of node.args) {
             programBuilder.addBytecode(makeVariable(param));
         }
@@ -262,10 +263,11 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
         programBuilder.addPWD(block);
         programBuilder.addEmpty();
         programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFSTR, node.name.content));
-        programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DOASGN), node);
+        programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DOCRET), node);
         return programBuilder.toProgram();
     } else if (node instanceof ASTClosure) {
         const block = makePureBlock(node.block);
+        node.args.reverse();
         for (const param of node.args) {
             programBuilder.addBytecode(makeVariable(param));
         }
@@ -275,6 +277,7 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
         return programBuilder.toProgram();
     } else if (node instanceof ASTImpl) {
         const block = makePureBlock(node.block);
+        node.args.reverse();
         for (const param of node.args) {
             programBuilder.addBytecode(makeVariable(param));
         }
@@ -284,9 +287,10 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
         programBuilder.addEmpty();
         const value = `${node.target.content}${node.name.content.startsWith(METHOD_SEP) ? '' : METHOD_SEP}${node.name.content}`;
         programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFSTR, value));
-        programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DOASGN), node);
+        programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DOCRET), node);
         return programBuilder.toProgram();
     } else if (node instanceof ASTCall) {
+        node.args.reverse();
         for (const arg of node.args) {
             programBuilder.addPWD(traverseAST(arg));
         }
