@@ -24,4 +24,6 @@ export const natives = {
         assertType( r, "number", "string can only multiply with numbers" );
         return l.repeat( r );
     },
+    [ScrambleFunction( "==", PlStuffType.STRING )]: ( l, r ) => l == r,
+
 }

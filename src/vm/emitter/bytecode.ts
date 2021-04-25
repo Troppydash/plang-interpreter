@@ -16,8 +16,6 @@ export enum PlBytecodeType {
     JMPICT, // unused
     JMPICF,
     JMPREL,
-    BLOENT,
-    BLOEXT,
 
     DOCALL,
     DORETN,
@@ -32,6 +30,8 @@ export enum PlBytecodeType {
     DOCONT,
 
     STKPOP,
+    STKENT,
+    STKEXT
 
 }
 

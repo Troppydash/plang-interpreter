@@ -41,7 +41,7 @@ export class PlStackMachine {
 
     seedStack() {
         const native = {
-            [ScrambleFunction( "output" )]: ( ...message: any ) => {
+            [ScrambleFunction( "say" )]: ( ...message: any ) => {
                 if ( message.length == 0 ) {
                     this.stream.output( '\n' );
                 } else {
@@ -49,7 +49,7 @@ export class PlStackMachine {
                 }
                 return null;
             },
-            [ScrambleFunction( "input" )]: ( ...message: any ) => {
+            [ScrambleFunction( "ask" )]: ( ...message: any ) => {
                 return this.stream.input( message.join( '\n' ) );
             },
             [ScrambleFunction( "panic" )]: ( ...message: any ) => {
@@ -422,12 +422,12 @@ export class PlStackMachine {
                 }
 
 
-                case PlBytecodeType.BLOENT: {
+                case PlBytecodeType.STKENT: {
                     this.stackFrame = new PlStackFrame( this.stackFrame );
                     break;
                 }
 
-                case PlBytecodeType.BLOEXT: {
+                case PlBytecodeType.STKEXT: {
                     this.stackFrame = this.stackFrame.outer;
                     break;
                 }

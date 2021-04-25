@@ -19,12 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Added vm jmp controls and blocks">
+    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Grouped some bytecodes together">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/emitter/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bytecode.txt" beforeDir="false" afterPath="$PROJECT_DIR$/bytecode.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/emitter/bytecode.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/bytecode.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/machine/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/memory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/memory.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/native.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/native.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +87,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.build-cli">
+  <component name="RunManager" selected="npm.build-browser">
     <configuration name="build-browser" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -383,7 +383,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619335683111</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Added the @ local scoping">
+      <created>1619345991487</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1619345991487</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -425,7 +432,9 @@
     <MESSAGE value="Started the stack machine" />
     <MESSAGE value="Added stack trace and function calls" />
     <MESSAGE value="Added vm jmp controls and blocks" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added vm jmp controls and blocks" />
+    <MESSAGE value="Added the @ local scoping" />
+    <MESSAGE value="Grouped some bytecodes together" />
+    <option name="LAST_COMMIT_MESSAGE" value="Grouped some bytecodes together" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -16,10 +16,9 @@ jmpiff - Jump if the top of the stack is false
 jmpict - Jump if the top of the stack is true, consume the stack
 jmpicf - Jump if the top of the stack is false, consume the stack
 jmprel - Force jump
-bloent - Enter block
-bloext - Exit block
 
-Dos:
+
+Actions:
 docall - Call functions
 doasgn - Assignment
 docret - Assignment but creation only
@@ -29,8 +28,11 @@ dooinc - Postfix increment
 doodec - Postfix decrement
 donegt - Negate operator
 dolnot - Logical not
+
 dobrak - Ghost break
 docont - Ghost continue
 
 Stack:
 stkpop - Pop stack
+stkent - Enter block
+stkext - Exit block
