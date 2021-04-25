@@ -79,7 +79,10 @@ export function RunVM(content: string, filename: string) {
     const program = EmitProgram(ast);
     const vm = new PlStackMachine({
         input: inout.input,
-        output: inout.print
+        output: message => {
+            inout.print(message);
+            inout.flush();
+        }
     });
 
     const out = vm.runProgram(program);

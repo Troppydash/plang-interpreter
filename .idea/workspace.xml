@@ -19,16 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Added stack trace and function calls">
+    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Added vm jmp controls and blocks">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/printer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/emitter/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/machine/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/machine/memory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/memory.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/native.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/native.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -91,7 +87,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run playground/test.plang">
+  <component name="RunManager" selected="npm.build-cli">
     <configuration name="build-browser" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -380,7 +376,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619319541177</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Added vm jmp controls and blocks">
+      <created>1619335683111</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1619335683111</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -421,7 +424,8 @@
     <MESSAGE value="Working emitter completed, the import and export instructions will be done later" />
     <MESSAGE value="Started the stack machine" />
     <MESSAGE value="Added stack trace and function calls" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added stack trace and function calls" />
+    <MESSAGE value="Added vm jmp controls and blocks" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added vm jmp controls and blocks" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -444,25 +448,8 @@
           <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="13" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/vm/machine/native/native.ts</url>
-          <line>19</line>
-          <properties lambdaOrdinal="0" />
-          <option name="timeStamp" value="31" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/vm/machine/index.ts</url>
-          <line>146</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="42" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="js.build_tools.npm">
-        <watch expression="this.stack" language="TypeScript" />
-      </configuration>
-    </watches-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

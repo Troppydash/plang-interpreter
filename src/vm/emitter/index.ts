@@ -180,8 +180,17 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
         } else {
             programBuilder.addEmpty();
         }
-        programBuilder.addBytecode(makeVariable(node.variable));
-        programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DOASGN), node);
+
+        const content = node.variable.content;
+        if (content[0] == '@') {
+            node.variable.content = content.substring(1)
+            programBuilder.addBytecode(makeVariable(node.variable));
+            programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DOCRET), node);
+        }
+        else {
+            programBuilder.addBytecode(makeVariable(node.variable));
+            programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DOASGN), node);
+        }
         return programBuilder.toProgram();
     } else if (node instanceof ASTDot) {
         return programBuilder

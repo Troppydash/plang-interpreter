@@ -7,10 +7,11 @@ import { PlFileInfo } from "../../compiler/lexing/info";
 export class PlStackFrame {
     values: Record<string, PlStuff>;
     outer: PlStackFrame | null;
+
     trace: PlTraceFrame | null;
 
-    constructor(outer: PlStackFrame | null, info: PlTraceFrame | null = null) {
-        this.trace = info;
+    constructor(outer: PlStackFrame | null, trace: PlTraceFrame | null = null) {
+        this.trace = trace;
         this.outer = outer;
         this.values = {};
     }
@@ -35,6 +36,16 @@ export class PlStackFrame {
         if (key in this.values) {
             return this.values[key];
         }
+        if (this.outer && this.trace == null) {
+            return this.outer.findValue(key);
+        }
+        return null;
+    }
+
+    findValueDeep( key: string): PlStuff | null {
+        if (key in this.values) {
+            return this.values[key];
+        }
         if (this.outer) {
             return this.outer.findValue(key);
         }
@@ -42,10 +53,14 @@ export class PlStackFrame {
     }
 
     setValue(key: string, value: PlStuff) {
-        if (this.outer && this.outer.findValue(key) != null) {
+        if (key in this.values) {
+            this.values[key] = value;
+            return;
+        }
+        if (this.outer && this.outer.findValueDeep(key) != null) {
             return this.outer.setValue(key, value);
         }
-        this.values[key] = value;
+        this.createValue(key, value);
     }
 
     createValue(key: string, value: PlStuff) {

@@ -20,6 +20,8 @@ export class PlStackMachine {
     readonly stream: PlStreamInout;
 
     stackFrame: PlStackFrame;
+    closureStack: PlStackFrame | null;
+
     stack: PlStuff[];
 
     debug: PlDebugProgram;
@@ -30,6 +32,8 @@ export class PlStackMachine {
         this.problems = [];
 
         this.stackFrame = new PlStackFrame( null, NewPlTraceFrame( "file" ) );
+        this.closureStack = null;
+
         this.stack = [];
 
         this.seedStack();
@@ -48,8 +52,8 @@ export class PlStackMachine {
             [ScrambleFunction( "input" )]: ( ...message: any ) => {
                 return this.stream.input( message.join( '\n' ) );
             },
-            [ScrambleFunction("panic")]: (...message: any) => {
-                throw message.join(' ');
+            [ScrambleFunction( "panic" )]: ( ...message: any ) => {
+                throw message.join( ' ' );
             },
             ...natives,
         };
@@ -125,7 +129,7 @@ export class PlStackMachine {
         const trace = [];
         let frame = this.stackFrame;
         while ( true ) {
-            if (frame.trace != null)
+            if ( frame.trace != null )
                 trace.push( frame.trace );
             if ( (frame = frame.outer) == null ) {
                 break;
@@ -135,11 +139,34 @@ export class PlStackMachine {
         return trace;
     }
 
-    jump(ptr: number, amount: number): number {
-        if (amount < 0) {
+    jump( ptr: number, amount: number ): number {
+        if ( amount < 0 ) {
             return ptr + amount - 2; // this because i am stupid at emitting bytecode jumps
         }
         return ptr + amount;
+    }
+
+    findValue( key: string ) {
+        // I HAVE NO IDEA HOW THESE SCOPING RULES WORK, BUT IT WORKS
+        let value = this.stackFrame.findValue( key );
+        if ( value == null && this.closureStack != null ) {
+            value = this.closureStack.findValueDeep( key );
+            if ( value != null ) {
+                return value;
+            }
+        }
+        return this.stackFrame.findValueDeep( key );
+    }
+
+    createValue( key: string, value: PlStuff ) {
+        return this.stackFrame.createValue( key, value );
+    }
+
+    setValue( key: string, value: PlStuff ) {
+        if ( this.stackFrame.findValue( key ) == null && this.closureStack != null && this.closureStack.findValueDeep( key ) != null ) {
+            return this.closureStack.setValue( key, value );
+        }
+        return this.stackFrame.setValue( key, value );
     }
 
     runProgram( pwd: PlProgramWithDebug ): PlStuff | null {
@@ -147,318 +174,327 @@ export class PlStackMachine {
         const { program, debug } = pwd;
         let ptr = 0;
         // try {
-            while ( ptr < program.length ) {
-                const byte = program[ptr];
-                switch ( byte.type ) {
-                    case PlBytecodeType.STKPOP: {
-                        this.popStack();
-                        break;
-                    }
-                    case PlBytecodeType.DEFNUM: {
-                        this.pushStack( NewPlStuff( PlStuffType.NUMBER, +byte.value ) );
-                        break;
-                    }
-                    case PlBytecodeType.DEFSTR: {
-                        this.pushStack( NewPlStuff( PlStuffType.STRING, byte.value ) );
-                        break;
-                    }
-                    case PlBytecodeType.DEFBOL: {
-                        if ( byte.value == '1' )
-                            this.pushStack( PlStuffTrue );
-                        else
-                            this.pushStack( PlStuffFalse );
-                        break;
-                    }
-                    case PlBytecodeType.DEFNUL: {
-                        this.pushStack( PlStuffNull );
-                        break;
-                    }
-                    case PlBytecodeType.DEFTYP: {
-                        this.pushStack( NewPlStuff( PlStuffType.TYPE, byte.value ) );
-                        break;
-                    }
-                    case PlBytecodeType.DEFETY: {
-                        this.pushStack( null );
-                        break;
-                    }
-                    case PlBytecodeType.DEFVAR: {
-                        let name = byte.value;
+        while ( ptr < program.length ) {
+            const byte = program[ptr];
+            switch ( byte.type ) {
+                case PlBytecodeType.STKPOP: {
+                    this.popStack();
+                    break;
+                }
+                case PlBytecodeType.DEFNUM: {
+                    this.pushStack( NewPlStuff( PlStuffType.NUMBER, +byte.value ) );
+                    break;
+                }
+                case PlBytecodeType.DEFSTR: {
+                    this.pushStack( NewPlStuff( PlStuffType.STRING, byte.value ) );
+                    break;
+                }
+                case PlBytecodeType.DEFBOL: {
+                    if ( byte.value == '1' )
+                        this.pushStack( PlStuffTrue );
+                    else
+                        this.pushStack( PlStuffFalse );
+                    break;
+                }
+                case PlBytecodeType.DEFNUL: {
+                    this.pushStack( PlStuffNull );
+                    break;
+                }
+                case PlBytecodeType.DEFTYP: {
+                    this.pushStack( NewPlStuff( PlStuffType.TYPE, byte.value ) );
+                    break;
+                }
+                case PlBytecodeType.DEFETY: {
+                    this.pushStack( null );
+                    break;
+                }
+                case PlBytecodeType.DEFVAR: {
+                    let name = byte.value;
 
-                        // try to find it in the stack frame
-                        let value = this.stackFrame.findValue( name );
+                    // try to find it in the stack frame
+                    let value = this.findValue( name );
+                    if ( value != null ) {
+                        this.pushStack( value );
+                        break;
+                    }
+
+                    // attempt to add type
+                    const left = this.peekStack( 1 );
+                    if ( left != null ) {
+                        value = this.findValue( ScrambleFunction( name, left.type ) )
                         if ( value != null ) {
                             this.pushStack( value );
                             break;
                         }
+                    }
 
-                        // attempt to add type
-                        const left = this.peekStack( 1 );
-                        if ( left != null ) {
-                            value = this.stackFrame.findValue( ScrambleFunction( name, left.type ) )
-                            if ( value != null ) {
-                                this.pushStack( value );
-                                break;
+                    this.newProblem( {
+                        "ASTVariable": "RE0003",
+                        "ASTBinary": "RE0004",
+                    }, ptr, debug, name, left ? PlStuffToTypeString( left.type ) : undefined );
+                    return null;
+                }
+                case PlBytecodeType.DEFLST: {
+                    const length = this.popStack();
+                    let values = [];
+                    for ( let i = 0; i < length.value; ++i ) {
+                        values.push( this.popStack() );
+                    }
+
+                    this.pushStack( NewPlStuff( PlStuffType.LIST, values ) );
+                    break;
+                }
+                case PlBytecodeType.DEFDIC: {
+                    break;
+                }
+
+                case PlBytecodeType.DEFFUN: {
+                    const arity = this.popStack();
+                    const parameters: PlStuff[] = [];
+                    for ( let i = 0; i < arity.value; ++i ) {
+                        parameters.push( this.popStack() );
+                    }
+                    // block
+                    const length = +byte.value;
+                    const start = ptr + 1;
+                    const end = ptr + length + 1;
+                    const bytecode = program.slice( start, end );
+                    const debugs = [];
+
+                    // get debug
+                    if ( debug ) {
+                        for ( const info of debug ) {
+                            if ( PlDebugWithin( info, start, end ) ) {
+                                debugs.push( { ...info, endLine: info.endLine - ptr - 1 } );
                             }
                         }
-
-                        this.newProblem( {
-                            "ASTVariable": "RE0003",
-                            "ASTBinary": "RE0004",
-                        }, ptr, debug, name, left ? PlStuffToTypeString( left.type ) : undefined );
-                        return null;
                     }
-                    case PlBytecodeType.DEFLST: {
-                        const length = this.popStack();
-                        let values = [];
-                        for ( let i = 0; i < length.value; ++i ) {
-                            values.push( this.popStack() );
-                        }
 
-                        this.pushStack( NewPlStuff( PlStuffType.LIST, values ) );
+                    this.pushStack( NewPlStuff( PlStuffType.FUNCTION, {
+                        stackFrame: new PlStackFrame( this.stackFrame, NewPlTraceFrame( "closure" ) ), // the define stackframe
+                        bytecode: { program: bytecode, debug: debugs },
+                        parameters
+                    } as PlFunction ) );
+                    ptr += length;
+                    break;
+                }
+
+                case PlBytecodeType.DOOINC:
+                case PlBytecodeType.DOODEC: {
+                    const value = this.popStack();
+                    if ( value.type == PlStuffType.NUMBER ) {
+                        if ( byte.type == PlBytecodeType.DOOINC )
+                            value.value++;
+                        else
+                            value.value--;
+                        this.pushStack( value );
                         break;
                     }
-                    case PlBytecodeType.DEFDIC: {
+                    this.newProblem( "RE0011", ptr, debug, PlStuffToTypeString( value.type ) );
+                    return null;
+                }
+
+                case PlBytecodeType.DONEGT: {
+                    const value = this.popStack();
+                    if ( value.type == PlStuffType.NUMBER ) {
+                        value.value = -value.value;
+                        this.pushStack( value );
+                        break;
+                    }
+                    this.newProblem( "RE0005", ptr, debug, '' + PlStuffToTypeString( value.type ) );
+                    return null;
+                }
+
+                case PlBytecodeType.DOLNOT: {
+                    break;
+                }
+
+                case PlBytecodeType.DOCRET:
+                case PlBytecodeType.DOASGN: {
+                    const name = this.popStack(); // is a string
+                    const dict = this.popStack();
+                    const value = this.popStack();
+
+                    if ( dict == null ) {
+                        if ( value.type == PlStuffType.FUNCTION ) {
+                            const content = value.value as PlFunction;
+                            content.stackFrame.setTraceName( name.value );
+                        }
+                        // set name to value
+                        if ( byte.type == PlBytecodeType.DOCRET ) {
+                            this.createValue( name.value, value );
+                        } else {
+                            this.setValue( name.value, value );
+                        }
                         break;
                     }
 
-                    case PlBytecodeType.DEFFUN: {
-                        const arity = this.popStack();
-                        const parameters: PlStuff[] = [];
-                        for ( let i = 0; i < arity.value; ++i ) {
-                            parameters.push( this.popStack() );
-                        }
-                        // block
-                        const length = +byte.value;
-                        const start = ptr + 1;
-                        const end = ptr + length + 1;
-                        const bytecode = program.slice( start, end );
-                        const debugs = [];
+                    return null;
+                }
 
-                        // get debug
-                        if ( debug ) {
-                            for ( const info of debug ) {
-                                if ( PlDebugWithin( info, start, end ) ) {
-                                    debugs.push( { ...info, endLine: info.endLine - ptr - 1 } );
-                                }
-                            }
-                        }
+                case PlBytecodeType.DOCALL: {
+                    const func = this.popStack();
+                    const arity = this.popStack();
+                    const args = [];
 
-                        this.pushStack( NewPlStuff( PlStuffType.FUNCTION, {
-                            stackFrame: null,
-                            bytecode: { program: bytecode, debug: debugs },
-                            parameters
-                        } as PlFunction ) );
-                        ptr += length;
-                        break;
+                    // trust this
+                    for ( let i = 0; i < +arity.value; ++i ) {
+                        args.push( this.popStack() );
                     }
 
-                    case PlBytecodeType.DOOINC:
-                    case PlBytecodeType.DOODEC: {
-                        const value = this.popStack();
-                        if (value.type == PlStuffType.NUMBER) {
-                            if (byte.type == PlBytecodeType.DOOINC)
-                                value.value++;
-                            else
-                                value.value--;
-                            this.pushStack(value);
-                            break;
-                        }
-                        this.newProblem("RE0011", ptr, debug, PlStuffToTypeString(value.type));
-                        return null;
+                    // get debug
+                    let callDebug: PlDebug;
+                    if ( debug ) {
+                        // get call debug
+                        callDebug = debug.filter( d => d.endLine == ptr + 1 ).pop();
                     }
 
-                    case PlBytecodeType.DONEGT: {
-                        const value = this.popStack();
-                        if ( value.type == PlStuffType.NUMBER ) {
-                            value.value = -value.value;
-                            this.pushStack( value );
-                            break;
-                        }
-                        this.newProblem( "RE0005", ptr, debug, '' + PlStuffToTypeString( value.type ) );
-                        return null;
-                    }
-
-                    case PlBytecodeType.DOLNOT: {
-                        break;
-                    }
-
-                    case PlBytecodeType.DOCRET:
-                    case PlBytecodeType.DOASGN: {
-                        const name = this.popStack(); // is a string
-                        const dict = this.popStack();
-                        const value = this.popStack();
-
-                        if ( dict == null ) {
-                            if ( value.type == PlStuffType.FUNCTION ) {
-                                const content = value.value as PlFunction;
-                                content.stackFrame.setTraceName( name.value );
-                            }
-                            // set name to value
-                            if (byte.type == PlBytecodeType.DOCRET) {
-                                this.stackFrame.createValue( name.value, value );
-                            } else {
-                                this.stackFrame.setValue( name.value, value );
-                            }
-                            break;
-                        }
-
-                        return null;
-                    }
-
-                    case PlBytecodeType.DOCALL: {
-                        const func = this.popStack();
-                        const arity = this.popStack();
-                        const args = [];
-
-                        // trust this
-                        for ( let i = 0; i < +arity.value; ++i ) {
-                            args.push( this.popStack() );
-                        }
-
-                        // get debug
-                        let callDebug: PlDebug;
-                        if ( debug ) {
-                            // get call debug
-                            callDebug = debug.filter( d => d.endLine == ptr + 1 ).pop();
-                        }
-
-                        // call function
-                        switch ( func.type ) {
-                            case PlStuffType.NFUNCTION: {
-                                const value = func.value as PlNativeFunction;
-                                try {
-                                    const out = value.callback( ...args );
-                                    this.pushStack( out );
-                                } catch ( e ) {
-                                    if ( callDebug ) {
-                                        this.stackFrame = new PlStackFrame( this.stackFrame, NewPlTraceFrame( "native", callDebug.span.info ) )
-                                    }
-                                    this.newProblem( "RE0007", ptr, debug, '' + e );
-                                    return null;
-                                }
-                                break;
-                            }
-                            case PlStuffType.FUNCTION: {
-                                const value = func.value as PlFunction;
-                                const parameters = value.parameters;
-                                if ( parameters.length != args.length ) {
-                                    this.newProblem( "RE0006", ptr, debug, '' + parameters.length, '' + args.length );
-                                    return null;
-                                }
-
-                                const saved = this.stackFrame;
-                                this.stackFrame = new PlStackFrame( this.stackFrame, NewPlTraceFrame( "closure" ) );
+                    // call function
+                    switch ( func.type ) {
+                        case PlStuffType.NFUNCTION: {
+                            const value = func.value as PlNativeFunction;
+                            try {
+                                const out = value.callback( ...args );
+                                this.pushStack( out );
+                            } catch ( e ) {
                                 if ( callDebug ) {
-                                    this.stackFrame.setTraceInfo( callDebug.span.info );
+                                    this.stackFrame = new PlStackFrame( this.stackFrame, NewPlTraceFrame( "native", callDebug.span.info ) )
                                 }
-                                // assign variables
-                                for ( let i = 0; i < args.length; ++i ) {
-                                    this.stackFrame.createValue( parameters[i].value, args[i] );
-                                }
-                                const out = this.runProgram(value.bytecode);
-                                if ( out == null ) {
-                                    return null;
-                                }
-                                this.stackFrame = saved;
-                                this.pushStack(out);
-                                break;
-                            }
-                            default: {
-                                this.newProblem("RE0008", ptr, debug, PlStuffToTypeString(func.type));
+                                this.newProblem( "RE0007", ptr, debug, '' + e );
                                 return null;
                             }
-                        }
-                        break;
-                    }
-
-                    case PlBytecodeType.DOFIND: {
-                        break;
-                    }
-
-                    case PlBytecodeType.DORETN: {
-                        return this.popStack();
-                    }
-
-                    case PlBytecodeType.DOBRAK:
-                    case PlBytecodeType.DOCONT: {
-                        this.newProblem("RE0009", ptr, debug);
-                        return null;
-                    }
-
-
-                    case PlBytecodeType.BLOENT: {
-                        this.stackFrame = new PlStackFrame(this.stackFrame);
-                        break;
-                    }
-
-                    case PlBytecodeType.BLOEXT: {
-                        this.stackFrame = this.stackFrame.outer;
-                        break;
-                    }
-
-                    case PlBytecodeType.JMPREL: {
-                        ptr = this.jump(ptr, +byte.value);
-                        break;
-                    }
-
-                    case PlBytecodeType.JMPIFT: {
-                        const peek = this.peekStack();
-                        if (peek.type == PlStuffType.BOOLEAN) {
-                            if (peek.value == true) {
-                                ptr = this.jump(ptr, +byte.value);
-                            }
                             break;
                         }
-                        this.newProblem("RE0010", ptr, debug);
-                        return null;
-                    }
-
-                    case PlBytecodeType.JMPIFF: {
-                        const peek = this.peekStack();
-                        if (peek.type == PlStuffType.BOOLEAN) {
-                            if (peek.value == false) {
-                                ptr = this.jump(ptr, +byte.value);
+                        case PlStuffType.FUNCTION: {
+                            const value = func.value as PlFunction;
+                            const parameters = value.parameters;
+                            if ( parameters.length != args.length ) {
+                                this.newProblem( "RE0006", ptr, debug, '' + parameters.length, '' + args.length );
+                                return null;
                             }
+
+                            const savedStack = this.stackFrame;
+                            const savedClosure = this.closureStack;
+
+                            this.closureStack = value.stackFrame;
+                            this.stackFrame = new PlStackFrame( this.stackFrame, value.stackFrame.trace );
+
+                            if ( callDebug ) {
+                                this.stackFrame.setTraceInfo( callDebug.span.info );
+                            }
+                            // assign variables
+                            for ( let i = 0; i < args.length; ++i ) {
+                                this.createValue( parameters[i].value, args[i] );
+                            }
+
+                            const out = this.runProgram( value.bytecode );
+                            if ( out == null ) {
+                                return null;
+                            }
+
+                            this.stackFrame = savedStack;
+                            this.closureStack = savedClosure;
+
+                            this.pushStack( out );
                             break;
                         }
-                        this.newProblem("RE0010", ptr, debug);
-                        return null;
-                    }
-
-                    case PlBytecodeType.JMPICT: {
-                        const peek = this.popStack();
-                        if (peek.type == PlStuffType.BOOLEAN) {
-                            if (peek.value == true) {
-                                ptr = this.jump(ptr, +byte.value);
-                            }
-                            break;
+                        default: {
+                            this.newProblem( "RE0008", ptr, debug, PlStuffToTypeString( func.type ) );
+                            return null;
                         }
-                        this.newProblem("RE0010", ptr, debug);
-                        return null;
                     }
-
-                    case PlBytecodeType.JMPICF: {
-                        const peek = this.popStack();
-                        if (peek.type == PlStuffType.BOOLEAN) {
-                            if (peek.value == false) {
-                                ptr = this.jump(ptr, +byte.value);
-                            }
-                            break;
-                        }
-                        this.newProblem("RE0010", ptr, debug);
-                        return null;
-                    }
-
-                    default: {
-                        this.newProblem( "RE0001", ptr, debug, '' + byte.type );
-                        return null;
-                    }
+                    break;
                 }
-                ++ptr;
-            }
 
-            // return Null if no exports
-            return PlStuffNull;
+                case PlBytecodeType.DOFIND: {
+                    // TODO: Write dictionary and others
+                    break;
+                }
+
+                case PlBytecodeType.DORETN: {
+                    return this.popStack();
+                }
+
+                case PlBytecodeType.DOBRAK:
+                case PlBytecodeType.DOCONT: {
+                    this.newProblem( "RE0009", ptr, debug );
+                    return null;
+                }
+
+
+                case PlBytecodeType.BLOENT: {
+                    this.stackFrame = new PlStackFrame( this.stackFrame );
+                    break;
+                }
+
+                case PlBytecodeType.BLOEXT: {
+                    this.stackFrame = this.stackFrame.outer;
+                    break;
+                }
+
+                case PlBytecodeType.JMPREL: {
+                    ptr = this.jump( ptr, +byte.value );
+                    break;
+                }
+
+                case PlBytecodeType.JMPIFT: {
+                    const peek = this.peekStack();
+                    if ( peek.type == PlStuffType.BOOLEAN ) {
+                        if ( peek.value == true ) {
+                            ptr = this.jump( ptr, +byte.value );
+                        }
+                        break;
+                    }
+                    this.newProblem( "RE0010", ptr, debug );
+                    return null;
+                }
+
+                case PlBytecodeType.JMPIFF: {
+                    const peek = this.peekStack();
+                    if ( peek.type == PlStuffType.BOOLEAN ) {
+                        if ( peek.value == false ) {
+                            ptr = this.jump( ptr, +byte.value );
+                        }
+                        break;
+                    }
+                    this.newProblem( "RE0010", ptr, debug );
+                    return null;
+                }
+
+                case PlBytecodeType.JMPICT: {
+                    const peek = this.popStack();
+                    if ( peek.type == PlStuffType.BOOLEAN ) {
+                        if ( peek.value == true ) {
+                            ptr = this.jump( ptr, +byte.value );
+                        }
+                        break;
+                    }
+                    this.newProblem( "RE0010", ptr, debug );
+                    return null;
+                }
+
+                case PlBytecodeType.JMPICF: {
+                    const peek = this.popStack();
+                    if ( peek.type == PlStuffType.BOOLEAN ) {
+                        if ( peek.value == false ) {
+                            ptr = this.jump( ptr, +byte.value );
+                        }
+                        break;
+                    }
+                    this.newProblem( "RE0010", ptr, debug );
+                    return null;
+                }
+
+                default: {
+                    this.newProblem( "RE0001", ptr, debug, '' + byte.type );
+                    return null;
+                }
+            }
+            ++ptr;
+        }
+
+        // return Null if no exports
+        return PlStuffNull;
         // } catch ( e ) {
         //     this.newProblem( "DE0002", ptr, debug, '' + e );
         //     return null;
