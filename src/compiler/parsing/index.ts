@@ -75,14 +75,13 @@ export class PlAstParser implements Parser {
 
     parseOnce(): ASTStatement | null {
         try {
-            this.clearLF();
             return this.pStatement();
         } catch (e) {
             if (e instanceof ErrTokenException) {
                 return null;
             }
             // normal error
-            this.newProblem(this.getToken(), "DE0001");
+            this.newProblem(this.getToken(), "DE0001", ''+e);
             return null;
         }
     }
@@ -98,7 +97,6 @@ export class PlAstParser implements Parser {
             } catch (e) {
                 return null;
             }
-
 
             const statement = this.parseOnce();
             if (statement == null) {

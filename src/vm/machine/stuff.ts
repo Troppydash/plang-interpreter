@@ -4,9 +4,11 @@ export enum PlStuffType {
     BOOLEAN,
     NULL,
     TYPE,
-    BLOCK,
     FUNCTION,
     NFUNCTION,
+    LIST,
+    DICTIONARY,
+
 }
 
 export interface PlStuff {
@@ -36,6 +38,10 @@ export function PlStuffToTypeString(stuffType: PlStuffType): string {
             return "Str"
         case PlStuffType.NULL:
             return "Null";
+        case PlStuffType.LIST:
+            return "List";
+        case PlStuffType.DICTIONARY:
+            return "Dict";
         default:
             return "Null";
     }

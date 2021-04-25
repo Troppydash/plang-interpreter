@@ -253,32 +253,34 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             .addStretch(node)
             .toProgram();
     } else if (node instanceof ASTFunction) {
-        programBuilder.addPWD(makeBlock(node.block));
+        const block = makePureBlock(node.block);
         for (const param of node.args) {
             programBuilder.addBytecode(makeVariable(param));
         }
         programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFNUM, '' + node.args.length));
-        programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFFUN));
+        programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFFUN, ''+block.program.length));
+        programBuilder.addPWD(block);
         programBuilder.addEmpty();
-
         programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFSTR, node.name.content));
         programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DOASGN), node);
         return programBuilder.toProgram();
     } else if (node instanceof ASTClosure) {
-        programBuilder.addPWD(makeBlock(node.block));
+        const block = makePureBlock(node.block);
         for (const param of node.args) {
             programBuilder.addBytecode(makeVariable(param));
         }
         programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFNUM, '' + node.args.length));
-        programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DEFFUN), node);
+        programBuilder.addBytecodeStretch(NewBytecode(PlBytecodeType.DEFFUN, ''+block.program.length), node);
+        programBuilder.addPWD(block);
         return programBuilder.toProgram();
     } else if (node instanceof ASTImpl) {
-        programBuilder.addPWD(makeBlock(node.block));
+        const block = makePureBlock(node.block);
         for (const param of node.args) {
             programBuilder.addBytecode(makeVariable(param));
         }
         programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFNUM, '' + node.args.length));
-        programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFFUN));
+        programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFFUN, ''+(block.program.length)));
+        programBuilder.addPWD(block);
         programBuilder.addEmpty();
         const value = `${node.target.content}${node.name.content.startsWith(METHOD_SEP) ? '' : METHOD_SEP}${node.name.content}`;
         programBuilder.addBytecode(NewBytecode(PlBytecodeType.DEFSTR, value));
@@ -625,14 +627,6 @@ function makeString(node: ASTString) {
 
 function makeType(node: ASTType) {
     return NewBytecode(PlBytecodeType.DEFTYP, `${node.content}`);
-}
-
-function makeBlock(node: ASTBlock): PlProgramWithDebug {
-    let statements = EmitProgram(node.statements);
-    return (new ProgramBuilder())
-        .addBytecode(NewBytecode(PlBytecodeType.BLOCRT, '' + statements.program.length))
-        .addPWDStretch(statements, node)
-        .toProgram();
 }
 
 function makeEvalBlock(node: ASTBlock): PlProgramWithDebug {

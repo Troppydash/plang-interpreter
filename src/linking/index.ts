@@ -46,7 +46,7 @@ export function RunParser( content: string, filename: string ): ASTProgram | nul
 
     const problems = parser.getProblems();
     if ( problems.length != 0 ) {
-        ReportProblems( problems, content );
+        ReportProblems( content, problems);
         return null;
     }
 
@@ -72,7 +72,7 @@ export function RunVM(content: string, filename: string) {
     const ast = parser.parseAll();
     if (ast == null) {
         const problems = parser.getProblems();
-        ReportProblems(problems, content);
+        ReportProblems(content, problems);
         return null;
     }
 
@@ -80,12 +80,14 @@ export function RunVM(content: string, filename: string) {
     const vm = new PlStackMachine({
         input: inout.input,
         output: inout.print
-    });
+    }, filename);
 
-    const out = vm.runProgram(program.program, program.debug);
+    const out = vm.runProgram(program);
     if (out == false) {
+        const trace = vm.getTrace();
         const problems = vm.getProblems();
-        ReportProblems(problems, content);
+        trace.reverse();
+        ReportProblems(content, problems, trace);
         return null;
     }
 }
@@ -110,7 +112,7 @@ export function RunFile( filePath: string ): number {
 
 
     // inout.print( AttemptPrettyPrint( result ) );
-    RunEmitter(content, filename);
+    // RunEmitter(content, filename);
     RunVM(content, filename);
 
     // console.log(result);

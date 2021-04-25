@@ -18,7 +18,6 @@ jmpicf - Jump if the top of the stack is false, consume the stack
 jmprel - Force jump
 bloent - Enter block
 bloext - Exit block
-blocrt - Create block
 
 Dos:
 docall - Call functions

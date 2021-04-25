@@ -1,4 +1,4 @@
-import {EmptyFileInfo, NewFileInfo, PlFileInfo} from "./info";
+import { NewEmptyFileInfo, NewFileInfo, PlFileInfo } from "./info";
 import { escapeString } from "../../extension";
 
 export enum PlTokenType {
@@ -80,7 +80,7 @@ export function NewFakePlToken(type: PlTokenType, content: string) {
     return {
         type,
         content,
-        info: EmptyFileInfo('')
+        info: NewEmptyFileInfo('')
     };
 }
 

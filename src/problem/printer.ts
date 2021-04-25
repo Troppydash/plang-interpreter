@@ -3,6 +3,7 @@ import {PCFullName, PCHint} from "./codes";
 import inout from "../inout";
 import {colors} from "../inout/color";
 import {chunkString} from "../extension";
+import { PlTrace, PlTraceFrame } from "./trace";
 
 const NLINESUP = 1;
 const NLINESDOWN = 2;
@@ -81,7 +82,8 @@ export function LogProblem(problem: PlProblem, content: string) {
     // hints
     buffer.push(`${colors.yellow("Hint")}: ${PCHint(code).split("\n").join("\n      ")}`);
     // error
-    buffer.push(`${colors.cyan(PCFullName(code))}: ${message}`);
+    const fullname = PCFullName(code);
+    buffer.push(`${colors.cyan(PCFullName(code))}: ${message.split('\n').join('\n  '+' '.repeat(fullname.length))}`);
 
 
     // print
@@ -90,4 +92,17 @@ export function LogProblem(problem: PlProblem, content: string) {
 
 export function LogProblemShort(problem: PlProblem) {
     return `${colors.cyan(PCFullName(problem.code))}: ${problem.message}`;
+}
+
+export function LogTrace(trace: PlTrace) {
+    const buffer = [];
+    for (const frame of trace) {
+        let text = `In frame '${frame.name}'`;
+        if (frame.info) {
+            text += ` on line ${frame.info.row+1}, file "${frame.info.filename}"`;
+        }
+        buffer.push(text);
+    }
+
+    inout.print(buffer.join('\n'));
 }

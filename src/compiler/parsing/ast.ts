@@ -309,6 +309,24 @@ export class ASTUnary extends ASTExpression {
         this.operator = operator;
         this.value = value;
     }
+
+    isPostfix() {
+        return this.operator.type == PlTokenType.INC || this.operator.type == PlTokenType.DEC;
+    }
+
+    firstToken(): PlToken {
+        if (this.isPostfix()) {
+            return this.value.getSpanToken();
+        }
+        return this.operator;
+    }
+
+    lastToken(): PlToken {
+        if (this.isPostfix()) {
+            return this.operator;
+        }
+        return this.value.getSpanToken();
+    }
 }
 
 export class ASTType extends ASTExpression {

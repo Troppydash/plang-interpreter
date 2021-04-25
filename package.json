@@ -7,8 +7,9 @@
     "build-cli": "npm run build && pkg .",
     "build": "tsc",
     "run": "node out/index.js",
-    "run-build": "npm run build && npm run run",
-    "watch-build": "tsc --watch"
+    "run-build": "npm run clean && npm run build && npm run run",
+    "watch-build": "tsc --watch",
+    "clean": "tsc --build --clean"
   },
   "pkg": {
     "scripts": "out/**/*.js",

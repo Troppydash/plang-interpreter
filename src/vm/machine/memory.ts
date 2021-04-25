@@ -2,13 +2,16 @@ import { PlProgram } from "../emitter/bytecode";
 import { PlStuff } from "./stuff";
 import { PlDebugProgram } from "../emitter/debug";
 import { PlProgramWithDebug } from "../emitter";
+import { PlTraceFrame } from "../../problem/trace";
 
 
 export class PlStackFrame {
+    trace: PlTraceFrame;
     values: Record<string, PlStuff>;
     outer: PlStackFrame | null;
 
-    constructor(outer: PlStackFrame | null) {
+    constructor(outer: PlStackFrame | null, info: PlTraceFrame) {
+        this.trace = info;
         this.outer = outer;
         this.values = {};
     }
@@ -24,7 +27,7 @@ export class PlStackFrame {
     }
 
     setValue(key: string, value: PlStuff) {
-        if (this.outer.findValue(key) != null) {
+        if (this.outer && this.outer.findValue(key) != null) {
             return this.outer.setValue(key, value);
         }
         this.values[key] = value;
@@ -45,4 +48,5 @@ export interface PlFunction {
 
 export interface PlNativeFunction {
     callback: Function;
+    native: Function;
 }

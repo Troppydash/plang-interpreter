@@ -5,7 +5,7 @@ export interface PlFileInfo {
     filename: string; // file that the word is in
 }
 
-export function EmptyFileInfo(filename: string): PlFileInfo {
+export function NewEmptyFileInfo(filename: string): PlFileInfo {
     return {
         row: 0,
         col: 0,

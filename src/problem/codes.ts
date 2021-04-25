@@ -97,13 +97,16 @@ const templates = {
     LP0002: "an impl statement must have at least one parameter",
     LP0003: "a case statement must have at least one expression",
 
-    DE0001: "an exception occurred during compiling",
-    DE0002: "an exception occurred during interpreting",
+    DE0001: "an exception occurred during compiling\n%0",
+    DE0002: "an exception occurred during interpreting\n%0",
 
     RE0001: "found an unknown bytecode with type '%0'",
     RE0002: "no debug information found for problem on bytecode line '%0'",
-    RE0003: "cannot find the variable or function called '%0'",
+    RE0003: "cannot find the variable named '%0'",
     RE0004: "there exists no operator '%0' on type '%1'",
+    RE0005: "expect a number to negate with, got type '%0'",
+    RE0006: "incorrect arity for a function call, needed %0 but got %1",
+    RE0007: "%0",
 }
 
 // because I am lazy
@@ -178,8 +181,11 @@ const hints: Record<PlProblemCode, string> = {
 
     RE0001: "unknown bytecode is produced from the emitter, a developer problem at the core",
     RE0002: "you are on your own here",
-    RE0003: "is the variable or function defined?",
-    RE0004: "the operator is not a valid operation on this type"
+    RE0003: "is the variable defined?",
+    RE0004: "the operator is not a valid operation on this type",
+    RE0005: "only numbers can be negated",
+    RE0006: "check the number of arguments for the function call, there might be a few missing",
+    RE0007: "afsd"
 }
 
 const problemFullName = {

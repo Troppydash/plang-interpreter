@@ -1,5 +1,6 @@
 // converter
 import { NewPlStuff, PlStuff, PlStuffFalse, PlStuffNull, PlStuffTrue, PlStuffType } from "../stuff";
+import { PlNativeFunction } from "../memory";
 
 export namespace PlConverter {
     export function PlToJs( object: PlStuff ): any {
@@ -19,8 +20,15 @@ export namespace PlConverter {
             case PlStuffType.NULL: {
                 return null;
             }
+            case PlStuffType.LIST: {
+                return object.value.map(v => PlToJs(v));
+            }
+            case PlStuffType.NFUNCTION: {
+                const value = object.value as PlNativeFunction;
+                return value.native;
+            }
         }
-        throw "Unimplemented";
+        throw "Unimplemented convert from pltojs";
     }
 
     export function JsToPl( object: any ): PlStuff {
@@ -37,12 +45,12 @@ export namespace PlConverter {
                 }
                 return PlStuffFalse;
             }
-
             case "function": {
                 return NewPlStuff( PlStuffType.NFUNCTION, {
                     callback: function ( ...args ) {
                         return JsToPl( object( ...args.map( a => PlToJs( a ) ) ) );
-                    }
+                    },
+                    native: object
                 } );
             }
 
@@ -55,6 +63,6 @@ export namespace PlConverter {
                 }
             }
         }
-        throw "Unimplemented";
+        throw "Unimplemented from jstopl";
     }
 }
