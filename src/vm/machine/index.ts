@@ -16,6 +16,11 @@ export interface PlStreamInout {
     input: ( message: string ) => string | null;
 }
 
+const JUMP_ERRORS: Record<string, PlProblemCode> = {
+    "*": "RE0010",
+    "ASTCondition": "RE0014",
+};
+
 export class PlStackMachine {
     readonly stream: PlStreamInout;
 
@@ -88,7 +93,7 @@ export class PlStackMachine {
 
         let surrounding: PlDebug = null;
         for ( const debug of debugs ) {
-            if ( line <= debug.endLine && line >= (debug.endLine - debug.length) ) {
+            if ( line < (debug.endLine) && line > (debug.endLine - debug.length) ) {
                 if ( surrounding == null ) {
                     surrounding = debug;
                 } else if ( debug.length < surrounding.length ) {
@@ -245,6 +250,14 @@ export class PlStackMachine {
                     break;
                 }
                 case PlBytecodeType.DEFDIC: {
+                    let object = {};
+                    const amount = this.popStack();
+                    for (let i = 0; i < +amount.value; ++i) {
+                        const key = this.popStack();
+                        object[key.value] = this.popStack();
+                    }
+
+                    this.pushStack(NewPlStuff(PlStuffType.DICTIONARY, object));
                     break;
                 }
 
@@ -290,7 +303,10 @@ export class PlStackMachine {
                         this.pushStack( value );
                         break;
                     }
-                    this.newProblem( "RE0011", ptr, debug, PlStuffToTypeString( value.type ) );
+                    this.newProblem( {
+                        "*": "RE0011",
+                        "ASTCondition": "RE0015",
+                    }, ptr, debug, PlStuffToTypeString( value.type ) );
                     return null;
                 }
 
@@ -312,10 +328,10 @@ export class PlStackMachine {
                 case PlBytecodeType.DOCRET:
                 case PlBytecodeType.DOASGN: {
                     const name = this.popStack(); // is a string
-                    const dict = this.popStack();
+                    const target = this.popStack();
                     const value = this.popStack();
 
-                    if ( dict == null ) {
+                    if ( target == null ) {
                         if ( value.type == PlStuffType.FUNCTION ) {
                             const content = value.value as PlFunction;
                             content.stackFrame.setTraceName( name.value );
@@ -329,13 +345,23 @@ export class PlStackMachine {
                         break;
                     }
 
+                    // target is not null
+                    if (target.type == PlStuffType.DICTIONARY) {
+                        if (name.value in target.value) {
+                            target.value[name.value] = value;
+                            this.pushStack(value);
+                            break;
+                        }
+                    }
+
+                    this.newProblem("RE0013", ptr, debug, PlStuffToTypeString(target.type));
                     return null;
                 }
 
                 case PlBytecodeType.DOCALL: {
                     const func = this.popStack();
                     const arity = this.popStack();
-                    const args = [];
+                    let args = [];
 
                     // trust this
                     for ( let i = 0; i < +arity.value; ++i ) {
@@ -368,6 +394,9 @@ export class PlStackMachine {
                         case PlStuffType.FUNCTION: {
                             const value = func.value as PlFunction;
                             const parameters = value.parameters;
+                            if (value.self) {
+                                args = [value.self, ...args];
+                            }
                             if ( parameters.length != args.length ) {
                                 this.newProblem( "RE0006", ptr, debug, '' + parameters.length, '' + args.length );
                                 return null;
@@ -407,8 +436,28 @@ export class PlStackMachine {
                 }
 
                 case PlBytecodeType.DOFIND: {
-                    // TODO: Write dictionary and others
-                    break;
+                    const bKey = this.popStack();
+                    const bTarget = this.popStack();
+
+                    const name = bKey.value;
+                    if (bTarget.type == PlStuffType.DICTIONARY) {
+                        if (name in bTarget.value) {
+                            this.pushStack(bTarget.value[name]);
+                            break;
+                        }
+                    }
+
+                    // try finding impl
+                    const scrambledName = ScrambleFunction(name, bTarget.type);
+                    const value = this.findValue(scrambledName);
+                    if (value != null) {
+                        value.value.self = bTarget;
+                        this.pushStack(value);
+                        break;
+                    }
+
+                    this.newProblem("RE0012", ptr, debug, name, PlStuffToTypeString(bTarget.type));
+                    return null;
                 }
 
                 case PlBytecodeType.DORETN: {
@@ -445,7 +494,7 @@ export class PlStackMachine {
                         }
                         break;
                     }
-                    this.newProblem( "RE0010", ptr, debug );
+                    this.newProblem( JUMP_ERRORS, ptr, debug, PlStuffToTypeString(peek.type) );
                     return null;
                 }
 
@@ -457,7 +506,7 @@ export class PlStackMachine {
                         }
                         break;
                     }
-                    this.newProblem( "RE0010", ptr, debug );
+                    this.newProblem( JUMP_ERRORS, ptr, debug, PlStuffToTypeString(peek.type) );
                     return null;
                 }
 
@@ -469,7 +518,7 @@ export class PlStackMachine {
                         }
                         break;
                     }
-                    this.newProblem( "RE0010", ptr, debug );
+                    this.newProblem( JUMP_ERRORS, ptr, debug, PlStuffToTypeString(peek.type) );
                     return null;
                 }
 
@@ -481,7 +530,7 @@ export class PlStackMachine {
                         }
                         break;
                     }
-                    this.newProblem( "RE0010", ptr, debug );
+                    this.newProblem( JUMP_ERRORS, ptr, debug, PlStuffToTypeString(peek.type) );
                     return null;
                 }
 

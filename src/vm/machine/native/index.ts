@@ -1,6 +1,6 @@
 // converter
 import { NewPlStuff, PlStuff, PlStuffFalse, PlStuffNull, PlStuffTrue, PlStuffType } from "../stuff";
-import { PlNativeFunction } from "../memory";
+import { PlFunction, PlNativeFunction } from "../memory";
 
 export namespace PlConverter {
     export function PlToJs( object: PlStuff ): any {
@@ -21,11 +21,23 @@ export namespace PlConverter {
                 return null;
             }
             case PlStuffType.LIST: {
-                return object.value.map(v => PlToJs(v));
+                return object.value.map( v => PlToJs( v ) );
+            }
+            case PlStuffType.DICTIONARY: {
+                const out = {};
+                Object.entries( object.value ).forEach( ( [ key, value ] ) => {
+                    out[key] = PlToJs( value as PlStuff );
+                } );
+                return out;
             }
             case PlStuffType.NFUNCTION: {
                 const value = object.value as PlNativeFunction;
                 return value.native;
+            }
+            case PlStuffType.FUNCTION: {
+                const value = object.value as PlFunction;
+                // TODO: think of how to do this
+                return "[function]";
             }
         }
         throw "Unimplemented convert from pltojs";
@@ -40,7 +52,7 @@ export namespace PlConverter {
                 return NewPlStuff( PlStuffType.STRING, object );
             }
             case "boolean": {
-                if (object) {
+                if ( object ) {
                     return PlStuffTrue;
                 }
                 return PlStuffFalse;

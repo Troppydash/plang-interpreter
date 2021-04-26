@@ -111,6 +111,11 @@ const templates = {
     RE0009: "cannot use 'continue' or 'break' outside a loop",
     RE0010: "cannot jump, top of the stack is not a boolean",
     RE0011: "cannot decrease or increase a non variable of type '%0'",
+    RE0012: "cannot find value with key '%0' on the target of type '%1'",
+    RE0013: "cannot assign to a non dictionary target, got type '%0'",
+
+    RE0014: "expected a boolean value here, got type '%0'",
+    RE0015: "expected a number value here, got type '%0'",
 }
 
 // because I am lazy
@@ -194,6 +199,11 @@ const hints: Record<PlProblemCode, string> = {
     RE0009: "is this statement surrounded by a loop?",
     RE0010: "not a boolean",
     RE0011: "",
+    RE0012: "",
+    RE0013: "",
+
+    RE0014: "",
+    RE0015: "",
 }
 
 const problemFullName = {

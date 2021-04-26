@@ -22,11 +22,19 @@ export function CreateSpanToken(firstToken: PlToken, lastToken: PlToken, content
         NewFileInfo(firstToken.info.row, lastToken.info.col, lastToken.info.col - firstToken.info.col + firstToken.info.length, firstToken.info.filename));
 }
 
+/// attributes ///
+export enum ASTAttributes {
+    ASTCondition = "ASTCondition"
+}
+
+
 export abstract class ASTNode {
+    attribute: ASTAttributes | null; // because js doesn't allow casting, so this is for a fake class name
     readonly tokens: PlToken[];
 
     protected constructor(tokens: PlToken[]) {
         this.tokens = tokens;
+        this.attribute = null;
     }
 
     firstToken() {
@@ -413,3 +421,5 @@ export class ASTVariable extends ASTExpression {
         this.content = content;
     }
 }
+
+

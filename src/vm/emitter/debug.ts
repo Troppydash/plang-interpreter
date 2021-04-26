@@ -11,9 +11,10 @@ export interface PlDebug {
 }
 
 export function NewPlDebug( node: ASTNode, endLine: number, length: number ): PlDebug {
+    const name = node.attribute == null ? (node as any).constructor.name : node.attribute;
     return {
         span: node.getSpanToken(),
-        name: (node as any).constructor.name,
+        name,
         endLine,
         length
     }

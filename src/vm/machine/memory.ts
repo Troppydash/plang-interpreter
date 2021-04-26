@@ -74,6 +74,7 @@ export interface PlFunction {
     stackFrame: PlStackFrame;
     bytecode: PlProgramWithDebug;
     parameters: PlStuff[];
+    self?: PlStuff;
 }
 
 export interface PlNativeFunction {
