@@ -342,6 +342,7 @@ export class PlStackMachine {
                         } else {
                             this.setValue( name.value, value );
                         }
+                        this.pushStack(value);
                         break;
                     }
 
@@ -379,6 +380,9 @@ export class PlStackMachine {
                     switch ( func.type ) {
                         case PlStuffType.NFUNCTION: {
                             const value = func.value as PlNativeFunction;
+                            if (value.self) {
+                                args = [value.self, ...args];
+                            }
                             try {
                                 const out = value.callback( ...args );
                                 this.pushStack( out );

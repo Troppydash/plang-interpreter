@@ -73,6 +73,9 @@ export namespace PlConverter {
                 if ( object == null ) {
                     return PlStuffNull;
                 }
+                if (object.length) {
+                    return NewPlStuff(PlStuffType.LIST, object.map(i => JsToPl(i)));
+                }
             }
         }
         throw "Unimplemented from jstopl";

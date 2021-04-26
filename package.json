@@ -14,8 +14,8 @@
   "pkg": {
     "scripts": "out/**/*.js",
     "targets": [
-      "node12-win-x64",
-      "node12-linux-x64"
+      "node14-win-x64",
+      "node14-linux-x64"
     ],
     "outputPath": "dist"
   },

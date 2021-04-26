@@ -109,7 +109,7 @@ const templates = {
     RE0007: "panic '%0'",
     RE0008: "attempted to call an uncallable value of type '%0'",
     RE0009: "cannot use 'continue' or 'break' outside a loop",
-    RE0010: "cannot jump, top of the stack is not a boolean",
+    RE0010: "saw a jump instruction but the value is not a boolean, got type '%0'",
     RE0011: "cannot decrease or increase a non variable of type '%0'",
     RE0012: "cannot find value with key '%0' on the target of type '%1'",
     RE0013: "cannot assign to a non dictionary target, got type '%0'",
@@ -197,13 +197,14 @@ const hints: Record<PlProblemCode, string> = {
     RE0007: "a function panicked, try reading the message below",
     RE0008: "you can only call a function, check the value that is stored in the variable?",
     RE0009: "is this statement surrounded by a loop?",
-    RE0010: "not a boolean",
-    RE0011: "",
-    RE0012: "",
-    RE0013: "",
+    RE0010: "the machine had expected a boolean type, check if the type of the value is as expected",
 
-    RE0014: "",
-    RE0015: "",
+    RE0011: "the ++ and -- operators can only be applied onto a variable",
+    RE0012: "the key does not exist on the value here, maybe check the spelling?",
+    RE0013: "the left side of the dot in an assignment have to be a dictionary type, if modifying type functions, use a 'impl' statement instead",
+
+    RE0014: "a boolean is expected here, check if the expression returns a true or a false",
+    RE0015: "a number is expected here, check if the expression returns a number",
 }
 
 const problemFullName = {

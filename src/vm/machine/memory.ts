@@ -47,7 +47,7 @@ export class PlStackFrame {
             return this.values[key];
         }
         if (this.outer) {
-            return this.outer.findValue(key);
+            return this.outer.findValueDeep(key);
         }
         return null;
     }
@@ -80,4 +80,5 @@ export interface PlFunction {
 export interface PlNativeFunction {
     callback: Function;
     native: Function;
+    self?: PlStuff;
 }
