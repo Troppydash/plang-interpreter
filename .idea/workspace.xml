@@ -21,13 +21,18 @@
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Some unorthodox error handling improvements">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/constants.txt" beforeDir="false" afterPath="$PROJECT_DIR$/constants.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/extension/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/extension/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/printer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/problem.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/problem.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/emitter/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/machine/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/memory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/memory.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/machine/native/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/native.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/native.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +74,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="add_unversioned_files" value="$PROJECT_DIR$/playground/test.plang" />
-    <property name="javascript.nodejs.core.library.configured.version" value="12.16.3" />
+    <property name="javascript.nodejs.core.library.configured.version" value="12.20.1" />
     <property name="javascript.nodejs.core.library.typings.version" value="12.20.10" />
     <property name="last_opened_file_path" value="$USER_HOME$/Folder2020/NodeProjects/jsproxy" />
     <property name="nodejs_interpreter_path" value="node" />
@@ -90,7 +95,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run playground/test.plang">
+  <component name="RunManager" selected="npm.run-build playground/test.plang">
     <configuration name="build-browser" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -193,7 +198,7 @@
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="false" />
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -393,14 +398,7 @@
       <option name="project" value="LOCAL" />
       <updated>1619345991487</updated>
     </task>
-    <task id="LOCAL-00025" summary="Some unorthodox error handling improvements">
-      <created>1619430833070</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1619430833070</updated>
-    </task>
-    <option name="localTasksCounter" value="26" />
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -446,6 +444,76 @@
     <MESSAGE value="Some unorthodox error handling improvements" />
     <option name="LAST_COMMIT_MESSAGE" value="Some unorthodox error handling improvements" />
   </component>
+  <component name="WindowStateProjectService">
+    <state x="246" y="14" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1619474922338">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state x="246" y="14" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1619474922338" />
+    <state width="1577" height="343" key="GridCell.Tab.0.bottom" timestamp="1619474811827">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="343" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619474811827" />
+    <state width="1577" height="343" key="GridCell.Tab.0.center" timestamp="1619474811825">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="343" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1619474811825" />
+    <state width="1577" height="343" key="GridCell.Tab.0.left" timestamp="1619474811823">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="343" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1619474811823" />
+    <state width="1577" height="343" key="GridCell.Tab.0.right" timestamp="1619474811826">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="343" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1619474811826" />
+    <state width="1577" height="265" key="GridCell.Tab.1.bottom" timestamp="1619438361486">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.1.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619438361486" />
+    <state width="1577" height="265" key="GridCell.Tab.1.center" timestamp="1619438361483">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.1.center/0.0.1600.858@0.0.1600.858" timestamp="1619438361483" />
+    <state width="1577" height="265" key="GridCell.Tab.1.left" timestamp="1619438361482">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.1.left/0.0.1600.858@0.0.1600.858" timestamp="1619438361482" />
+    <state width="1577" height="265" key="GridCell.Tab.1.right" timestamp="1619438361484">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.1.right/0.0.1600.858@0.0.1600.858" timestamp="1619438361484" />
+    <state width="1577" height="265" key="GridCell.Tab.2.bottom" timestamp="1619438361491">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.2.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619438361491" />
+    <state width="1577" height="265" key="GridCell.Tab.2.center" timestamp="1619438361489">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.2.center/0.0.1600.858@0.0.1600.858" timestamp="1619438361489" />
+    <state width="1577" height="265" key="GridCell.Tab.2.left" timestamp="1619438361487">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.2.left/0.0.1600.858@0.0.1600.858" timestamp="1619438361487" />
+    <state width="1577" height="265" key="GridCell.Tab.2.right" timestamp="1619438361490">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.2.right/0.0.1600.858@0.0.1600.858" timestamp="1619438361490" />
+    <state width="1577" height="265" key="GridCell.Tab.3.bottom" timestamp="1619438361495">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.3.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619438361495" />
+    <state width="1577" height="265" key="GridCell.Tab.3.center" timestamp="1619438361493">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.3.center/0.0.1600.858@0.0.1600.858" timestamp="1619438361493" />
+    <state width="1577" height="265" key="GridCell.Tab.3.left" timestamp="1619438361492">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.3.left/0.0.1600.858@0.0.1600.858" timestamp="1619438361492" />
+    <state width="1577" height="265" key="GridCell.Tab.3.right" timestamp="1619438361494">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state width="1577" height="265" key="GridCell.Tab.3.right/0.0.1600.858@0.0.1600.858" timestamp="1619438361494" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -466,15 +534,9 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/vm/machine/index.ts</url>
-          <line>235</line>
+          <line>89</line>
           <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="21" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/vm/machine/index.ts</url>
-          <line>530</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="22" />
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

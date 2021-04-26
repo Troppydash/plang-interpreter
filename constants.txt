@@ -3,6 +3,7 @@ MAXBUFFER: maximum buffer size, used for printing buffering
 
 problem/printer
 NLINESUP, NLINESDOWN: number of error lines printing that is displayed before the error line and after the error line
+TRACE_MAX: maximum number of callframes to display
 
 compiler/parsing/visualizer:
 PPINDENT: number of spaces when pretty printing an AST

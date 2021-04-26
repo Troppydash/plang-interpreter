@@ -14,7 +14,7 @@ export function HTMessage(hereType: PlHereType) {
 }
 
 export interface PlProblem {
-    fileInfo: PlFileInfo,
+    fileInfo: PlFileInfo | null,
     message: string;
     code: PlProblemCode;
     here: PlHereType
@@ -37,7 +37,7 @@ export function NewPlProblem(code: PlProblemCode, fileInfo: PlFileInfo, ...args:
     };
 }
 
-export function NewPlProblemAt(code: PlProblemCode, fileInfo: PlFileInfo, here: PlHereType = "here", ...args: string[]): PlProblem {
+export function NewPlProblemAt(code: PlProblemCode, fileInfo: PlFileInfo |null, here: PlHereType = "here", ...args: string[]): PlProblem {
     return {
         fileInfo,
         message: replaceArgs(templates[code], args),

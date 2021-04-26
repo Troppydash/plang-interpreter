@@ -80,4 +80,26 @@ export namespace PlConverter {
         }
         throw "Unimplemented from jstopl";
     }
+
+    export function PlToString(object: PlStuff): string {
+        switch (object.type) {
+            case PlStuffType.BOOLEAN:
+                return object.value ? "true" : "false";
+            case PlStuffType.DICTIONARY:
+                return "[dictionary]";
+            case PlStuffType.NFUNCTION:
+            case PlStuffType.FUNCTION:
+                return "[function]";
+            case PlStuffType.LIST:
+                return "[list]";
+            case PlStuffType.NULL:
+                return "null";
+            case PlStuffType.NUMBER:
+                return ""+object.value;
+            case PlStuffType.STRING:
+                return `"${object.value}"`;
+            case PlStuffType.TYPE:
+                return `'${object.value}'`;
+        }
+    }
 }

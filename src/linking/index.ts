@@ -10,6 +10,7 @@ import { PlProblem } from "../problem/problem";
 import { EmitProgram, EmitStatement } from "../vm/emitter/";
 import {ProgramWithDebugToString} from "../vm/emitter/pprinter";
 import { PlStackMachine } from "../vm/machine";
+import {PlConverter} from "../vm/machine/native";
 
 export function RunLinker( content: string, filename: string ): PlToken[] | null {
     const lexer = new PlLexer( NewPlFile( filename, content ) );
@@ -65,6 +66,27 @@ export function RunEmitter(content: string, filename: string): null {
     // inout.print(ProgramToPlb(program.program));
 }
 
+export function RunOnce(vm: PlStackMachine, content: string, filename: string) {
+    const lexer = new PlLexer( NewPlFile( filename, content ) );
+    const parser = new PlAstParser( lexer );
+    const ast = parser.parseAll();
+    if (ast == null) {
+        const problems = parser.getProblems();
+        ReportProblems(content, problems);
+        return null;
+    }
+
+    const program = EmitProgram(ast);
+    program.program.pop(); // remove final stkpop
+    const out = vm.runProgram(program);
+    if (out == null) {
+        const trace = vm.getTrace();
+        const problems = vm.getProblems();
+        ReportProblems(content, problems, trace);
+        return null;
+    }
+    return vm.popStack();
+}
 
 export function RunVM(content: string, filename: string) {
     const lexer = new PlLexer( NewPlFile( filename, content ) );
@@ -85,6 +107,8 @@ export function RunVM(content: string, filename: string) {
         }
     });
 
+    program.debug = [];
+
     const out = vm.runProgram(program);
     if (out == null) {
         const trace = vm.getTrace();
@@ -92,6 +116,7 @@ export function RunVM(content: string, filename: string) {
         ReportProblems(content, problems, trace);
         return null;
     }
+    return out;
 }
 
 export function RunFile( filePath: string ): number {

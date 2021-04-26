@@ -116,6 +116,7 @@ const templates = {
 
     RE0014: "expected a boolean value here, got type '%0'",
     RE0015: "expected a number value here, got type '%0'",
+    RE0016: "expected the '.%0' type function on the value of type '%1'"
 }
 
 // because I am lazy
@@ -205,6 +206,7 @@ const hints: Record<PlProblemCode, string> = {
 
     RE0014: "a boolean is expected here, check if the expression returns a true or a false",
     RE0015: "a number is expected here, check if the expression returns a number",
+    RE0016: "only a value that contain the '.iter' type function can be used in a each..in loop, is the value a list or a dictionary?"
 }
 
 const problemFullName = {

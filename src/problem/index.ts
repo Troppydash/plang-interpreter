@@ -18,8 +18,14 @@ export function ReportProblems(content: string, problems: PlProblem[], trace?: P
         LogTrace(trace);
         inout.print('');
     }
-    for (const problem of problems) {
-        LogProblem(problem, content);
+    try {
+        for (const problem of problems) {
+            LogProblem(problem, content);
+        }
+    } catch (e) {
+        inout.print(`Exception in reporting the problems: ${e}`);
+        inout.print("This is a developer error, please report this to him");
     }
+
     inout.flush();
 }

@@ -1,8 +1,9 @@
 import inout, { isNode } from "../inout";
-import { RunEmitter, RunParser, RunVM, TryRunParser } from "../linking";
-import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
+import { RunOnce, TryRunParser} from "../linking";
 import { LogProblemShort } from "../problem/printer";
 import { colors } from "../inout/color";
+import {PlConverter} from "../vm/machine/native";
+import {PlStackMachine} from "../vm/machine";
 
 export function StartREPL( filename: string ): number {
     inout.print( "Welcome to the Plang interactive console" );
@@ -12,11 +13,26 @@ export function StartREPL( filename: string ): number {
         inout.print( `Press ctrl+c to quit` );
     }
 
+    let stream = false;
+    const vm = new PlStackMachine({
+        input: message => {
+            stream = true;
+            return inout.input(message)
+        },
+        output: message => {
+            stream = true;
+            inout.print(message);
+            inout.flush()
+        }
+    });
+
     outer:
         while ( true ) {
             let content = "";
             let firstPrompt = true;
             let linenum = 1;
+
+            stream = false;
 
             completer:
             while ( true ) {
@@ -62,7 +78,10 @@ export function StartREPL( filename: string ): number {
                 break;
             }
 
-            RunEmitter(content, filename);
+            const result = RunOnce(vm, content, filename);
+            if (stream == false && result != null) {
+                inout.print(`${' '.repeat(filename.length)}> ${PlConverter.PlToString(result)}`);
+            }
         }
 
     inout.flush();

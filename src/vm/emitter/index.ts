@@ -1,4 +1,4 @@
-import { NewBytecode, PlBytecode, PlBytecodeType, PlProgram } from "./bytecode";
+import {NewBytecode, PlBytecode, PlBytecodeType, PlProgram} from "./bytecode";
 import {
     ASTAssign,
     ASTAttributes,
@@ -34,8 +34,8 @@ import {
     ASTVariable,
     ASTWhile
 } from "../../compiler/parsing/ast";
-import { NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram } from "./debug";
-import { NewFakePlToken, PlTokenType } from "../../compiler/lexing/token";
+import {NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram} from "./debug";
+import {NewFakePlToken, PlTokenType} from "../../compiler/lexing/token";
 
 export const METHOD_SEP = '@';
 export const LOOP_INDEX = 'i@';
@@ -589,10 +589,13 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
 
         const assignment = new ASTCreate( [], undefined,
             iter,
-            new ASTCall( [ target ], new ASTDot( [], node.iterator, new ASTVariable( [], "iter" ) ), [] )
+            new ASTCall( [ target ], new ASTDot( [], node.iterator, new ASTVariable( node.iterator.tokens, "iter" ) ), [] )
         );
+        node.iterator.attribute = ASTAttributes.ASTCondition;
+        const assng = traverseAST(assignment);
         programBuilder
-            .addPWD( traverseAST( assignment ) )
+            .addPWDNoDebug( assng )
+            .addStretch(node.iterator, assng.program.length)
             .addBytecode( NewBytecode( PlBytecodeType.STKPOP ) );
 
         const get =  new ASTVariable([], 'get');

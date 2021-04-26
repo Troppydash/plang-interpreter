@@ -103,7 +103,7 @@ export class PlStackMachine {
         }
 
         if ( surrounding == null ) {
-            this.problems.push( NewPlProblem( "RE0002", NewFileInfo( 0, 0, 0, '' ), '' + line ) );
+            this.problems.push( NewPlProblem( typeof code == "string" ? code : code["*"], null, ...args ) );
             return;
         }
 
@@ -140,7 +140,6 @@ export class PlStackMachine {
                 break;
             }
         }
-        trace.reverse();
         return trace;
     }
 
@@ -178,7 +177,7 @@ export class PlStackMachine {
         /// WE ASSUME THAT THE PROGRAM IS VALID AND ONLY HANDLE RUNTIME ERRORS HERE NOT JS EXCEPTIONS
         const { program, debug } = pwd;
         let ptr = 0;
-        // try {
+        try {
         while ( ptr < program.length ) {
             const byte = program[ptr];
             switch ( byte.type ) {
@@ -460,7 +459,10 @@ export class PlStackMachine {
                         break;
                     }
 
-                    this.newProblem("RE0012", ptr, debug, name, PlStuffToTypeString(bTarget.type));
+                    this.newProblem({
+                        "*": "RE0012",
+                        "ASTCondition": "RE0016",
+                    }, ptr, debug, name, PlStuffToTypeString(bTarget.type));
                     return null;
                 }
 
@@ -548,9 +550,9 @@ export class PlStackMachine {
 
         // return Null if no exports
         return PlStuffNull;
-        // } catch ( e ) {
-        //     this.newProblem( "DE0002", ptr, debug, '' + e );
-        //     return null;
-        // }
+        } catch ( e ) {
+            this.newProblem( "DE0002", ptr, debug, '' + e );
+            return null;
+        }
     }
 }

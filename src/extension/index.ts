@@ -47,7 +47,7 @@ export function chunkString(str, n) {
         ret.push('');
     }
 
-    return ret
+    return ret;
 }
 
 export function dddString(source: string, limit: number = 20) {
