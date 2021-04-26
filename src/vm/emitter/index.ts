@@ -316,7 +316,7 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             .toProgram();
     } else if (node instanceof ASTIf) {
         // surround whole thing with block
-        programBuilder.addBytecode(NewBytecode(PlBytecodeType.BLOENT));
+        programBuilder.addBytecode(NewBytecode(PlBytecodeType.STKENT));
 
         for (let i = 0; i < node.conditions.length; ++i) {
             let condition = traverseAST(node.conditions[i]);
@@ -346,13 +346,13 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
         }
 
         return programBuilder
-            .addBytecode(NewBytecode(PlBytecodeType.BLOEXT))
+            .addBytecode(NewBytecode(PlBytecodeType.STKEXT))
             .addEmpty()
             .addStretch(node)
             .toProgram();
     } else if (node instanceof ASTFor) {
         programBuilder
-            .addBytecode(NewBytecode(PlBytecodeType.BLOENT));
+            .addBytecode(NewBytecode(PlBytecodeType.STKENT));
 
         if (node.start) {
             programBuilder
@@ -419,12 +419,12 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
         // jmprel -
 
         return programBuilder
-            .addBytecode(NewBytecode(PlBytecodeType.BLOEXT))
+            .addBytecode(NewBytecode(PlBytecodeType.STKEXT))
             .addEmpty()
             .addStretch(node)
             .toProgram();
     } else if (node instanceof ASTWhile) {
-        programBuilder.addBytecode(NewBytecode(PlBytecodeType.BLOENT))
+        programBuilder.addBytecode(NewBytecode(PlBytecodeType.STKENT))
 
         let cond = traverseAST(node.condition);
         let block = makePureBlock(node.block);
@@ -444,12 +444,12 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             .addPWD(block)
             .addBytecode(NewBytecode(PlBytecodeType.JMPREL, '-' + (cond.program.length + block.program.length)));
 
-        return programBuilder.addBytecode(NewBytecode(PlBytecodeType.BLOEXT))
+        return programBuilder.addBytecode(NewBytecode(PlBytecodeType.STKEXT))
             .addEmpty()
             .addStretch(node)
             .toProgram();
     } else if (node instanceof ASTLoop) {
-        programBuilder.addBytecode(NewBytecode(PlBytecodeType.BLOENT));
+        programBuilder.addBytecode(NewBytecode(PlBytecodeType.STKENT));
 
         let block = makePureBlock(node.block);
         let bodySize = block.program.length;
@@ -492,7 +492,7 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             .addBytecode(NewBytecode(PlBytecodeType.JMPREL, '-' + (bodySize - 1)));
 
         return programBuilder
-            .addBytecode(NewBytecode(PlBytecodeType.BLOEXT))
+            .addBytecode(NewBytecode(PlBytecodeType.STKEXT))
             .addEmpty()
             .addStretch(node)
             .toProgram();
@@ -502,7 +502,7 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             value = new ASTVariable([], MATCH_VALUE);
             const assignment = new ASTAssign([], undefined, value, node.value);
             programBuilder
-                .addBytecode(NewBytecode(PlBytecodeType.BLOENT))
+                .addBytecode(NewBytecode(PlBytecodeType.STKENT))
                 .addPWD(traverseAST(assignment))
                 .addBytecode(NewBytecode(PlBytecodeType.STKPOP));
         }
@@ -539,7 +539,7 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             .toProgram();
     } else if (node instanceof ASTEach) {
         programBuilder
-            .addBytecode(NewBytecode(PlBytecodeType.BLOENT));
+            .addBytecode(NewBytecode(PlBytecodeType.STKENT));
 
         // iter@ = target.iter()
         // while @i = iter@.next() {
@@ -597,7 +597,7 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
             .addPWD(kvBlock)
             .addPWD(block)
             .addBytecode(NewBytecode(PlBytecodeType.JMPREL, '-' + (cond.program.length + block.program.length + kvBlock.program.length)))
-            .addBytecode(NewBytecode(PlBytecodeType.BLOEXT))
+            .addBytecode(NewBytecode(PlBytecodeType.STKEXT))
             .addEmpty()
             .addStretch(node)
             .toProgram();
@@ -644,9 +644,9 @@ function makeType(node: ASTType) {
 
 function makeEvalBlock(node: ASTBlock): PlProgramWithDebug {
     return (new ProgramBuilder())
-        .addBytecode(NewBytecode(PlBytecodeType.BLOENT))
+        .addBytecode(NewBytecode(PlBytecodeType.STKENT))
         .addPWD(EmitProgram(node.statements,))
-        .addBytecode(NewBytecode(PlBytecodeType.BLOEXT))
+        .addBytecode(NewBytecode(PlBytecodeType.STKEXT))
         .toProgram();
 }
 
