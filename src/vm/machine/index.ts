@@ -93,7 +93,7 @@ export class PlStackMachine {
 
         let surrounding: PlDebug = null;
         for ( const debug of debugs ) {
-            if ( line < (debug.endLine) && line > (debug.endLine - debug.length) ) {
+            if ( line < (debug.endLine) && line >= (debug.endLine - debug.length) ) {
                 if ( surrounding == null ) {
                     surrounding = debug;
                 } else if ( debug.length < surrounding.length ) {
@@ -102,12 +102,12 @@ export class PlStackMachine {
             }
         }
 
+        args = args.filter( a => a != undefined );
         if ( surrounding == null ) {
             this.problems.push( NewPlProblem( typeof code == "string" ? code : code["*"], null, ...args ) );
             return;
         }
 
-        args = args.filter( a => a != undefined );
         if ( typeof code == "string" ) {
             this.problems.push( NewPlProblem( code, surrounding.span.info, ...args ) );
             return;
@@ -123,7 +123,7 @@ export class PlStackMachine {
             return;
         }
 
-        this.problems.push( NewPlProblem( "RE0002", NewFileInfo( 0, 0, 0, '' ), '' + line ) );
+        this.problems.push( NewPlProblem( "RE0002", null, '' + line ) );
     }
 
     getProblems() {

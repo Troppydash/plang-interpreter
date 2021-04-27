@@ -1,9 +1,10 @@
 import inout, { isNode } from "../inout";
-import { RunOnce, TryRunParser} from "../linking";
+import {RunEmitter, RunOnce, TryRunParser} from "../linking";
 import { LogProblemShort } from "../problem/printer";
 import { colors } from "../inout/color";
 import {PlConverter} from "../vm/machine/native";
 import {PlStackMachine} from "../vm/machine";
+import {EmitProgram} from "../vm/emitter";
 
 export function StartREPL( filename: string ): number {
     inout.print( "Welcome to the Plang interactive console" );
@@ -78,6 +79,7 @@ export function StartREPL( filename: string ): number {
                 break;
             }
 
+            // RunEmitter(content, filename);
             const result = RunOnce(vm, content, filename);
             if (stream == false && result != null) {
                 inout.print(`${' '.repeat(filename.length)}> ${PlConverter.PlToString(result)}`);

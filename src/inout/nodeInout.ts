@@ -29,24 +29,15 @@ const prompt = ps( {
     autocomplete: complete( ac.split( ' ' ) )
 } );
 
-// stream buffering
-const buffer = new PlBuffer();
-
 export function print( message ) {
-    const exceed = buffer.push( message );
-    if ( exceed ) {
-        console.log( buffer.empty().join( '\n' ) );
-    }
+    console.log(message);
 }
 
 export function flush() {
-    if ( !buffer.isEmpty() ) {
-        console.log( buffer.empty().join( '\n' ) );
-    }
+    return;
 }
 
 export function input( message ) {
-    flush();
     return prompt( message );
 }
 
