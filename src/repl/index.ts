@@ -82,6 +82,7 @@ export function StartREPL( filename: string ): number {
             if (stream == false && result != null) {
                 inout.print(`${' '.repeat(filename.length)}> ${PlConverter.PlToString(result)}`);
             }
+            vm.problems = [];
         }
 
     inout.flush();

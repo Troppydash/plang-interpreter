@@ -107,8 +107,6 @@ export function RunVM(content: string, filename: string) {
         }
     });
 
-    program.debug = [];
-
     const out = vm.runProgram(program);
     if (out == null) {
         const trace = vm.getTrace();

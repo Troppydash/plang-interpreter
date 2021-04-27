@@ -21,18 +21,9 @@
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Some unorthodox error handling improvements">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/constants.txt" beforeDir="false" afterPath="$PROJECT_DIR$/constants.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/extension/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/extension/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/printer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/problem.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/problem.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/emitter/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/native.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/native.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +86,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run-build playground/test.plang">
+  <component name="RunManager" selected="npm.build-cli">
     <configuration name="build-browser" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -398,7 +389,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619345991487</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Repl now runs the input, Error handling has been improved">
+      <created>1619475057006</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1619475057006</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -417,7 +415,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Backup incase it crashes" />
     <MESSAGE value="Added basic expression parsing code, the compiler now functions." />
     <MESSAGE value="Added lists and call parsing." />
     <MESSAGE value="Added dict parsing" />
@@ -442,29 +439,30 @@
     <MESSAGE value="Added the @ local scoping" />
     <MESSAGE value="Grouped some bytecodes together" />
     <MESSAGE value="Some unorthodox error handling improvements" />
-    <option name="LAST_COMMIT_MESSAGE" value="Some unorthodox error handling improvements" />
+    <MESSAGE value="Repl now runs the input, Error handling has been improved" />
+    <option name="LAST_COMMIT_MESSAGE" value="Repl now runs the input, Error handling has been improved" />
   </component>
   <component name="WindowStateProjectService">
     <state x="246" y="14" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1619474922338">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
     <state x="246" y="14" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1619474922338" />
-    <state width="1577" height="343" key="GridCell.Tab.0.bottom" timestamp="1619474811827">
+    <state width="1577" height="343" key="GridCell.Tab.0.bottom" timestamp="1619486631642">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="343" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619474811827" />
-    <state width="1577" height="343" key="GridCell.Tab.0.center" timestamp="1619474811825">
+    <state width="1577" height="343" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619486631642" />
+    <state width="1577" height="343" key="GridCell.Tab.0.center" timestamp="1619486631641">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="343" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1619474811825" />
-    <state width="1577" height="343" key="GridCell.Tab.0.left" timestamp="1619474811823">
+    <state width="1577" height="343" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1619486631641" />
+    <state width="1577" height="343" key="GridCell.Tab.0.left" timestamp="1619486631641">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="343" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1619474811823" />
-    <state width="1577" height="343" key="GridCell.Tab.0.right" timestamp="1619474811826">
+    <state width="1577" height="343" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1619486631641" />
+    <state width="1577" height="343" key="GridCell.Tab.0.right" timestamp="1619486631642">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="343" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1619474811826" />
+    <state width="1577" height="343" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1619486631642" />
     <state width="1577" height="265" key="GridCell.Tab.1.bottom" timestamp="1619438361486">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
@@ -513,6 +511,10 @@
       <screen x="0" y="0" width="1600" height="858" />
     </state>
     <state width="1577" height="265" key="GridCell.Tab.3.right/0.0.1600.858@0.0.1600.858" timestamp="1619438361494" />
+    <state x="388" y="116" key="Vcs.Push.Dialog.v2" timestamp="1619475058640">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state x="388" y="116" key="Vcs.Push.Dialog.v2/0.0.1600.858@0.0.1600.858" timestamp="1619475058640" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

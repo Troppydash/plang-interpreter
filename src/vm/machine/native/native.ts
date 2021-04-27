@@ -49,6 +49,7 @@ const operators = {
     [ScrambleFunction( "-", PlStuffType.NUMBER )]: assertEqual( ( l, r ) => l - r ),
     [ScrambleFunction( "*", PlStuffType.NUMBER )]: assertEqual( ( l, r ) => l * r ),
     [ScrambleFunction( "/", PlStuffType.NUMBER )]: assertEqual( ( l, r ) => l / r ),
+    [ScrambleFunction( "mod", PlStuffType.NUMBER )]: assertEqual( ( l, r ) => l % r ),
     ...generateCompare( PlStuffType.NUMBER, ( l, r ) => l === r, ( l, r ) => l > r ),
 
     // strings
@@ -56,6 +57,10 @@ const operators = {
     [ScrambleFunction( "*", PlStuffType.STRING )]: ( l, r ) => {
         assertType( r, "number", "string can only multiply with numbers" );
         return l.repeat( r );
+    },
+    [ScrambleFunction( "have", PlStuffType.STRING )]: ( l, r ) => {
+        assertType( r, "string", "'have' needs a string as argument" );
+        return l.indexOf(r) != -1;
     },
     ...generateCompare( PlStuffType.STRING, ( l, r ) => l === r ),
 
