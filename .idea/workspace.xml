@@ -20,8 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Some unorthodox error handling improvements">
-      <change afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +84,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\compiler" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run playground/test.plang">
+  <component name="RunManager" selected="npm.run playground/test.plang as">
     <configuration name="build-browser" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -135,13 +135,13 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="run playground/test.plang" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="run playground/test.plang as" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="run" />
       </scripts>
-      <arguments value="playground/test.plang" />
+      <arguments value="playground/test.plang as" />
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
@@ -172,14 +172,14 @@
       <item itemvalue="npm.run-build playground/test.plang" />
       <item itemvalue="npm.build-browser" />
       <item itemvalue="npm.build-dist" />
-      <item itemvalue="npm.run playground/test.plang" />
+      <item itemvalue="npm.run playground/test.plang as" />
       <item itemvalue="npm.build" />
       <item itemvalue="npm.watch-build" />
       <item itemvalue="npm.clean" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.run playground/test.plang" />
+        <item itemvalue="npm.run playground/test.plang as" />
         <item itemvalue="npm.build" />
         <item itemvalue="npm.clean" />
         <item itemvalue="npm.watch-build" />
@@ -218,6 +218,7 @@
       <workItem from="1618984593976" duration="6100000" />
       <workItem from="1619077667357" duration="26200000" />
       <workItem from="1619220219970" duration="22647000" />
+      <workItem from="1619585262910" duration="343000" />
     </task>
     <task id="LOCAL-00001" summary="moved some comments">
       <created>1617620767259</created>
@@ -408,11 +409,18 @@
       <option name="project" value="LOCAL" />
       <updated>1619506547156</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Added readme.md">
+      <created>1619574183978</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1619574183978</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
+    <option name="version" value="2" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -427,7 +435,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added dict parsing" />
     <MESSAGE value="Added if and export parsing" />
     <MESSAGE value="Added impl parsing" />
     <MESSAGE value="Added match parsing" />
@@ -452,29 +459,30 @@
     <MESSAGE value="Repl now runs the input, Error handling has been improved" />
     <MESSAGE value="some qol changes" />
     <MESSAGE value="fixed the debug output of the each..in statement" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed the debug output of the each..in statement" />
+    <MESSAGE value="Added readme.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added readme.md" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="246" y="14" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1619503237468">
+    <state x="242" y="-10" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1619585604153">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state x="246" y="14" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1619503237468" />
-    <state width="1577" height="399" key="GridCell.Tab.0.bottom" timestamp="1619560987424">
+    <state x="242" y="-10" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.858@0.0.1600.858" timestamp="1619585604153" />
+    <state width="1577" height="399" key="GridCell.Tab.0.bottom" timestamp="1619574175049">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="399" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619560987424" />
-    <state width="1577" height="399" key="GridCell.Tab.0.center" timestamp="1619560987423">
+    <state width="1577" height="399" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619574175049" />
+    <state width="1577" height="399" key="GridCell.Tab.0.center" timestamp="1619574175048">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="399" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1619560987423" />
-    <state width="1577" height="399" key="GridCell.Tab.0.left" timestamp="1619560987423">
+    <state width="1577" height="399" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1619574175048" />
+    <state width="1577" height="399" key="GridCell.Tab.0.left" timestamp="1619574175047">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="399" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1619560987423" />
-    <state width="1577" height="399" key="GridCell.Tab.0.right" timestamp="1619560987424">
+    <state width="1577" height="399" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1619574175047" />
+    <state width="1577" height="399" key="GridCell.Tab.0.right" timestamp="1619574175049">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="399" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1619560987424" />
+    <state width="1577" height="399" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1619574175049" />
     <state width="1577" height="265" key="GridCell.Tab.1.bottom" timestamp="1619504921100">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
@@ -523,14 +531,14 @@
       <screen x="0" y="0" width="1600" height="858" />
     </state>
     <state width="1577" height="265" key="GridCell.Tab.3.right/0.0.1600.858@0.0.1600.858" timestamp="1619504921101" />
-    <state x="384" y="92" key="Vcs.Push.Dialog.v2" timestamp="1619506548545">
+    <state x="380" y="68" key="Vcs.Push.Dialog.v2" timestamp="1619574186002">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state x="384" y="92" key="Vcs.Push.Dialog.v2/0.0.1600.858@0.0.1600.858" timestamp="1619506548545" />
-    <state x="917" y="-24" width="623" height="842" key="dock-window-1" timestamp="1619573167309">
+    <state x="380" y="68" key="Vcs.Push.Dialog.v2/0.0.1600.858@0.0.1600.858" timestamp="1619574186002" />
+    <state x="913" y="-24" width="623" height="842" key="dock-window-1" timestamp="1619585604782">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state x="917" y="-24" width="623" height="842" key="dock-window-1/0.0.1600.858@0.0.1600.858" timestamp="1619573167309" />
+    <state x="913" y="-24" width="623" height="842" key="dock-window-1/0.0.1600.858@0.0.1600.858" timestamp="1619585604782" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -553,7 +561,6 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/vm/machine/index.ts</url>
           <line>461</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="24" />
         </line-breakpoint>
       </breakpoints>

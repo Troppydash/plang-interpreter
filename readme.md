@@ -4,7 +4,7 @@ The **Plang** stands for **P**rogramming **Lang**uage.
 ### Description
 This repository houses the source code of the plang interpreter written entirely in Typescript.
 
-The source code are all in the `src/` folder. `compiler/` contains the lexer and parser; `inout/` contains the input and output functions; `linking/` contains the linker; `problem/` contains the error printer; `repl/` contains the REPL; `vm` contains the virtual machine emitter and stack machine; `extensions/` are code that I've copied from stackoverflow.
+The source code are all in the `src/` folder. `compiler/` contains the lexer and parser; `inout/` contains the input and output functions; `linking/` contains the linker; `problem/` contains the error printer; `repl/` contains the REPL; `vm/` contains the virtual machine emitter and stack machine; `extensions/` are code that I've copied from stackoverflow.
 
 ### Examples
 ```
@@ -70,7 +70,7 @@ say(counter()) # prints 3
 ```
 
 ```
-# Who needs classes anyways
+# who needs classes anyways
 func makeVector(x, y) {
     @data = list(x, y)
     return dict(
@@ -99,7 +99,7 @@ If there is no executable, see the section below to build it yourself.
 ### How do I build it
 Node 12 or higher is used to build the interpreter, but feel free to try it with a lower node version. The command `node -v` will tell you if node is installed on your machine.
 
-Run `npm install` first to install all the dependencies, and run `npm build-cli` to make an executable in the `dist/` folder.
+Run `npm install` first to install all the dependencies, and run `npm run build-cli` to make an executable in the `dist/` folder.
 
 Other commands located in package.json are as follows
 ```
