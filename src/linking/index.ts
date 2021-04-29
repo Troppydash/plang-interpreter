@@ -1,17 +1,14 @@
 import PlToken from "../compiler/lexing/token";
 import PlLexer from "../compiler/lexing";
 import {ReportProblem, ReportProblems} from "../problem";
-import {NewPlFile} from "../inout/file";
+import { NewPlFile, PlFile } from "../inout/file";
 import inout from "../inout";
 import {ASTProgram} from "../compiler/parsing/ast";
 import {PlAstParser} from "../compiler/parsing";
-import {AttemptPrettyPrint} from "../compiler/parsing/visualizer";
 import {PlProblem} from "../problem/problem";
-import {EmitProgram, EmitStatement} from "../vm/emitter/";
+import {EmitProgram} from "../vm/emitter/";
 import {ProgramWithDebugToString} from "../vm/emitter/pprinter";
 import {PlStackMachine} from "../vm/machine";
-import {PlConverter} from "../vm/machine/native/converter";
-import {colors} from "../inout/color";
 import {StartInteractive} from "../problem/interactive";
 import {TRACE_MAX} from "../problem/printer";
 
@@ -28,19 +25,6 @@ export function RunLinker(content: string, filename: string): PlToken[] | null {
     }
 
     return result;
-}
-
-export function TryRunParser(content: string, filename: string): PlProblem[] | null {
-    const lexer = new PlLexer(NewPlFile(filename, content));
-    const parser = new PlAstParser(lexer);
-    const result = parser.parseAll();
-
-    const problems = parser.getProblems();
-    if (result == null || problems.length != 0) {
-        return problems;
-    }
-
-    return null;
 }
 
 export function RunParser(content: string, filename: string): ASTProgram | null {
@@ -69,13 +53,25 @@ export function RunEmitter(content: string, filename: string): null {
     // inout.print(ProgramToPlb(program.program));
 }
 
-export function RunOnce(vm: PlStackMachine, content: string, filename: string) {
-    const lexer = new PlLexer(NewPlFile(filename, content));
+
+
+export function TryRunParser(file: PlFile): PlProblem[] | null {
+    const lexer = new PlLexer(file);
+    const parser = new PlAstParser(lexer);
+    const ast = parser.parseAll();
+    if (ast == null) {
+        return parser.getProblems();
+    }
+    return null;
+}
+
+export function RunOnce(vm: PlStackMachine, file: PlFile) {
+    const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
     const ast = parser.parseAll();
     if (ast == null) {
         const problems = parser.getProblems();
-        ReportProblems(content, problems);
+        ReportProblems(file.content, problems);
         return null;
     }
 
@@ -85,19 +81,19 @@ export function RunOnce(vm: PlStackMachine, content: string, filename: string) {
     if (out == null) {
         const trace = vm.getTrace();
         const problems = vm.getProblems();
-        ReportProblems(content, problems, trace);
+        ReportProblems(file.content, problems, trace);
         return null;
     }
     return vm.popStack();
 }
 
-export async function RunVM(content: string, filename: string) {
-    const lexer = new PlLexer(NewPlFile(filename, content));
+export async function RunVM(file: PlFile) {
+    const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
     const ast = parser.parseAll();
     if (ast == null) {
         const problems = parser.getProblems();
-        ReportProblems(content, problems);
+        ReportProblems(file.content, problems);
         return null;
     }
 
@@ -114,7 +110,7 @@ export async function RunVM(content: string, filename: string) {
     if (out == null) {
         const trace = vm.getTrace();
         const problems = vm.getProblems();
-        const ok = ReportProblems(content, problems, trace);
+        const ok = ReportProblems(file.content, problems, trace);
 
         // fancy
         if (ok && trace.length > TRACE_MAX) {
@@ -122,7 +118,7 @@ export async function RunVM(content: string, filename: string) {
             // if (answer == 'n' || answer == null) {
             //     return null;
             // }
-            await StartInteractive(content, problems, trace);
+            await StartInteractive(file.content, problems, trace);
         }
 
         return null;
@@ -143,6 +139,8 @@ export async function RunFile(filePath: string): Promise<number> {
         return 1;
     }
 
-    await RunVM(content, filename);
+    const file = NewPlFile(filename, content);
+
+    await RunVM(file);
     return 0;
 }

@@ -56,7 +56,7 @@ export function CreateProblemTitle(code: string, info: PlFileInfo) {
     return buffer;
 }
 
-export function CreateProblemBody(here: PlHereType, info: PlFileInfo, content: string) {
+export function CreateProblemBody(here: PlHereType, info: PlFileInfo, content: string, grey: Function = colors.grey) {
     const buffer = [];
     const actualCol = info.col - info.length;
     const largestLineNumberLength = (info.row + NLINESDOWN).toString().length;
@@ -71,19 +71,19 @@ export function CreateProblemBody(here: PlHereType, info: PlFileInfo, content: s
     for (const line of linesUp) {
         if (line !== null) {
             const output = line.join('\n' + ' '.repeat(largestLineNumberLength - 1) + '\u21B3| ');
-            buffer.push(colors.grey(startLine.toString().padStart(largestLineNumberLength) + '| ' + output));
+            buffer.push(grey(startLine.toString().padStart(largestLineNumberLength) + '| ' + output));
         }
         ++startLine;
     }
     // add current line and ^^ pointers
     buffer.push(startLine.toString().padStart(largestLineNumberLength) + '| ' + targetLine[0]);
     ++startLine;
-    buffer.push(' '.repeat(largestLineNumberLength) + colors.grey('| ') + ' '.repeat(actualCol) + colors.red('^'.repeat(info.length) + ' ' + HTMessage(here)));
+    buffer.push(' '.repeat(largestLineNumberLength) + grey('| ') + ' '.repeat(actualCol) + colors.red('^'.repeat(info.length) + ' ' + HTMessage(here)));
     // add all the lines below
     for (const line of linesDown) {
         if (line !== null) {
             const output = line.join(' ↵\n' + gap);
-            buffer.push(colors.grey(startLine.toString().padStart(largestLineNumberLength) + '| ' + output));
+            buffer.push(grey(startLine.toString().padStart(largestLineNumberLength) + '| ' + output));
         }
         ++startLine;
     }

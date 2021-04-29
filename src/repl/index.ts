@@ -5,6 +5,7 @@ import { colors } from "../inout/color";
 import {PlActions, PlConverter} from "../vm/machine/native/converter";
 import {PlStackMachine} from "../vm/machine";
 import {EmitProgram} from "../vm/emitter";
+import { NewPlFile } from "../inout/file";
 
 export function StartREPL( filename: string ): number {
     inout.print( "Welcome to the Plang interactive console" );
@@ -52,7 +53,8 @@ export function StartREPL( filename: string ): number {
                 let oldContent = content;
                 content += message;
 
-                const outcome = TryRunParser(content, filename);
+                const file = NewPlFile(filename, content);
+                const outcome = TryRunParser(file);
                 content += '\n';
 
                 let oldFirstPrompt = firstPrompt;
@@ -80,7 +82,8 @@ export function StartREPL( filename: string ): number {
             }
 
             // RunEmitter(content, filename);
-            const result = RunOnce(vm, content, filename);
+            const file = NewPlFile(filename, content);
+            const result = RunOnce(vm, file);
             if (stream == false && result != null) {
                 inout.print(`${' '.repeat(filename.length)}> ${PlActions.PlToString(result)}`);
             }

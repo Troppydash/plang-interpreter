@@ -38,7 +38,7 @@ import {
 import PlToken, {PlTokenType} from "../lexing/token";
 import {PlProblemCode} from "../../problem/codes";
 
-class ErrTokenException extends Error {
+class ErrTokenException {
 
 }
 
@@ -507,6 +507,7 @@ export class PlAstParser implements Parser {
         blocks.push(block);
 
         while (true) {
+            this.clearLF();
             const token = this.peekToken();
             if (token.type != PlTokenType.ELIF) {
                 break;

@@ -61,7 +61,11 @@ export function StartInteractive(content: string, problems: PlProblem[], trace: 
 
             buffer.push(...CreateProblemTitle(code, info));
             if (info != null) {
-                buffer.push(...CreateProblemBody("here", info, content));
+                if (process.platform == "win32") {
+                    buffer.push(...CreateProblemBody("here", info, content, message => message));
+                } else {
+                    buffer.push(...CreateProblemBody("here", info, content));
+                }
             }
 
             buffer.push('');

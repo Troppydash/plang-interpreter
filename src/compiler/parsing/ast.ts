@@ -47,9 +47,11 @@ export abstract class ASTNode {
 
     getSpanToken() {
         try {
-            // TODO: this might break if the tokens span multiple lines
             const firstToken = this.firstToken();
-            const lastToken = this.lastToken(); // maybe make this the last token on the same line?
+            const lastToken = this.lastToken()
+            if (lastToken.info.row != firstToken.info.row) {
+                return lastToken;
+            }
             return CreateSpanToken(firstToken, lastToken, this.tokens.map(t => t.content).join(''));
         } catch ( e ) {
             if (this.tokens.length == 0) {
@@ -89,6 +91,10 @@ export class ASTFunction extends ASTStatement {
         this.args = args;
         this.block = block;
     }
+
+    lastToken(): PlToken {
+        return this.block.getSpanToken();
+    }
 }
 
 
@@ -104,6 +110,10 @@ export class ASTImpl extends ASTStatement {
         this.args = args;
         this.target = target;
         this.block = block;
+    }
+
+    lastToken(): PlToken {
+        return this.block.getSpanToken();
     }
 }
 
@@ -155,12 +165,18 @@ export class ASTIf extends ASTStatement {
     blocks: ASTBlock[]; // all the 'then' blocks
     other?: ASTBlock; // else block
 
-
     constructor(tokens: PlToken[], conditions: ASTExpression[], blocks: ASTBlock[], other?: ASTBlock) {
         super(tokens);
         this.conditions = conditions;
         this.blocks = blocks;
         this.other = other;
+    }
+
+    lastToken(): PlToken {
+        if (this.other) {
+            return this.other.getSpanToken();
+        }
+        return this.blocks[this.blocks.length-1].getSpanToken();
     }
 }
 
@@ -178,6 +194,10 @@ export class ASTEach extends ASTStatement {
         this.iterator = iterator;
         this.block = block;
     }
+
+    lastToken(): PlToken {
+        return this.block.getSpanToken();
+    }
 }
 
 export class ASTLoop extends ASTStatement {
@@ -189,6 +209,10 @@ export class ASTLoop extends ASTStatement {
         this.amount = amount;
         this.block = block;
     }
+
+    lastToken(): PlToken {
+        return this.block.getSpanToken();
+    }
 }
 
 export class ASTWhile extends ASTStatement {
@@ -199,6 +223,10 @@ export class ASTWhile extends ASTStatement {
         super(tokens);
         this.condition = condition;
         this.block = block;
+    }
+
+    lastToken(): PlToken {
+        return this.block.getSpanToken();
     }
 }
 
@@ -214,6 +242,10 @@ export class ASTFor extends ASTStatement {
         this.condition = condition;
         this.after = after;
         this.block = block;
+    }
+
+    lastToken(): PlToken {
+        return this.block.getSpanToken();
     }
 }
 
