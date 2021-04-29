@@ -36,19 +36,37 @@ export class PlStackFrame {
         if (key in this.values) {
             return this.values[key];
         }
-        if (this.outer && this.trace == null) {
-            return this.outer.findValue(key);
+
+        if (this.trace != null) {
+            return null;
+        }
+        let outer = this.outer;
+        while (outer != null) {
+            if (key in outer.values) {
+                return outer.values[key];
+            }
+            if (outer.trace != null ) {
+                return null;
+            }
+            outer = outer.outer;
         }
         return null;
     }
 
     findValueDeep( key: string): PlStuff | null {
+        // non recursive way see if it works
         if (key in this.values) {
             return this.values[key];
         }
-        if (this.outer) {
-            return this.outer.findValueDeep(key);
+
+        let outer = this.outer;
+        while (outer != null) {
+            if (key in outer.values) {
+                return outer.values[key];
+            }
+            outer = outer.outer;
         }
+
         return null;
     }
 
@@ -57,10 +75,18 @@ export class PlStackFrame {
             this.values[key] = value;
             return;
         }
-        if (this.outer && this.outer.findValueDeep(key) != null) {
-            return this.outer.setValue(key, value);
+        if (this.outer == null || this.outer.findValueDeep(key) == null) {
+            this.createValue(key, value);
+            return;
         }
-        this.createValue(key, value);
+        let outer = this.outer;
+        while (outer != null) {
+            if (key in outer.values) {
+                this.values[key] = value;
+                return;
+            }
+            outer = outer.outer;
+        }
     }
 
     createValue(key: string, value: PlStuff) {

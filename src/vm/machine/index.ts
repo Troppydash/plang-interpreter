@@ -451,7 +451,7 @@ export class PlStackMachine {
                                     this.createValue(parameters[i].value, args[i]);
                                 }
 
-                                const out = this.runProgram(value.bytecode);
+                                const out = this.runProgram(value.bytecode); // TODO: Make this faster when adding imports and exports
                                 if (out == null) {
                                     return null;
                                 }
