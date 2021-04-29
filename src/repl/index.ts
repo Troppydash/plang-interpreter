@@ -2,7 +2,7 @@ import inout, { isNode } from "../inout";
 import {RunEmitter, RunOnce, TryRunParser} from "../linking";
 import { LogProblemShort } from "../problem/printer";
 import { colors } from "../inout/color";
-import {PlConverter} from "../vm/machine/native";
+import {PlActions, PlConverter} from "../vm/machine/native/converter";
 import {PlStackMachine} from "../vm/machine";
 import {EmitProgram} from "../vm/emitter";
 
@@ -82,7 +82,7 @@ export function StartREPL( filename: string ): number {
             // RunEmitter(content, filename);
             const result = RunOnce(vm, content, filename);
             if (stream == false && result != null) {
-                inout.print(`${' '.repeat(filename.length)}> ${PlConverter.PlToString(result)}`);
+                inout.print(`${' '.repeat(filename.length)}> ${PlActions.PlToString(result)}`);
             }
             vm.problems = [];
         }

@@ -38,7 +38,7 @@ import {
 import PlToken, {PlTokenType} from "../lexing/token";
 import {PlProblemCode} from "../../problem/codes";
 
-class ErrTokenException {
+class ErrTokenException extends Error {
 
 }
 

@@ -1,14 +1,13 @@
 export enum PlStuffType {
-    NUMBER,
-    STRING,
-    BOOLEAN,
-    NULL,
-    TYPE,
-    FUNCTION,
-    NFUNCTION,
-    LIST,
-    DICTIONARY,
-
+    Int,
+    Str,
+    Bool,
+    Null,
+    Type,
+    Func,
+    NFunc,
+    List,
+    Dict
 }
 
 export interface PlStuff {
@@ -23,31 +22,33 @@ export function NewPlStuff(type: PlStuffType, value: any): PlStuff {
     };
 }
 
-export function PlStuffToTypeString(stuffType: PlStuffType): string {
+export function PlStuffTypeFromString(string: string) {
+    return PlStuffType[string];
+}
+
+export function PlStuffTypeToString(stuffType: PlStuffType): string {
     switch (stuffType) {
-        case PlStuffType.NUMBER:
+        case PlStuffType.Int:
             return "Int";
-        case PlStuffType.TYPE:
+        case PlStuffType.Type:
             return "Type";
-        case PlStuffType.FUNCTION:
-        case PlStuffType.NFUNCTION:
+        case PlStuffType.Func:
+        case PlStuffType.NFunc:
             return "Func";
-        case PlStuffType.BOOLEAN:
+        case PlStuffType.Bool:
             return "Bool";
-        case PlStuffType.STRING:
+        case PlStuffType.Str:
             return "Str"
-        case PlStuffType.NULL:
+        case PlStuffType.Null:
             return "Null";
-        case PlStuffType.LIST:
+        case PlStuffType.List:
             return "List";
-        case PlStuffType.DICTIONARY:
+        case PlStuffType.Dict:
             return "Dict";
-        default:
-            return "Null";
     }
 }
 
 // optimization
-export const PlStuffTrue = NewPlStuff(PlStuffType.BOOLEAN, true);
-export const PlStuffFalse = NewPlStuff(PlStuffType.BOOLEAN, false);
-export const PlStuffNull = NewPlStuff(PlStuffType.NULL, null);
+export const PlStuffTrue = NewPlStuff(PlStuffType.Bool, true);
+export const PlStuffFalse = NewPlStuff(PlStuffType.Bool, false);
+export const PlStuffNull = NewPlStuff(PlStuffType.Null, null);

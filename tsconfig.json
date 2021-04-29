@@ -5,7 +5,7 @@
     "sourceMap": true,
     "moduleResolution": "Node",
     "outDir": "./out",
-    "removeComments": true
+    "removeComments": true,
   },
   "exclude": [
     "node_modules"

@@ -10,7 +10,7 @@ import { PlProblem } from "../problem/problem";
 import { EmitProgram, EmitStatement } from "../vm/emitter/";
 import {ProgramWithDebugToString} from "../vm/emitter/pprinter";
 import { PlStackMachine } from "../vm/machine";
-import {PlConverter} from "../vm/machine/native";
+import {PlConverter} from "../vm/machine/native/converter";
 
 export function RunLinker( content: string, filename: string ): PlToken[] | null {
     const lexer = new PlLexer( NewPlFile( filename, content ) );
