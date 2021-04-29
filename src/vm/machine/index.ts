@@ -156,7 +156,7 @@ export class PlStackMachine {
         const trace = [];
         if (this.problems.length > 0) {
             const error = this.problems[0];
-            trace.push(NewPlTraceFrame(error.code, error.fileInfo));
+            trace.push(NewPlTraceFrame(error.code, error.info));
         }
         let frame = this.stackFrame;
         while (true) {

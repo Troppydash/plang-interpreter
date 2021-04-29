@@ -68,7 +68,7 @@ export function StartREPL( filename: string ): number {
                     }
                     if (!oldFirstPrompt) {
                         inout.print(`${LogProblemShort(outcome[0])}`);
-                        const result = inout.input(colors.magenta(`Undo line ${linenum-1}? `) + '[y/n]: ');
+                        const result = inout.input(colors.magenta(`Undo line ${linenum-1}? `) + `[${colors.green('y')}/n]: `);
                         if (result != 'n') {
                             linenum -= 1;
                             content = oldContent;
