@@ -74,10 +74,14 @@ export class PlStackMachine {
                 } else {
                     this.stream.output(message.map(m => PlActions.PlToString(m)).join(' '));
                 }
-                return null;
+                return PlStuffNull;
             },
             [ScrambleFunction("ask")]: (...message: any) => {
-                return this.stream.input(message.map(m => PlActions.PlToString(m)).join('\n'));
+                const str = this.stream.input(message.map(m => PlActions.PlToString(m)).join('\n'));
+                if (str == null) {
+                    throw new Error("Input stream ended");
+                }
+                return NewPlStuff(PlStuffType.Str, str);
             },
             ...natives,
         }
@@ -341,13 +345,18 @@ export class PlStackMachine {
                             this.pushStack(value);
                             break;
                         }
-                        this.newProblem("RE0005", ptr, debug, '' + PlStuffTypeToString(value.type));
+                        this.newProblem("RE0005", ptr, debug, PlStuffTypeToString(value.type));
                         return null;
                     }
 
                     case PlBytecodeType.DOLNOT: {
-                        // TODO: Write this
-                        break;
+                        const value = this.popStack();
+                        if (value.type == PlStuffType.Bool) {
+                            this.pushStack(value.value == true ? PlStuffFalse : PlStuffTrue);
+                            break;
+                        }
+                        this.newProblem("RE0017", ptr, debug, PlStuffTypeToString(value.type));
+                        return null;
                     }
 
                     case PlBytecodeType.DOCRET:

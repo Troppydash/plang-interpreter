@@ -46,11 +46,7 @@ export const jsOperators = {
     [ScrambleFunction("*", PlStuffType.Str)]: (l, r) => {
         assertTypeof(r, "number", "string can only multiply with numbers");
         return l.repeat(r);
-    },
-    [ScrambleFunction("have", PlStuffType.Str)]: (l, r) => {
-        assertTypeof(r, "string", "'have' needs a string as argument");
-        return l.indexOf(r) != -1;
-    },
+    }
 };
 
 export const operators = {

@@ -285,6 +285,10 @@ export class ASTCall extends ASTExpression {
         this.target = target;
         this.args = args;
     }
+
+    firstToken(): PlToken {
+        return this.target.getSpanToken();
+    }
 }
 
 export class ASTBinary extends ASTExpression {

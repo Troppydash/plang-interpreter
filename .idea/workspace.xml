@@ -20,17 +20,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Some unorthodox error handling improvements">
-      <change afterPath="$PROJECT_DIR$/src/problem/interactive.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/printer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/problem.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/problem.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/problem/codes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/codes.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/machine/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/impl/all.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/impl/all.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/impl/str.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/impl/str.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/operators.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/operators.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -227,7 +223,7 @@
       <workItem from="1618984593976" duration="6100000" />
       <workItem from="1619077667357" duration="26200000" />
       <workItem from="1619220219970" duration="22647000" />
-      <workItem from="1619585262910" duration="19651000" />
+      <workItem from="1619585262910" duration="21655000" />
     </task>
     <task id="LOCAL-00001" summary="moved some comments">
       <created>1617620767259</created>
@@ -439,7 +435,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619659405404</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="Built a cool interactive error handler">
+      <created>1619672484345</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1619672484345</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -458,7 +461,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added match parsing" />
     <MESSAGE value="Added import parsing" />
     <MESSAGE value="Fixed printing operator precedence" />
     <MESSAGE value="Added Error codes and some bug fixes" />
@@ -483,7 +485,8 @@
     <MESSAGE value="Added readme.md" />
     <MESSAGE value="fixed some md stuff" />
     <MESSAGE value="Copy and clone rules are done" />
-    <option name="LAST_COMMIT_MESSAGE" value="Copy and clone rules are done" />
+    <MESSAGE value="Built a cool interactive error handler" />
+    <option name="LAST_COMMIT_MESSAGE" value="Built a cool interactive error handler" />
   </component>
   <component name="WindowStateProjectService">
     <state x="250" y="42" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1619655747977">
@@ -494,22 +497,22 @@
       <screen x="0" y="0" width="1600" height="858" />
     </state>
     <state width="551" height="506" key="DebuggerActiveHint/0.0.1600.858@0.0.1600.858" timestamp="1619671809634" />
-    <state width="1577" height="589" key="GridCell.Tab.0.bottom" timestamp="1619672338748">
+    <state width="1577" height="376" key="GridCell.Tab.0.bottom" timestamp="1619673779075">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="589" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619672338748" />
-    <state width="1577" height="589" key="GridCell.Tab.0.center" timestamp="1619672338748">
+    <state width="1577" height="376" key="GridCell.Tab.0.bottom/0.0.1600.858@0.0.1600.858" timestamp="1619673779075" />
+    <state width="1577" height="376" key="GridCell.Tab.0.center" timestamp="1619673779074">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="589" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1619672338748" />
-    <state width="1577" height="589" key="GridCell.Tab.0.left" timestamp="1619672338748">
+    <state width="1577" height="376" key="GridCell.Tab.0.center/0.0.1600.858@0.0.1600.858" timestamp="1619673779074" />
+    <state width="1577" height="376" key="GridCell.Tab.0.left" timestamp="1619673779074">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="589" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1619672338748" />
-    <state width="1577" height="589" key="GridCell.Tab.0.right" timestamp="1619672338748">
+    <state width="1577" height="376" key="GridCell.Tab.0.left/0.0.1600.858@0.0.1600.858" timestamp="1619673779074" />
+    <state width="1577" height="376" key="GridCell.Tab.0.right" timestamp="1619673779074">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state width="1577" height="589" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1619672338748" />
+    <state width="1577" height="376" key="GridCell.Tab.0.right/0.0.1600.858@0.0.1600.858" timestamp="1619673779074" />
     <state width="1577" height="402" key="GridCell.Tab.1.bottom" timestamp="1619671891417">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
@@ -558,10 +561,14 @@
       <screen x="0" y="0" width="1600" height="858" />
     </state>
     <state width="1577" height="402" key="GridCell.Tab.3.right/0.0.1600.858@0.0.1600.858" timestamp="1619671891424" />
-    <state x="376" y="44" key="Vcs.Push.Dialog.v2" timestamp="1619659407843">
+    <state x="372" y="20" key="Vcs.Push.Dialog.v2" timestamp="1619672486004">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
-    <state x="376" y="44" key="Vcs.Push.Dialog.v2/0.0.1600.858@0.0.1600.858" timestamp="1619659407843" />
+    <state x="372" y="20" key="Vcs.Push.Dialog.v2/0.0.1600.858@0.0.1600.858" timestamp="1619672486004" />
+    <state x="267" y="-24" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1619672920498">
+      <screen x="0" y="0" width="1600" height="858" />
+    </state>
+    <state x="267" y="-24" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1600.858@0.0.1600.858" timestamp="1619672920498" />
     <state x="577" y="275" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1619666452047">
       <screen x="0" y="0" width="1600" height="858" />
     </state>
