@@ -507,7 +507,6 @@ export class PlAstParser implements Parser {
         blocks.push(block);
 
         while (true) {
-            this.clearLF();
             const token = this.peekToken();
             if (token.type != PlTokenType.ELIF) {
                 break;

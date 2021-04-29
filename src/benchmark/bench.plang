@@ -1,0 +1,92 @@
+# the plang benchmark
+
+times = 10000
+
+# operators
+loop times {
+    1 + 2
+    1 - 2
+    1 * 2
+    1 / 2
+}
+
+# assignment
+loop times {
+    i = 1 + 2
+    i = 1 - 2
+    i = 1 * 2
+    i = 1 / 2
+}
+
+# inc, dec
+i = 1
+loop times {
+    i++
+}
+loop times {
+    i--
+}
+
+# types
+loop times {
+    t = 1
+    t = 1.2
+    t = "Hello World"
+    t = Int
+    t = list()
+    t = dict()
+    t = null
+    t = true
+    t = panic
+}
+
+# array and dict
+loop times {
+    t = list(1, 1, 1, 1, 1, 1, 1, 1)
+    t = dict(a: 1, b: 1, c: 1, d: 1)
+}
+
+# functions
+loop times {
+    func t() {
+       return "Hello"
+    }
+    t()
+}
+
+# closures
+loop times {
+    t = func() {
+        s = 12
+        return func() {
+            return s + 13
+        }
+    }
+    f = t()
+    f()
+}
+
+# cf
+loop times {
+    g = 1
+    while g <= 10 {
+        g = g + 1
+    }
+}
+
+loop times {
+    g = 1
+    for g = 0; g <= 100; g++ {
+        z = say
+    }
+}
+
+func fib(n) {
+    if n < 2 {
+        return n
+    }
+    return fib(n-1) + fib(n-2)
+}
+for i = 0; i <= 40; i++ {
+    fib(i)
+}

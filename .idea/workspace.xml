@@ -19,15 +19,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Some unorthodox error handling improvements">
+    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="bugfixes for weyman the bug tester">
+      <change afterPath="$PROJECT_DIR$/src/benchmark/bench.plang" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/inout/file.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/inout/file.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/interactive.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/interactive.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/problem/printer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/problem/printer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/repl/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/repl/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +66,7 @@
     <property name="add_unversioned_files" value="$PROJECT_DIR$/playground/test.plang" />
     <property name="javascript.nodejs.core.library.configured.version" value="12.16.3" />
     <property name="javascript.nodejs.core.library.typings.version" value="12.20.11" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Folder2020/NodeProjects/jsproxy" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/out" />
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -82,6 +77,9 @@
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\Folder2021\PlangProjects\plang-interpreter\out" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/vm/machine/native/impl" />
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter\src\vm\machine\native" />
@@ -90,7 +88,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.run playground/test2.plang">
+  <component name="RunManager" selected="npm.build">
     <configuration name="build-browser" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -185,15 +183,15 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.run playground/test2.plang" />
         <item itemvalue="npm.build" />
+        <item itemvalue="npm.run playground/test2.plang" />
         <item itemvalue="npm.clean" />
         <item itemvalue="npm.watch-build" />
         <item itemvalue="npm.build-dist" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="false" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -225,6 +223,7 @@
       <workItem from="1619077667357" duration="26200000" />
       <workItem from="1619220219970" duration="22647000" />
       <workItem from="1619585262910" duration="21655000" />
+      <workItem from="1619685351858" duration="348000" />
     </task>
     <task id="LOCAL-00001" summary="moved some comments">
       <created>1617620767259</created>
@@ -443,11 +442,18 @@
       <option name="project" value="LOCAL" />
       <updated>1619672484345</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="bugfixes for weyman the bug tester">
+      <created>1619684545298</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1619684545298</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="2" />
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -462,7 +468,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added import parsing" />
     <MESSAGE value="Fixed printing operator precedence" />
     <MESSAGE value="Added Error codes and some bug fixes" />
     <MESSAGE value="Started writing the virtual machine" />
@@ -487,7 +492,8 @@
     <MESSAGE value="fixed some md stuff" />
     <MESSAGE value="Copy and clone rules are done" />
     <MESSAGE value="Built a cool interactive error handler" />
-    <option name="LAST_COMMIT_MESSAGE" value="Built a cool interactive error handler" />
+    <MESSAGE value="bugfixes for weyman the bug tester" />
+    <option name="LAST_COMMIT_MESSAGE" value="bugfixes for weyman the bug tester" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -495,7 +501,6 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/compiler/parsing/index.ts</url>
           <line>210</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
