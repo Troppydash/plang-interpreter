@@ -6,20 +6,20 @@ export type ASTProgram = ASTStatement[];
 
 // TODO: make each class have an enum type so we can use a switch and not instanceof
 
-export function ASTProgramToString(program: ASTProgram): string {
+export function ASTProgramToString( program: ASTProgram ): string {
     let statements = [];
-    for (const statement of program) {
-        statements.push(JSON.stringify(statement));
+    for ( const statement of program ) {
+        statements.push( JSON.stringify( statement ) );
     }
-    return statements.map((str, line) => `Line ${line + 1}| ${str}`).join('\n');
+    return statements.map( ( str, line ) => `Line ${line + 1}| ${str}` ).join( '\n' );
 }
 
-export function CreateSpanToken(firstToken: PlToken, lastToken: PlToken, content: string | null = null) {
-    if (content == null) {
+export function CreateSpanToken( firstToken: PlToken, lastToken: PlToken, content: string | null = null ) {
+    if ( content == null ) {
         content = firstToken.content + lastToken.content;
     }
-    return NewPlToken(PlTokenType.SPAN, content,
-        NewFileInfo(firstToken.info.row, lastToken.info.col, lastToken.info.col - firstToken.info.col + firstToken.info.length, firstToken.info.filename));
+    return NewPlToken( PlTokenType.SPAN, content,
+        NewFileInfo( firstToken.info.row, lastToken.info.col, lastToken.info.col - firstToken.info.col + firstToken.info.length, firstToken.info.filename ) );
 }
 
 /// attributes ///
@@ -32,7 +32,7 @@ export abstract class ASTNode {
     attribute: ASTAttributes | null; // because js doesn't allow casting, so this is for a fake class name
     readonly tokens: PlToken[];
 
-    protected constructor(tokens: PlToken[]) {
+    protected constructor( tokens: PlToken[] ) {
         this.tokens = tokens;
         this.attribute = null;
     }
@@ -49,18 +49,18 @@ export abstract class ASTNode {
         try {
             const firstToken = this.firstToken();
             const lastToken = this.lastToken()
-            if (lastToken.info.row != firstToken.info.row) {
+            if ( lastToken.info.row != firstToken.info.row ) {
                 return lastToken;
             }
-            return CreateSpanToken(firstToken, lastToken, this.tokens.map(t => t.content).join(''));
+            return CreateSpanToken( firstToken, lastToken, this.tokens.map( t => t.content ).join( '' ) );
         } catch ( e ) {
-            if (this.tokens.length == 0) {
-                return NewFakePlToken(PlTokenType.SPAN, '');
+            if ( this.tokens.length == 0 ) {
+                return NewFakePlToken( PlTokenType.SPAN, '' );
             }
         }
     }
 
-    is(type): boolean {
+    is( type ): boolean {
         return this instanceof type;
     }
 }
@@ -74,8 +74,8 @@ export abstract class ASTExpression extends ASTNode {
 export class ASTBlock extends ASTStatement {
     statements: ASTStatement[];
 
-    constructor(tokens: PlToken[], statements: ASTStatement[]) {
-        super(tokens);
+    constructor( tokens: PlToken[], statements: ASTStatement[] ) {
+        super( tokens );
         this.statements = statements;
     }
 }
@@ -85,8 +85,8 @@ export class ASTFunction extends ASTStatement {
     args: ASTVariable[];
     block: ASTBlock;
 
-    constructor(tokens: PlToken[], name: ASTVariable, args: ASTVariable[], block: ASTBlock) {
-        super(tokens);
+    constructor( tokens: PlToken[], name: ASTVariable, args: ASTVariable[], block: ASTBlock ) {
+        super( tokens );
         this.name = name;
         this.args = args;
         this.block = block;
@@ -104,8 +104,8 @@ export class ASTImpl extends ASTStatement {
     target: ASTType;
     block: ASTBlock;
 
-    constructor(tokens: PlToken[], name: ASTVariable, args: ASTVariable[], target: ASTType, block: ASTBlock) {
-        super(tokens);
+    constructor( tokens: PlToken[], name: ASTVariable, args: ASTVariable[], target: ASTType, block: ASTBlock ) {
+        super( tokens );
         this.name = name;
         this.args = args;
         this.target = target;
@@ -122,8 +122,8 @@ export class ASTImport extends ASTStatement {
     alias?: ASTVariable;
     select?: ASTVariable[];
 
-    constructor(tokens: PlToken[], path: ASTVariable[], alias?: ASTVariable, select?: ASTVariable[]) {
-        super(tokens);
+    constructor( tokens: PlToken[], path: ASTVariable[], alias?: ASTVariable, select?: ASTVariable[] ) {
+        super( tokens );
         this.path = path;
         this.alias = alias;
         this.select = select;
@@ -133,8 +133,8 @@ export class ASTImport extends ASTStatement {
 export class ASTExport extends ASTStatement {
     content: ASTExpression;
 
-    constructor(tokens: PlToken[], content: ASTExpression) {
-        super(tokens);
+    constructor( tokens: PlToken[], content: ASTExpression ) {
+        super( tokens );
         this.content = content;
     }
 }
@@ -142,21 +142,21 @@ export class ASTExport extends ASTStatement {
 export class ASTReturn extends ASTStatement {
     content?: ASTExpression;
 
-    constructor(tokens: PlToken[], content?: ASTExpression) {
-        super(tokens);
+    constructor( tokens: PlToken[], content?: ASTExpression ) {
+        super( tokens );
         this.content = content;
     }
 }
 
 export class ASTBreak extends ASTStatement {
-    constructor(tokens: PlToken[]) {
-        super(tokens);
+    constructor( tokens: PlToken[] ) {
+        super( tokens );
     }
 }
 
 export class ASTContinue extends ASTStatement {
-    constructor(tokens: PlToken[]) {
-        super(tokens);
+    constructor( tokens: PlToken[] ) {
+        super( tokens );
     }
 }
 
@@ -165,18 +165,18 @@ export class ASTIf extends ASTStatement {
     blocks: ASTBlock[]; // all the 'then' blocks
     other?: ASTBlock; // else block
 
-    constructor(tokens: PlToken[], conditions: ASTExpression[], blocks: ASTBlock[], other?: ASTBlock) {
-        super(tokens);
+    constructor( tokens: PlToken[], conditions: ASTExpression[], blocks: ASTBlock[], other?: ASTBlock ) {
+        super( tokens );
         this.conditions = conditions;
         this.blocks = blocks;
         this.other = other;
     }
 
     lastToken(): PlToken {
-        if (this.other) {
+        if ( this.other ) {
             return this.other.getSpanToken();
         }
-        return this.blocks[this.blocks.length-1].getSpanToken();
+        return this.blocks[this.blocks.length - 1].getSpanToken();
     }
 }
 
@@ -187,8 +187,8 @@ export class ASTEach extends ASTStatement {
     block: ASTBlock;
 
 
-    constructor(tokens: PlToken[], value: ASTVariable, iterator: ASTExpression, block: ASTBlock, key?: ASTVariable ) {
-        super(tokens);
+    constructor( tokens: PlToken[], value: ASTVariable, iterator: ASTExpression, block: ASTBlock, key?: ASTVariable ) {
+        super( tokens );
         this.value = value;
         this.key = key;
         this.iterator = iterator;
@@ -204,8 +204,8 @@ export class ASTLoop extends ASTStatement {
     amount?: ASTExpression;
     block: ASTBlock;
 
-    constructor(tokens: PlToken[], block: ASTBlock, amount?: ASTExpression,) {
-        super(tokens);
+    constructor( tokens: PlToken[], block: ASTBlock, amount?: ASTExpression, ) {
+        super( tokens );
         this.amount = amount;
         this.block = block;
     }
@@ -219,8 +219,8 @@ export class ASTWhile extends ASTStatement {
     condition: ASTExpression;
     block: ASTBlock;
 
-    constructor(tokens: PlToken[], condition: ASTExpression, block: ASTBlock) {
-        super(tokens);
+    constructor( tokens: PlToken[], condition: ASTExpression, block: ASTBlock ) {
+        super( tokens );
         this.condition = condition;
         this.block = block;
     }
@@ -236,8 +236,8 @@ export class ASTFor extends ASTStatement {
     after?: ASTExpression;
     block: ASTBlock;
 
-    constructor(tokens: PlToken[], block: ASTBlock, start?: ASTExpression, condition?: ASTExpression, after?: ASTExpression) {
-        super(tokens);
+    constructor( tokens: PlToken[], block: ASTBlock, start?: ASTExpression, condition?: ASTExpression, after?: ASTExpression ) {
+        super( tokens );
         this.start = start;
         this.condition = condition;
         this.after = after;
@@ -255,8 +255,8 @@ export class ASTMatch extends ASTStatement {
     blocks: ASTBlock[];
     other?: ASTBlock;
 
-    constructor(tokens: PlToken[], value: ASTExpression | null, cases: ASTExpression[][], blocks: ASTBlock[], other?: ASTBlock) {
-        super(tokens);
+    constructor( tokens: PlToken[], value: ASTExpression | null, cases: ASTExpression[][], blocks: ASTBlock[], other?: ASTBlock ) {
+        super( tokens );
         this.value = value;
         this.cases = cases;
         this.blocks = blocks;
@@ -269,15 +269,15 @@ export class ASTAssign extends ASTExpression {
     variable: ASTVariable;
     value: ASTExpression;
 
-    constructor(tokens: PlToken[], pre: ASTExpression, variable: ASTVariable, value: ASTExpression) {
-        super(tokens);
+    constructor( tokens: PlToken[], pre: ASTExpression, variable: ASTVariable, value: ASTExpression ) {
+        super( tokens );
         this.pre = pre;
         this.variable = variable;
         this.value = value;
     }
 
     firstToken(): PlToken {
-        return this.pre == null ? this.variable.getSpanToken() :this.pre.getSpanToken();
+        return this.pre == null ? this.variable.getSpanToken() : this.pre.getSpanToken();
     }
 
     lastToken(): PlToken {
@@ -293,8 +293,8 @@ export class ASTDot extends ASTExpression {
     left: ASTExpression;
     right: ASTVariable;
 
-    constructor(tokens: PlToken[], left: ASTExpression, right: ASTVariable) {
-        super(tokens);
+    constructor( tokens: PlToken[], left: ASTExpression, right: ASTVariable ) {
+        super( tokens );
         this.left = left;
         this.right = right;
     }
@@ -312,14 +312,22 @@ export class ASTCall extends ASTExpression {
     target: ASTExpression;
     args: ASTExpression[];
 
-    constructor(tokens: PlToken[], target: ASTExpression, args: ASTExpression[]) {
-        super(tokens);
+    constructor( tokens: PlToken[], target: ASTExpression, args: ASTExpression[] ) {
+        super( tokens );
         this.target = target;
         this.args = args;
     }
 
     firstToken(): PlToken {
         return this.target.getSpanToken();
+    }
+
+    lastToken(): PlToken {
+        const last = this.tokens[this.tokens.length - 1];
+        if ( last.type != PlTokenType.RPAREN ) {
+            return this.args[this.args.length - 1].getSpanToken();
+        }
+        return last;
     }
 }
 
@@ -328,8 +336,8 @@ export class ASTBinary extends ASTExpression {
     right: ASTExpression;
     operator: PlToken;
 
-    constructor(tokens: PlToken[], left: ASTExpression, right: ASTExpression, operator: PlToken) {
-        super(tokens);
+    constructor( tokens: PlToken[], left: ASTExpression, right: ASTExpression, operator: PlToken ) {
+        super( tokens );
         this.left = left;
         this.right = right;
         this.operator = operator;
@@ -348,8 +356,8 @@ export class ASTUnary extends ASTExpression {
     operator: PlToken;
     value: ASTExpression;
 
-    constructor(tokens: PlToken[], operator: PlToken, value: ASTExpression) {
-        super(tokens);
+    constructor( tokens: PlToken[], operator: PlToken, value: ASTExpression ) {
+        super( tokens );
         this.operator = operator;
         this.value = value;
     }
@@ -359,14 +367,14 @@ export class ASTUnary extends ASTExpression {
     }
 
     firstToken(): PlToken {
-        if (this.isPostfix()) {
+        if ( this.isPostfix() ) {
             return this.value.getSpanToken();
         }
         return this.operator;
     }
 
     lastToken(): PlToken {
-        if (this.isPostfix()) {
+        if ( this.isPostfix() ) {
             return this.operator;
         }
         return this.value.getSpanToken();
@@ -376,8 +384,8 @@ export class ASTUnary extends ASTExpression {
 export class ASTType extends ASTExpression {
     content: string;
 
-    constructor(tokens: PlToken[], content: string) {
-        super(tokens);
+    constructor( tokens: PlToken[], content: string ) {
+        super( tokens );
         this.content = content;
     }
 }
@@ -385,8 +393,8 @@ export class ASTType extends ASTExpression {
 export class ASTList extends ASTExpression {
     values: ASTExpression[];
 
-    constructor(tokens: PlToken[], values: ASTExpression[]) {
-        super(tokens);
+    constructor( tokens: PlToken[], values: ASTExpression[] ) {
+        super( tokens );
         this.values = values;
     }
 }
@@ -397,8 +405,8 @@ export class ASTDict extends ASTExpression {
     keys: ASTDictKey[];
     values: ASTExpression[];
 
-    constructor(tokens: PlToken[], keys: (ASTVariable | ASTNumber)[], values: ASTExpression[]) {
-        super(tokens);
+    constructor( tokens: PlToken[], keys: (ASTVariable | ASTNumber)[], values: ASTExpression[] ) {
+        super( tokens );
         this.keys = keys;
         this.values = values;
     }
@@ -409,8 +417,8 @@ export class ASTClosure extends ASTExpression {
     args: ASTVariable[];
     block: ASTBlock;
 
-    constructor(tokens: PlToken[], args: ASTVariable[], block: ASTBlock) {
-        super(tokens);
+    constructor( tokens: PlToken[], args: ASTVariable[], block: ASTBlock ) {
+        super( tokens );
         this.args = args;
         this.block = block;
     }
@@ -419,8 +427,8 @@ export class ASTClosure extends ASTExpression {
 export class ASTNumber extends ASTExpression {
     value: string;
 
-    constructor(tokens: PlToken[], value: string) {
-        super(tokens);
+    constructor( tokens: PlToken[], value: string ) {
+        super( tokens );
         this.value = value;
     }
 }
@@ -428,8 +436,8 @@ export class ASTNumber extends ASTExpression {
 export class ASTBoolean extends ASTExpression {
     value: string;
 
-    constructor(tokens: PlToken[], value: string) {
-        super(tokens);
+    constructor( tokens: PlToken[], value: string ) {
+        super( tokens );
         this.value = value;
     }
 }
@@ -437,23 +445,23 @@ export class ASTBoolean extends ASTExpression {
 export class ASTString extends ASTExpression {
     content: string;
 
-    constructor(tokens: PlToken[], content: string) {
-        super(tokens);
+    constructor( tokens: PlToken[], content: string ) {
+        super( tokens );
         this.content = content;
     }
 }
 
 export class ASTNull extends ASTExpression {
-    constructor(tokens: PlToken[]) {
-        super(tokens);
+    constructor( tokens: PlToken[] ) {
+        super( tokens );
     }
 }
 
 export class ASTVariable extends ASTExpression {
     content: string;
 
-    constructor(tokens: PlToken[], content: string) {
-        super(tokens);
+    constructor( tokens: PlToken[], content: string ) {
+        super( tokens );
         this.content = content;
     }
 }

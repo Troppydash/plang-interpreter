@@ -79,7 +79,7 @@ export class PlStackMachine {
             [ScrambleFunction("ask")]: (...message: any) => {
                 const str = this.stream.input(message.map(m => PlActions.PlToString(m)).join('\n'));
                 if (str == null) {
-                    throw new Error("Input stream ended");
+                    return PlStuffNull;
                 }
                 return NewPlStuff(PlStuffType.Str, str);
             },
@@ -216,7 +216,7 @@ export class PlStackMachine {
                         break;
                     }
                     case PlBytecodeType.DEFNUM: {
-                        this.pushStack(NewPlStuff(PlStuffType.Int, +byte.value));
+                        this.pushStack(NewPlStuff(PlStuffType.Num, +byte.value));
                         break;
                     }
                     case PlBytecodeType.DEFSTR: {
@@ -323,7 +323,7 @@ export class PlStackMachine {
                     case PlBytecodeType.DOOINC:
                     case PlBytecodeType.DOODEC: {
                         const value = this.popStack();
-                        if (value.type == PlStuffType.Int) {
+                        if (value.type == PlStuffType.Num) {
                             if (byte.type == PlBytecodeType.DOOINC)
                                 value.value++;
                             else
@@ -340,7 +340,7 @@ export class PlStackMachine {
 
                     case PlBytecodeType.DONEGT: {
                         const value = this.popStack();
-                        if (value.type == PlStuffType.Int) {
+                        if (value.type == PlStuffType.Num) {
                             value.value = -value.value;
                             this.pushStack(value);
                             break;

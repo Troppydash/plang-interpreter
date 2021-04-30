@@ -95,3 +95,7 @@ export function generateForSome(name: string, types: PlStuffType[], func: Functi
     }
     return out;
 }
+
+
+export type ExportNative = Record<string, (...args: PlStuff[]) => PlStuff>;
+export type ExportJs = Record<string, (...args: any[]) => any>;

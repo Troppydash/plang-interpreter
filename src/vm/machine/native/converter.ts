@@ -7,7 +7,7 @@ export namespace PlConverter {
             case PlStuffType.Str: {
                 return object.value;
             }
-            case PlStuffType.Int: {
+            case PlStuffType.Num: {
                 return +object.value;
             }
             case PlStuffType.Type: {
@@ -45,7 +45,7 @@ export namespace PlConverter {
     export function JsToPl(object: any): PlStuff {
         switch (typeof object) {
             case "number": {
-                return NewPlStuff(PlStuffType.Int, object);
+                return NewPlStuff(PlStuffType.Num, object);
             }
             case "string": {
                 return NewPlStuff(PlStuffType.Str, object);
@@ -71,9 +71,14 @@ export namespace PlConverter {
                 if (object == null) {
                     return PlStuffNull;
                 }
-                if (object.length) {
+                if (Array.isArray(object)) {
                     return NewPlStuff(PlStuffType.List, object.map(i => JsToPl(i)));
                 }
+                const obj = {};
+                for (const [key, value] of Object.entries(object)) {
+                    obj[key] = JsToPl(value);
+                }
+                return NewPlStuff(PlStuffType.Dict, obj);
             }
         }
         throw new Error("Unimplemented from jstopl");
@@ -94,7 +99,7 @@ export namespace PlActions {
                 return `list(${object.value.map(v => PlToString(v)).join(', ')})`;
             case PlStuffType.Null:
                 return "null";
-            case PlStuffType.Int:
+            case PlStuffType.Num:
                 return "" + object.value;
             case PlStuffType.Str:
                 return `${object.value}`;
@@ -107,7 +112,7 @@ export namespace PlActions {
     export function PlCopy(object: PlStuff): PlStuff {
         const {type, value} = object;
         switch (type) {
-            case PlStuffType.Int:
+            case PlStuffType.Num:
             case PlStuffType.Str:
             case PlStuffType.List:
             case PlStuffType.Func:
@@ -127,7 +132,7 @@ export namespace PlActions {
     export function PlClone(object: PlStuff): PlStuff {
         const {type, value} = object;
         switch (type) {
-            case PlStuffType.Int:
+            case PlStuffType.Num:
             case PlStuffType.Str:
                 return NewPlStuff(type, value);
 

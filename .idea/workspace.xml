@@ -19,11 +19,22 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="simple benchmark">
+    <list default="true" id="3ba05e42-11f0-4b2d-b96e-7793d0e6c242" name="Default Changelist" comment="Some optimizing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/benchmark/bench.plang" beforeDir="false" afterPath="$PROJECT_DIR$/src/benchmark/bench.plang" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/lexing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/emitter/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/machine/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/memory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/memory.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/converter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/converter.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/helpers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/helpers.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/impl/all.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/impl/all.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/impl/list.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/impl/list.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/impl/str.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/impl/str.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/operators.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/operators.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/vm/machine/stuff.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/stuff.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,7 +100,7 @@
       <recent name="E:\Folder2021\PlangProjects\plang-interpreter" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.build-cli">
+  <component name="RunManager" selected="npm.run playground/test.plang">
     <configuration name="build-browser" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -140,24 +151,24 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="run playground/test2.plang" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="run playground/test.plang" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="run" />
       </scripts>
-      <arguments value="playground/test2.plang" />
+      <arguments value="playground/test.plang" />
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="run-build playground/test2.plang" type="js.build_tools.npm" nameIsGenerated="true">
+    <configuration name="run-build playground/test.plang" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
         <script value="run-build" />
       </scripts>
-      <arguments value="playground/test2.plang" />
+      <arguments value="playground/test.plang" />
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
@@ -174,18 +185,18 @@
     </configuration>
     <list>
       <item itemvalue="npm.build-cli" />
-      <item itemvalue="npm.run-build playground/test2.plang" />
+      <item itemvalue="npm.run-build playground/test.plang" />
       <item itemvalue="npm.build-browser" />
       <item itemvalue="npm.build-dist" />
-      <item itemvalue="npm.run playground/test2.plang" />
+      <item itemvalue="npm.run playground/test.plang" />
       <item itemvalue="npm.build" />
       <item itemvalue="npm.watch-build" />
       <item itemvalue="npm.clean" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.run playground/test.plang" />
         <item itemvalue="npm.build" />
-        <item itemvalue="npm.run playground/test2.plang" />
         <item itemvalue="npm.clean" />
         <item itemvalue="npm.watch-build" />
         <item itemvalue="npm.build-dist" />
@@ -224,7 +235,8 @@
       <workItem from="1619077667357" duration="26200000" />
       <workItem from="1619220219970" duration="22647000" />
       <workItem from="1619585262910" duration="21655000" />
-      <workItem from="1619685351858" duration="3407000" />
+      <workItem from="1619685351858" duration="3719000" />
+      <workItem from="1619746641330" duration="9860000" />
     </task>
     <task id="LOCAL-00001" summary="moved some comments">
       <created>1617620767259</created>
@@ -457,7 +469,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619686203834</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="Some optimizing">
+      <created>1619689214675</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1619689214675</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -476,7 +495,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added Error codes and some bug fixes" />
     <MESSAGE value="Started writing the virtual machine" />
     <MESSAGE value="Reframed some bytecodes" />
     <MESSAGE value="Added more bytecodes" />
@@ -501,7 +519,8 @@
     <MESSAGE value="Built a cool interactive error handler" />
     <MESSAGE value="bugfixes for weyman the bug tester" />
     <MESSAGE value="simple benchmark" />
-    <option name="LAST_COMMIT_MESSAGE" value="simple benchmark" />
+    <MESSAGE value="Some optimizing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Some optimizing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -510,6 +529,18 @@
           <url>file://$PROJECT_DIR$/src/compiler/parsing/index.ts</url>
           <line>210</line>
           <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/vm/machine/native/impl/all.ts</url>
+          <line>74</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/vm/machine/native/index.ts</url>
+          <line>39</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="21" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

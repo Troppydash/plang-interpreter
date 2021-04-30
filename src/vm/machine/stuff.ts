@@ -1,5 +1,5 @@
 export enum PlStuffType {
-    Int,
+    Num,
     Str,
     Bool,
     Null,
@@ -28,7 +28,7 @@ export function PlStuffTypeFromString(string: string) {
 
 export function PlStuffTypeToString(stuffType: PlStuffType): string {
     switch (stuffType) {
-        case PlStuffType.Int:
+        case PlStuffType.Num:
             return "Int";
         case PlStuffType.Type:
             return "Type";

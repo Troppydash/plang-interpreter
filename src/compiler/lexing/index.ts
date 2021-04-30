@@ -468,13 +468,6 @@ class PlLexer implements Lexer {
         if (iscap(c)) {
             // check datatypes
             switch (c) {
-                case "I": {
-                    const token = this.testNextKeyword("Int", PlTokenType.TYPE);
-                    if (token) {
-                        return token;
-                    }
-                    break;
-                }
                 case "S": {
                     const token = this.testNextKeyword("Str", PlTokenType.TYPE);
                     if (token) {
@@ -483,7 +476,11 @@ class PlLexer implements Lexer {
                     break;
                 }
                 case "N": {
-                    const token = this.testNextKeyword("Null", PlTokenType.TYPE);
+                    let token = this.testNextKeyword("Num", PlTokenType.TYPE);
+                    if (token) {
+                        return token;
+                    }
+                    token = this.testNextKeyword("Null", PlTokenType.TYPE);
                     if (token) {
                         return token;
                     }
@@ -512,6 +509,13 @@ class PlLexer implements Lexer {
                 }
                 case "T": {
                     const token = this.testNextKeyword("Type", PlTokenType.TYPE);
+                    if (token) {
+                        return token;
+                    }
+                    break;
+                }
+                case "B": {
+                    const token = this.testNextKeyword("Bool", PlTokenType.TYPE);
                     if (token) {
                         return token;
                     }

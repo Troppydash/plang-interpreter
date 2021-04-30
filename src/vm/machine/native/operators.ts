@@ -9,7 +9,7 @@ function equals(l: PlStuff, r: PlStuff) {
 
     let out;
     switch (l.type) {
-        case PlStuffType.Int:
+        case PlStuffType.Num:
         case PlStuffType.Bool:
         case PlStuffType.Type:
         case PlStuffType.Str:
@@ -35,11 +35,11 @@ function greater(l: PlStuff, r: PlStuff) {
 
 export const jsOperators = {
     // numbers
-    [ScrambleFunction("+", PlStuffType.Int)]: assertTypeofEqual((l, r) => l + r),
-    [ScrambleFunction("-", PlStuffType.Int)]: assertTypeofEqual((l, r) => l - r),
-    [ScrambleFunction("*", PlStuffType.Int)]: assertTypeofEqual((l, r) => l * r),
-    [ScrambleFunction("/", PlStuffType.Int)]: assertTypeofEqual((l, r) => l / r),
-    [ScrambleFunction("mod", PlStuffType.Int)]: assertTypeofEqual((l, r) => l % r),
+    [ScrambleFunction("+", PlStuffType.Num)]: assertTypeofEqual((l, r) => l + r),
+    [ScrambleFunction("-", PlStuffType.Num)]: assertTypeofEqual((l, r) => l - r),
+    [ScrambleFunction("*", PlStuffType.Num)]: assertTypeofEqual((l, r) => l * r),
+    [ScrambleFunction("/", PlStuffType.Num)]: assertTypeofEqual((l, r) => l / r),
+    [ScrambleFunction("mod", PlStuffType.Num)]: assertTypeofEqual((l, r) => l % r),
 
     // strings
     [ScrambleFunction("+", PlStuffType.Str)]: assertTypeofEqual((l, r) => l + r),
@@ -50,7 +50,7 @@ export const jsOperators = {
 };
 
 export const operators = {
-    ...generateCompare(PlStuffType.Int, equals, assertTypeEqual(greater)),
+    ...generateCompare(PlStuffType.Num, equals, assertTypeEqual(greater)),
     ...generateCompare(PlStuffType.Str, equals),
     ...generateCompare(PlStuffType.Bool, equals),
     ...generateCompare(PlStuffType.Null, equals),

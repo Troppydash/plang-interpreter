@@ -11,6 +11,7 @@ import {ProgramWithDebugToString} from "../vm/emitter/pprinter";
 import {PlStackMachine} from "../vm/machine";
 import {StartInteractive} from "../problem/interactive";
 import {TRACE_MAX} from "../problem/printer";
+import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
 
 export function RunLinker(content: string, filename: string): PlToken[] | null {
     const lexer = new PlLexer(NewPlFile(filename, content));
@@ -139,8 +140,9 @@ export async function RunFile(filePath: string): Promise<number> {
         return 1;
     }
 
-    const file = NewPlFile(filename, content);
 
+    const file = NewPlFile(filename, content);
+    // console.log(AttemptPrettyPrint(RunParser(content, filename)));
     await RunVM(file);
     return 0;
 }

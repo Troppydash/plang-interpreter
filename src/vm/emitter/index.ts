@@ -577,8 +577,8 @@ function traverseAST(node: ASTNode): PlProgramWithDebug {
 
         // iter@ = target.iter()
         // while (@i = iter@.next()).get(2) {
-        //  KEY = i@.get(1)
-        //  VALUE = i@.get(2)
+        //  KEY = i@.get(1).get(1)
+        //  VALUE = i@.get(1).get(2)
         //  BLOCK
         // }
 

@@ -41,7 +41,7 @@ export const all = {
                 break;
             case PlStuffType.Bool:
                 switch (object.type) {
-                    case PlStuffType.Int:
+                    case PlStuffType.Num:
                         out = object.value != 0;
                         break;
                     case PlStuffType.List:
@@ -64,7 +64,7 @@ export const all = {
                 out = PlActions.PlToString(object);
                 break;
 
-            case PlStuffType.Int: {
+            case PlStuffType.Num: {
                 let num = null;
                 switch (object.type) {
                     case PlStuffType.Bool:
@@ -86,16 +86,14 @@ export const all = {
                     case PlStuffType.Type:
                         break;
                 }
-                if (num != null) {
-                    out = NewPlStuff(PlStuffType.Int, num);
-                }
+                out = num;
                 break;
             }
             case PlStuffType.Type:
                 if (object.type == PlStuffType.Str) {
                     try {
                         const type = PlStuffTypeFromString(object.value);
-                        out = NewPlStuff(PlStuffType.Type, type);
+                        out = type;
                     } catch (e) {
                         // nothing
                     }
