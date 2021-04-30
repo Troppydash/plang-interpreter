@@ -324,8 +324,8 @@ export class ASTCall extends ASTExpression {
 
     lastToken(): PlToken {
         const last = this.tokens[this.tokens.length - 1];
-        if ( last.type != PlTokenType.RPAREN ) {
-            return this.args[this.args.length - 1].getSpanToken();
+        if ( last.type != PlTokenType.RPAREN && this.args.length > 0) {
+            return this.args[0].getSpanToken();
         }
         return last;
     }

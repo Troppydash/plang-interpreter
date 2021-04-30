@@ -421,10 +421,10 @@ export class PlStackMachine {
                             case PlStuffType.NFunc: {
                                 const value = func.value as PlNativeFunction;
                                 try {
-                                    const out = value.callback(...args);
+                                    const out = value.callback.bind(this)(...args);
                                     this.pushStack(out);
                                 } catch (e) {
-                                    this.newProblem("RE0007", ptr, debug, '' + e);
+                                    this.newProblem("RE0007", ptr, debug, e.message);
                                     return null;
                                 }
                                 break;

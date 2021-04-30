@@ -23,17 +23,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/lexing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/lexing/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/ast.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/compiler/parsing/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/compiler/parsing/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/linking/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/linking/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/emitter/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/emitter/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/machine/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/converter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/converter.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/helpers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/helpers.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/impl/all.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/impl/all.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/impl/list.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/impl/list.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/impl/str.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/impl/str.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/machine/native/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/vm/machine/native/operators.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/native/operators.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/vm/machine/stuff.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/vm/machine/stuff.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -533,14 +524,7 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/vm/machine/native/impl/all.ts</url>
           <line>74</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/vm/machine/native/index.ts</url>
-          <line>39</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="21" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -29,7 +29,7 @@ export function PlStuffTypeFromString(string: string) {
 export function PlStuffTypeToString(stuffType: PlStuffType): string {
     switch (stuffType) {
         case PlStuffType.Num:
-            return "Int";
+            return "Num";
         case PlStuffType.Type:
             return "Type";
         case PlStuffType.Func:
