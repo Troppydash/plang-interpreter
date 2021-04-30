@@ -17,11 +17,12 @@ export function StartREPL( filename: string ): number {
 
     let stream = false;
     const vm = new PlStackMachine({
+        ...inout,
         input: message => {
             stream = true;
             return inout.input(message)
         },
-        output: message => {
+        print: message => {
             stream = true;
             inout.print(message);
             inout.flush()

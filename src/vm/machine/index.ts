@@ -18,6 +18,8 @@ import {PlProblemCode} from "../../problem/codes";
 import {PlActions, PlConverter} from "./native/converter";
 import {PlProgramWithDebug} from "../emitter";
 import {NewPlTraceFrame} from "../../problem/trace";
+import {assertType, expectedNArguments} from "./native/helpers";
+import {PlInout} from "../../inout";
 
 export interface PlStreamInout {
     output: (message: string) => void;
@@ -30,7 +32,7 @@ const JUMP_ERRORS: Record<string, PlProblemCode> = {
 };
 
 export class PlStackMachine {
-    readonly stream: PlStreamInout;
+    readonly inout: PlInout;
 
     stackFrame: PlStackFrame;
     closureStack: PlStackFrame | null;
@@ -40,8 +42,8 @@ export class PlStackMachine {
     debug: PlDebugProgram;
     problems: PlProblem[];
 
-    constructor(stream: PlStreamInout) {
-        this.stream = stream;
+    constructor(inout: PlInout) {
+        this.inout = inout;
         this.problems = [];
 
         this.stackFrame = new PlStackFrame(null, NewPlTraceFrame("file"));
@@ -70,18 +72,39 @@ export class PlStackMachine {
         const native = {
             [ScrambleFunction("say")]: (...message: any) => {
                 if (message.length == 0) {
-                    this.stream.output('\n');
+                    this.inout.print('\n');
                 } else {
-                    this.stream.output(message.map(m => PlActions.PlToString(m)).join(' '));
+                    this.inout.print(message.map(m => PlActions.PlToString(m)).join(' '));
                 }
                 return PlStuffNull;
             },
             [ScrambleFunction("ask")]: (...message: any) => {
-                const str = this.stream.input(message.map(m => PlActions.PlToString(m)).join('\n'));
+                const str = this.inout.input(message.map(m => PlActions.PlToString(m)).join('\n'));
                 if (str == null) {
                     return PlStuffNull;
                 }
                 return NewPlStuff(PlStuffType.Str, str);
+            },
+            [ScrambleFunction( "javascript" )]: ( ...args: PlStuff[] ) => {
+                expectedNArguments(1, args as unknown as IArguments, false);
+                const code = args[0];
+                assertType(code, PlStuffType.Str, "'javascript' need strings as parameters");
+
+                try {
+                    this.inout.execute(code.value, {
+                        pl: {
+                            import: (key) => {
+                                return PlConverter.PlToJs(this.findValue(key));
+                            },
+                            export: (key, value) => {
+                                this.createValue(key, PlConverter.JsToPl(value));
+                                return null;
+                            }
+                        }
+                    })
+                } catch ( e ) {
+                    throw new Error(`from Javascript - [${e.name}] ${e.message}`);
+                }
             },
             ...natives,
         }
@@ -421,7 +444,7 @@ export class PlStackMachine {
                             case PlStuffType.NFunc: {
                                 const value = func.value as PlNativeFunction;
                                 try {
-                                    const out = value.callback.bind(this)(...args);
+                                    const out = value.callback(...args);
                                     this.pushStack(out);
                                 } catch (e) {
                                     this.newProblem("RE0007", ptr, debug, e.message);

@@ -50,7 +50,7 @@ export abstract class ASTNode {
             const firstToken = this.firstToken();
             const lastToken = this.lastToken()
             if ( lastToken.info.row != firstToken.info.row ) {
-                return lastToken;
+                return firstToken;
             }
             return CreateSpanToken( firstToken, lastToken, this.tokens.map( t => t.content ).join( '' ) );
         } catch ( e ) {

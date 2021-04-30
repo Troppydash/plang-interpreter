@@ -5,7 +5,7 @@ export const isNode =
     process.versions != null &&
     process.versions.node != null;
 
-interface Inout {
+export interface PlInout {
     print: (message: string) => void;
     input: (message: string) => string | null;
     flush: () => void;
@@ -13,9 +13,11 @@ interface Inout {
     paths: Paths;
     setRootPath: (rootFile: string) => void;
     readFile: (filePath: string, type: PathType) => string | null;
+
+    execute: (code: string, vars: Record<string, any>) => void;
 }
 
-let inout: Inout;
+let inout: PlInout;
 if ( isNode ) {
     inout = require("./nodeInout");
 } else {

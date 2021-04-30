@@ -100,8 +100,8 @@ export async function RunVM(file: PlFile) {
 
     const program = EmitProgram(ast);
     const vm = new PlStackMachine({
-        input: inout.input,
-        output: message => {
+        ...inout,
+        print: message => {
             inout.print(message);
             inout.flush();
         }

@@ -91,6 +91,7 @@ const templates = {
     CE0005: "reached EOF with an unclosed ')'",
     CE0006: "reached EOF with an unclosed ')'",
     CE0007: "reached LF or EOF with an unclosed '}'",
+    CE0008: "reached EOF with an unclosed '\"\"\"'",
 
 
     LP0001: "found two or more default options in a match statement",
@@ -182,6 +183,7 @@ const hints: Record<PlProblemCode, string> = {
     CE0005: "did you forget to close an argument list?",
     CE0006: "did you forget to close an parameter list",
     CE0007: "did you forget to close your match statement?",
+    CE0008: "did you forget to close a multiline string?",
 
 
     LP0001: "there can be only one default block in a match statement, try removing all other default blocks in the match",

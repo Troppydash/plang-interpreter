@@ -63,31 +63,5 @@ export const natives: Record<string, PlStuff> = {
     ...operators,
     ...str,
     ...list,
-    ...all,
-    [ScrambleFunction( "javascript" )]: function( ...args: PlStuff[] ) {
-        for (const arg of args) {
-            assertType(arg, PlStuffType.Str, "'javascript' need strings as parameters");
-        }
-        if ( args.length == 0 ) {
-            throw new Error( "Javascript section needs some code to run, try 'javascript \"console.log('Hello');\"'" );
-        }
-
-        const code = args.pop();
-        const params = args;
-
-        const values = {};
-        for ( const param of params ) {
-            // @ts-ignore
-            values[param.value] = PlConverter.PlToJs(this.findValue( param.value ));
-        }
-
-        try {
-            maskedEval(code.value, {
-                ...values,
-                console
-            });
-        } catch ( e ) {
-            throw new Error(`from Javascript - [${e.name}] ${e.message}`);
-        }
-    }
+    ...all
 };
