@@ -40,6 +40,7 @@ export class PlStackFrame {
         if (this.trace != null) {
             return null;
         }
+
         let outer = this.outer;
         while (outer != null) {
             if (key in outer.values) {
@@ -82,7 +83,7 @@ export class PlStackFrame {
         let outer = this.outer;
         while (outer != null) {
             if (key in outer.values) {
-                this.values[key] = value;
+                outer.values[key] = value;
                 return;
             }
             outer = outer.outer;

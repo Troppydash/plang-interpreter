@@ -873,7 +873,7 @@ export class PlAstParser implements Parser {
 
         while ( this.peekMatch( [ PlTokenType.MUL, PlTokenType.DIV ] ) ) {
             const token = this.nextToken();
-            const right = this.pMult();
+            const right = this.pPrefix();
             if ( right == null ) {
                 return null;
             }

@@ -9,7 +9,7 @@ import {PlFileInfo} from "../compiler/lexing/info";
 const NLINESUP = 1;
 const NLINESDOWN = 2;
 const CHARWRAP = 80;
-export const TRACE_MAX = 4;
+export const TRACE_MAX = 2;
 
 
 function wrapLine(line: string, header: string) {

@@ -51,14 +51,6 @@ export const jsNatives: Record<string, any> = {
     },
 };
 
-function maskedEval( src, ctx = {} ) {
-    ctx = new Proxy( ctx, {
-        has: () => true
-    } )
-    let func = (new Function( "with(this) { " + src + "}" ));
-    func.call( ctx );
-}
-
 export const natives: Record<string, PlStuff> = {
     ...operators,
     ...str,

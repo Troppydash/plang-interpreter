@@ -26,7 +26,7 @@ export const all = {
     ...generateForAll("is", function (object, type) {
         expectedNArguments(1, arguments);
         assertType(type, PlStuffType.Type, "'.is' requires a type as an argument");
-        return PlStuffTypeToString(object.type) == type.value ? PlStuffTrue : PlStuffFalse;
+        return object.type == type.value ? PlStuffTrue : PlStuffFalse;
     }),
     ...generateForAll("to", function (object: PlStuff, type: PlStuff) {
         expectedNArguments(1, arguments);
@@ -102,5 +102,5 @@ export const all = {
         }
 
         return NewPlStuff(out == null ? PlStuffType.Null : type.value, out);
-    })
+    }),
 };

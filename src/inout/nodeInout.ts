@@ -72,6 +72,7 @@ function maskedEval( src, ctx = {} ) {
 export function execute(code: string, vars: Record<string, any>): void {
     maskedEval(code, {
         console,
+        Math,
         require,
         ...vars,
     });
