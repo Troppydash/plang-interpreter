@@ -1,14 +1,6 @@
-import {assertType, expectedNArguments, generateForAll, generateForSome} from "../helpers";
-import {PlActions} from "../converter";
-import {
-    NewPlStuff,
-    PlStuff,
-    PlStuffFalse,
-    PlStuffTrue,
-    PlStuffType,
-    PlStuffTypeFromString,
-    PlStuffTypeToString
-} from "../../stuff";
+import { assertType, expectedNArguments, generateForAll, generateForSome } from "../helpers";
+import { PlActions } from "../converter";
+import { NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType, PlStuffTypeFromString } from "../../stuff";
 
 export const all = {
     ...generateForAll("copy", function (object) {
@@ -26,7 +18,11 @@ export const all = {
     ...generateForAll("is", function (object, type) {
         expectedNArguments(1, arguments);
         assertType(type, PlStuffType.Type, "'.is' requires a type as an argument");
-        return object.type == type.value ? PlStuffTrue : PlStuffFalse;
+        let otype = object.type;
+        if (object.type == PlStuffType.NFunc) {
+            otype = PlStuffType.Func;
+        }
+        return otype == type.value ? PlStuffTrue : PlStuffFalse;
     }),
     ...generateForAll("to", function (object: PlStuff, type: PlStuff) {
         expectedNArguments(1, arguments);
@@ -102,5 +98,12 @@ export const all = {
         }
 
         return NewPlStuff(out == null ? PlStuffType.Null : type.value, out);
+    }),
+    ...generateForAll("type", function(object: PlStuff) {
+        expectedNArguments(0, arguments);
+        if (object.type == PlStuffType.NFunc) {
+            return NewPlStuff(PlStuffType.Type, PlStuffType.Func);
+        }
+        return NewPlStuff(PlStuffType.Type, object.type);
     }),
 };

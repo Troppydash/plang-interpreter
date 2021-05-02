@@ -11,7 +11,7 @@ export namespace PlConverter {
                 return +object.value;
             }
             case PlStuffType.Type: {
-                return object.value;
+                return PlStuffTypeToString(object.value);
             }
             case PlStuffType.Bool: {
                 return object.value;
