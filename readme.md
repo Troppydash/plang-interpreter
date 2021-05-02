@@ -90,6 +90,30 @@ v1.set(2, 3)
 say(v1.get()) # prints 2, 3
 ```
 
+```
+# using javascript inside of plang
+values = list(1, 10, 20, 30)
+
+javascript """
+    const values = pl.import("values"); // import the variable "values" from plang
+    function factorial(n) {
+        if (n < 2) {
+            return 1;
+        }
+        return n * factorial(n-1);
+    }
+    const out = [];
+    for (const value of values) {
+        out.push(factorial(value));
+    }
+    pl.export("out", out); // export the variable as "out" to plang
+"""
+
+each item, index in out {
+    say("factorial", values.get(index), "=", item)
+}
+```
+
 ### How do I use it
 If you have the executable, `plang.exe <file>`
 will run the file. You can also start the REPL by running `plang.exe` directly with no arguments.
