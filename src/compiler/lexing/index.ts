@@ -264,7 +264,7 @@ class PlLexer implements Lexer {
                 break;
             }
             case 'i': {
-                for (const pair of [["impl", PlTokenType.IMPL], ["import", PlTokenType.IMPORT], ["if", PlTokenType.IF], ["in", PlTokenType.IN]]) {
+                for (const pair of [["impl", PlTokenType.IMPL], ["import", PlTokenType.IMPORT], ["if", PlTokenType.IF]]) {
                     const [str, type] = (pair as [string, PlTokenType]);
                     const token = this.testNextKeyword(str, type);
                     if (token) {
@@ -374,7 +374,7 @@ class PlLexer implements Lexer {
                 break;
             }
             case 'o': {
-                for (const pair of [["or", PlTokenType.OR]]) {
+                for (const pair of [["or", PlTokenType.OR],  ["of", PlTokenType.OF]]) {
                     const [str, type] = (pair as [string, PlTokenType]);
                     const token = this.testNextKeyword(str, type);
                     if (token) {

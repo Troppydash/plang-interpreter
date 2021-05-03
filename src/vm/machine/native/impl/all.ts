@@ -116,6 +116,6 @@ export const all = {
             throw new Error("no type function 'have' found on the other value");
         }
         // value is a native function for sure // TODO: make this work for all functions
-        return value.callback(PlCopy(other), self);
+        return value.value.callback(PlCopy(other), self);
     })
 };

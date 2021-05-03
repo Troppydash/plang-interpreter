@@ -53,10 +53,10 @@ const templates = {
     ET0022: "expected a left brace '{' after elif conditions",
     ET0023: "expected a left brace '{' after else conditions",
 
-    // each..in
+    // each..of
     ET0024: "expected the value or key in an each statement to be a variable",
-    ET0025: "expected the keyword in after the each value and keys",
-    ET0026: "expected a left brace '{' after each..in statement",
+    ET0025: "expected the keyword 'of' after the each value and keys",
+    ET0026: "expected a left brace '{' after each..of statement",
 
     // impl
     ET0027: "expected a variable as the impl name",
@@ -156,7 +156,7 @@ const hints: Record<PlProblemCode, string> = {
     ET0022: simplyPutA(),
     ET0023: simplyPutA(),
     ET0024: "a variable begins with a letter or an underscore",
-    ET0025: "maybe check the syntax for an each..in statement: each value, key in array {}",
+    ET0025: "maybe check the syntax for an each..of statement: each value, key in array {}",
     ET0026: simplyPutA(),
     ET0027: "a variable begins with a letter or an underscore",
     ET0028: simplyPutA("a parenthesis '('"),
@@ -210,7 +210,7 @@ const hints: Record<PlProblemCode, string> = {
 
     RE0014: "a boolean is expected here, check if the expression returns a true or a false",
     RE0015: "a number is expected here, check if the expression returns a number",
-    RE0016: "only a value that contain the '.iter' type function can be used in a each..in loop, is the value a list or a dictionary?",
+    RE0016: "only a value that contain the '.iter' type function can be used in a each..of loop, is the value a list or a dictionary?",
     RE0017: "maybe check if the expression returns a boolean value?"
 }
 

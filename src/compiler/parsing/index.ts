@@ -565,7 +565,7 @@ export class PlAstParser implements Parser {
             }
         }
 
-        if ( this.tryPeekToken( PlTokenType.IN, "ET0025", key == null ? value.getSpanToken() : key.getSpanToken() ) == null ) {
+        if ( this.tryPeekToken( PlTokenType.OF, "ET0025", key == null ? value.getSpanToken() : key.getSpanToken() ) == null ) {
             return null;
         }
         tokens.push( this.nextToken() );

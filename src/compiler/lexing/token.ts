@@ -9,7 +9,7 @@ export enum PlTokenType {
     EXPORT,
     RETURN, BREAK, CONTINUE,
     IF, ELIF, ELSE,
-    EACH, IN,
+    EACH, OF,
     LOOP,
     WHILE,
     FOR,
