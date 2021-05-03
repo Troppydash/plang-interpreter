@@ -18,20 +18,22 @@ import {PlProblemCode} from "../../problem/codes";
 import {PlActions, PlConverter} from "./native/converter";
 import {PlProgramWithDebug} from "../emitter";
 import {NewPlTraceFrame} from "../../problem/trace";
-import {assertType, expectedNArguments} from "./native/helpers";
 import {PlInout} from "../../inout";
-
-export interface PlStreamInout {
-    output: (message: string) => void;
-    input: (message: string) => string | null;
-}
 
 const JUMP_ERRORS: Record<string, PlProblemCode> = {
     "*": "RE0010",
     "ASTCondition": "RE0014",
 };
 
-export class PlStackMachine {
+export interface StackMachine {
+    findValue(key: string);
+    createValue(key: string, value: PlStuff);
+    setValue(key: string, value: PlStuff);
+    stack: PlStuff[];
+    readonly inout: PlInout;
+}
+
+export class PlStackMachine implements StackMachine {
     readonly inout: PlInout;
 
     stackFrame: PlStackFrame;
@@ -39,7 +41,6 @@ export class PlStackMachine {
 
     stack: PlStuff[];
 
-    debug: PlDebugProgram;
     problems: PlProblem[];
 
     constructor(inout: PlInout) {
@@ -55,66 +56,19 @@ export class PlStackMachine {
     }
 
     seedStack() {
-        const jsNative = {
-            [ScrambleFunction("panic")]: (...message: any) => {
-                throw new Error(message.join(' '));
-            },
-            ...jsNatives,
-        };
-
-        for (const [key, entry] of Object.entries(jsNative)) {
+        for (const [key, entry] of Object.entries(jsNatives)) {
             this.stackFrame.createValue(
                 key,
                 PlConverter.JsToPl(entry)
             );
         }
 
-        const native = {
-            [ScrambleFunction("say")]: (...message: any) => {
-                if (message.length == 0) {
-                    this.inout.print('\n');
-                } else {
-                    this.inout.print(message.map(m => PlActions.PlToString(m)).join(' '));
-                }
-                return PlStuffNull;
-            },
-            [ScrambleFunction("ask")]: (...message: any) => {
-                const str = this.inout.input(message.map(m => PlActions.PlToString(m)).join('\n'));
-                if (str == null) {
-                    return PlStuffNull;
-                }
-                return NewPlStuff(PlStuffType.Str, str);
-            },
-            [ScrambleFunction( "javascript" )]: ( ...args: PlStuff[] ) => {
-                expectedNArguments(1, args as unknown as IArguments, false);
-                const code = args[0];
-                assertType(code, PlStuffType.Str, "'javascript' need strings as parameters");
-
-                try {
-                    this.inout.execute(code.value, {
-                        pl: {
-                            import: (key) => {
-                                return PlConverter.PlToJs(this.findValue(key));
-                            },
-                            export: (key, value) => {
-                                this.createValue(key, PlConverter.JsToPl(value));
-                                return null;
-                            }
-                        }
-                    })
-                } catch ( e ) {
-                    throw new Error(`from Javascript - [${e.name}] ${e.message}`);
-                }
-            },
-            ...natives,
-        }
-
-        for (const [key, entry] of Object.entries(native)) {
+        for (const [key, entry] of Object.entries(natives)) {
             this.stackFrame.createValue(
                 key,
                 NewPlStuff(PlStuffType.NFunc, {
                     callback: entry,
-                    native: entry
+                    native: entry,
                 } as PlNativeFunction)
             );
         }
@@ -444,7 +398,7 @@ export class PlStackMachine {
                             case PlStuffType.NFunc: {
                                 const value = func.value as PlNativeFunction;
                                 try {
-                                    const out = value.callback(...args);
+                                    const out = value.callback.bind(this)(...args);
                                     this.pushStack(out);
                                 } catch (e) {
                                     this.newProblem("RE0007", ptr, debug, e.message);

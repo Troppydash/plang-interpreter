@@ -1,6 +1,7 @@
-import { ScrambleFunction } from "../../scrambler";
-import { PlStuff, PlStuffType } from "../../stuff";
-import { assertType, expectedNArguments } from "../helpers";
+import {ScrambleFunction} from "../../scrambler";
+import {PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../../stuff";
+import {assertType, expectedNArguments} from "../helpers";
+import {equals} from "../operators";
 
 export const jsList = {
     [ScrambleFunction( "size", PlStuffType.List )]: function(lst) {
@@ -52,4 +53,13 @@ export const list = {
         list[idx] = value;
         return self;
     },
+    [ScrambleFunction("have", PlStuffType.List)]: function(self, value) {
+        expectedNArguments(1, arguments);
+        for (const item of self.value) {
+            if (equals(item, value)) {
+                return PlStuffTrue;
+            }
+        }
+        return PlStuffFalse;
+    }
 }

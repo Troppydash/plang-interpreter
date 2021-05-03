@@ -1,6 +1,9 @@
 import { assertType, expectedNArguments, generateForAll, generateForSome } from "../helpers";
 import { PlActions } from "../converter";
 import { NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType, PlStuffTypeFromString } from "../../stuff";
+import {StackMachine} from "../../index";
+import {ScrambleFunction} from "../../scrambler";
+import PlCopy = PlActions.PlCopy;
 
 export const all = {
     ...generateForAll("copy", function (object) {
@@ -106,4 +109,13 @@ export const all = {
         }
         return NewPlStuff(PlStuffType.Type, object.type);
     }),
+    ...generateForAll("in", function (this: StackMachine, self: PlStuff, other: PlStuff) {
+        expectedNArguments(1, arguments);
+        const value = this.findValue(ScrambleFunction("have", other.type));
+        if (value == null) {
+            throw new Error("no type function 'have' found on the other value");
+        }
+        // value is a native function for sure // TODO: make this work for all functions
+        return value.callback(PlCopy(other), self);
+    })
 };

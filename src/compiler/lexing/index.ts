@@ -435,8 +435,7 @@ class PlLexer implements Lexer {
                 if (!multi && c == '\n') {
                     return this.newErrorToken("LE0002", NewFileInfo(oldRow, oldCol, 1, this.filename));
                 }
-                content += c;
-                if (!multi && c === '\\') {
+                if (!multi && c === '\\') { // TODO: Fix this \n thing
                     this.advancePointer();
                     c = this.currentChar();
                     switch (c) {
@@ -469,8 +468,9 @@ class PlLexer implements Lexer {
                         }
                     }
                     this.advancePointer();
-                    c = this.currentChar();
+                    continue;
                 }
+                content += c;
                 if (multi) {
                     if (this.testNextChars('"""', PlTokenType.STR) != null) {
                         break;

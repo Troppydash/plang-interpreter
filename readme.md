@@ -33,7 +33,7 @@ loop {
 
 ```
 # type functions
-impl times(self, function) for Int {
+impl times(self, function) for Num {
     loop self { # loop self amount of times
         function()
     }
