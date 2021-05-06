@@ -117,5 +117,14 @@ export const all = {
         }
         // value is a native function for sure // TODO: make this work for all functions
         return value.value.callback(PlCopy(other), self);
-    })
+    }),
+    ...generateForAll("from", function (this: StackMachine, self: PlStuff, other: PlStuff) {
+        expectedNArguments(1, arguments);
+        const value = this.findValue(ScrambleFunction("get", other.type));
+        if (value == null) {
+            throw new Error("no type function 'get' found on the other value");
+        }
+        // value is a native function for sure // TODO: make this work for all functions
+        return value.value.callback(PlCopy(other), self);
+    }),
 };

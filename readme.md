@@ -109,7 +109,7 @@ javascript """
     pl.export("out", out); // export the variable as "out" to plang
 """
 
-each item, index in out {
+each item, index of out {
     say("factorial", values.get(index), "=", item)
 }
 ```
