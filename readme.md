@@ -85,9 +85,9 @@ func makeVector(x, y) {
 }
 
 v1 = makeVector(1, 2)
-say(v1.get()) # prints 1, 2
+say(v1.get()) # prints list(1, 2)
 v1.set(2, 3)
-say(v1.get()) # prints 2, 3
+say(v1.get()) # prints list(2, 3)
 ```
 
 ```

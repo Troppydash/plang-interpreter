@@ -70,10 +70,10 @@ export const special = {
             this.inout.execute(code.value, {
                 pl: {
                     import: (key) => {
-                        return PlConverter.PlToJs(this.findValue(key));
+                        return PlConverter.PlToJs(this.findValue(key), this.runFunction.bind(this));
                     },
                     export: (key, value) => {
-                        this.createValue(key, PlConverter.JsToPl(value));
+                        this.createValue(key, PlConverter.JsToPl(value, this.runFunction));
                         return null;
                     }
                 }

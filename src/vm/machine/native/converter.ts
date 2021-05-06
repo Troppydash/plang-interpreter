@@ -1,8 +1,12 @@
 import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffNull, PlStuffTrue, PlStuffType, PlStuffTypeToString} from "../stuff";
 import {PlFunction, PlNativeFunction} from "../memory";
+import { PlProgramWithDebug } from "../../emitter";
+import { PlDebugWithin } from "../../emitter/debug";
+import { PlInout } from "../../../inout";
+import { PlStackMachine } from "../index";
 
 export namespace PlConverter {
-    export function PlToJs(object: PlStuff): any {
+    export function PlToJs(object: PlStuff, runFunction: Function): any {
         switch (object.type) {
             case PlStuffType.Str: {
                 return object.value;
@@ -20,12 +24,12 @@ export namespace PlConverter {
                 return null;
             }
             case PlStuffType.List: {
-                return object.value.map(v => PlToJs(v));
+                return object.value.map(v => PlToJs(v, runFunction));
             }
             case PlStuffType.Dict: {
                 const out = {};
                 Object.entries(object.value).forEach(([key, value]) => {
-                    out[key] = PlToJs(value as PlStuff);
+                    out[key] = PlToJs(value as PlStuff, runFunction);
                 });
                 return out;
             }
@@ -34,15 +38,15 @@ export namespace PlConverter {
                 return value.native;
             }
             case PlStuffType.Func: {
-                const value = object.value as PlFunction;
-                // TODO: think of how to do this
-                return "[function]";
+                return (...args) => {
+                    return PlToJs(runFunction(object, ...args), runFunction);
+                };
             }
         }
         throw new Error("Unimplemented convert from pltojs");
     }
 
-    export function JsToPl(object: any): PlStuff {
+    export function JsToPl(object: any, runFunction: Function): PlStuff {
         switch (typeof object) {
             case "number": {
                 return NewPlStuff(PlStuffType.Num, object);
@@ -59,7 +63,7 @@ export namespace PlConverter {
             case "function": {
                 return NewPlStuff(PlStuffType.NFunc, {
                     callback: function (...args) {
-                        return JsToPl(object(...args.map(a => PlToJs(a))));
+                        return JsToPl(object(...args.map(a => PlToJs(a, runFunction))), runFunction);
                     },
                     native: object
                 });
@@ -72,11 +76,11 @@ export namespace PlConverter {
                     return PlStuffNull;
                 }
                 if (Array.isArray(object)) {
-                    return NewPlStuff(PlStuffType.List, object.map(i => JsToPl(i)));
+                    return NewPlStuff(PlStuffType.List, object.map(i => JsToPl(i, runFunction)));
                 }
                 const obj = {};
                 for (const [key, value] of Object.entries(object)) {
-                    obj[key] = JsToPl(value);
+                    obj[key] = JsToPl(value, runFunction);
                 }
                 return NewPlStuff(PlStuffType.Dict, obj);
             }

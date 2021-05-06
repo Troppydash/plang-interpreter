@@ -96,12 +96,11 @@ export class PlStackFrame {
 }
 
 
-// functions
 export interface PlFunction {
-    stackFrame: PlStackFrame;
-    bytecode: PlProgramWithDebug;
-    parameters: PlStuff[];
-    self?: PlStuff;
+    index: number; // index of bytecode
+    closure: PlStackFrame; // closure stack frame
+    parameters: string[]; // parameter names
+    self?: PlStuff; // self for overloading
 }
 
 export interface PlNativeFunction {
