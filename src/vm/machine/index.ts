@@ -100,8 +100,12 @@ export class PlStackMachine implements StackMachine {
             param[parameters[i + (self != null ? 1 : 0)]] = JsToPl(args[i], this.runFunction);
         }
 
-        func.value.index = -1; // of course
-        param[closure.trace.name] = func;
+        param[closure.trace.name] = NewPlStuff(PlStuffType.Func, {
+            closure,
+            parameters,
+            self,
+            index: -1
+        } as PlFunction);
 
         const machine = new PlStackMachine(this.inout, param);
         machine.closureFrames.push(closure);

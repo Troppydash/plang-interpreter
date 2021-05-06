@@ -73,7 +73,7 @@ export const special = {
                         return PlConverter.PlToJs(this.findValue(key), this.runFunction.bind(this));
                     },
                     export: (key, value) => {
-                        this.createValue(key, PlConverter.JsToPl(value, this.runFunction));
+                        this.createValue(key, PlConverter.JsToPl(value, this.runFunction.bind(this)));
                         return null;
                     }
                 }
