@@ -1,21 +1,21 @@
 import {ScrambleFunction} from "../scrambler";
 import {PlActions, PlConverter} from "./converter";
 import {NewPlStuff, PlStuff, PlStuffNull, PlStuffType} from "../stuff";
-import {assertType, assertTypeof, expectedNArguments} from "./helpers";
-import PlToString = PlActions.PlToString;
+import {AssertType, AssertTypeof, ExpectedNArguments, GenerateGuardedFunction} from "./helpers";
 import {StackMachine} from "../index"; // Hopefully this doesn't cause a circular dependency problem
+import PlToString = PlActions.PlToString;
 
 export const jsSpecial = {
     [ScrambleFunction( "range" )]: function ( start, end, step ) {
         if ( start != undefined )
-            assertTypeof( start, "number", "range start needs to be a number" );
+            AssertTypeof("range", start, "number", 1);
         if ( end != undefined )
-            assertTypeof( end, "number", "range end needs to be a number" );
+            AssertTypeof( "range", end, "number", 2);
         if ( step != undefined )
-            assertTypeof( step, "number", "range step needs to be a number" );
+            AssertTypeof( "range", step, "number", 3);
 
         if ( arguments.length > 3 ) {
-            throw new Error( "range can only take a maximum of three arguments, start end step" );
+            throw new Error( "'range' can only take a maximum of three arguments - start, end, step" );
         }
 
         if ( arguments.length == 2 ) {
@@ -61,11 +61,7 @@ export const special = {
         }
         return NewPlStuff(PlStuffType.Str, str);
     },
-    [ScrambleFunction("javascript")]: function (this: StackMachine, ...args: PlStuff[]) {
-        expectedNArguments(1, args as unknown as IArguments, false);
-        const code = args[0];
-        assertType(code, PlStuffType.Str, "'javascript' need strings as parameters");
-
+    [ScrambleFunction("javascript")]: GenerateGuardedFunction("javascript", [PlStuffType.Str], function (this: StackMachine, code: PlStuff) {
         try {
             this.inout.execute(code.value, {
                 pl: {
@@ -79,9 +75,9 @@ export const special = {
                 }
             })
         } catch (e) {
-            throw new Error(`from Javascript - [${e.name}] ${e.message}`);
+            throw new Error(`[Javascript ${e.name}] ${e.message}`);
         }
-    },
+    }),
 
     [ScrambleFunction("panic")]: (...message: PlStuff[]) => {
         throw new Error(message.map(m => PlToString(m)).join(' '));

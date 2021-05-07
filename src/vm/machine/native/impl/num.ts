@@ -1,28 +1,23 @@
 import {ScrambleFunction} from "../../scrambler";
-import {assertTypeof, expectedNArguments} from "../helpers";
+import {AssertTypeof, ExpectedNArguments, GenerateJsGuardedTypeFunction} from "../helpers";
 import {PlStuffType} from "../../stuff";
 
 export const jsNum = {
-    [ScrambleFunction("abs", PlStuffType.Num)]: function (self) {
-        expectedNArguments(0, arguments);
+    [ScrambleFunction("abs", PlStuffType.Num)]: GenerateJsGuardedTypeFunction( "abs", [], function (self) {
         if (self < 0)
             return -self;
         return self;
-    },
-    [ScrambleFunction("floor", PlStuffType.Num)]: function (self) {
-        expectedNArguments(0, arguments);
+    }),
+    [ScrambleFunction("floor", PlStuffType.Num)]: GenerateJsGuardedTypeFunction( "abs", [],  function (self) {
         return Math.floor(self);
-    },
-    [ScrambleFunction("ceil", PlStuffType.Num)]: function (self) {
-        expectedNArguments(0, arguments);
+    }),
+    [ScrambleFunction("ceil", PlStuffType.Num)]: GenerateJsGuardedTypeFunction( "abs", [],  function (self) {
         return Math.ceil(self);
-    },
-    [ScrambleFunction("round", PlStuffType.Num)]: function (self: number, threshold) {
-        expectedNArguments(1, arguments);
-        assertTypeof(threshold, "number", "'round' needs a threshold as a parameter");
+    }),
+    [ScrambleFunction("round", PlStuffType.Num)]: GenerateJsGuardedTypeFunction( "abs", ["number"], function (self: number, threshold) {
         if ((self - Math.floor(self)) > threshold) {
             return Math.ceil(self);
         }
         return Math.floor(self);
-    }
+    })
 };

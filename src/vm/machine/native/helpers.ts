@@ -1,43 +1,115 @@
 import {ScrambleFunction} from "../scrambler";
-import {PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../stuff";
+import {
+    PlStuff,
+    PlStuffFalse,
+    PlStuffTrue,
+    PlStuffType,
+    PlStuffTypeFromJsString,
+    PlStuffTypeFromString,
+    PlStuffTypeToString
+} from "../stuff";
+import {MakeArityMessage, MakeOperatorMessage, MakeTypeMessage} from "./messeger";
+import {TypeofTypes} from "../../../extension";
+import {PlConverter} from "./converter";
+import JsToPl = PlConverter.JsToPl;
 
-export function assertTypeof(value: any, type: string, message: string) {
-    if (typeof value != type) {
-        throw new Error(message);
+export function AssertTypeof(name: string, got: any, expected: TypeofTypes, position: number = 1) {
+    if (typeof got != expected) {
+        throw new Error(MakeTypeMessage(name, PlStuffTypeFromJsString(expected), JsToPl(got, ()=>{}), position));
     }
 }
 
-export function assertType(value: PlStuff, type: PlStuffType, message: string) {
-    if (value.type != type) {
-        throw new Error(message);
+export function AssertType(name: string, got: PlStuff, expected: PlStuffType, position: number = 1) {
+    if (got.type != expected) {
+        throw new Error(MakeTypeMessage(name, expected, got, position));
     }
 }
 
-export function assertTypeofEqual(closure: Function) {
+export function AssertOperatorsSide(name: string, closure: Function) {
     return (l, r) => {
         if (typeof l != typeof r) {
-            throw new Error("the types on each side of the operator are not the same");
+            throw new Error(MakeOperatorMessage(name, JsToPl(l, ()=>{}).type, JsToPl(r, ()=>{}).type));
         }
         return closure(l, r);
     }
 }
 
-export function assertTypeEqual(closure: Function) {
+export function AssertTypeEqual(name: string, closure: Function) {
     return (l, r) => {
         if (l.type != r.type) {
-            throw new Error("the types on each side of the operator are not the same");
+            throw new Error(MakeOperatorMessage(name, l.type, r.type));
         }
         return closure(l, r);
     }
 }
 
 
-export function expectedNArguments(n: number, args: IArguments, type: boolean = true) {
-    let got = args.length;
-    if (type)
-        --got;
-    if (n != got) {
-        throw new Error(`incorrect arity for a function call, needed ${n} but got ${got}`);
+export function ExpectedNArguments(name: string, got: number, expected: number) {
+    if (expected != got) {
+        throw new Error(MakeArityMessage(name, expected, got));
+    }
+}
+
+export function GenerateGuardedFunction(name: string, guards: (PlStuffType | "*")[], func: Function) {
+    return function(...args: PlStuff[]) {
+        ExpectedNArguments(name, args.length, guards.length);
+        for (let i = 0; i < guards.length; ++i) {
+            const guard = guards[i];
+            if (guard == "*") {
+                continue;
+            }
+            AssertType(name, args[i], guard, i+1);
+        }
+        return func.bind(this)(...args);
+    }
+}
+
+
+export function GenerateGuardedTypeFunction(name: string, guards: (PlStuffType | "*")[], func: Function) {
+    return function(...args: PlStuff[]) {
+        // first one is self
+        const first = args.shift();
+
+        ExpectedNArguments(name, args.length, guards.length);
+        for (let i = 0; i < guards.length; ++i) {
+            const guard = guards[i];
+            if (guard == "*") {
+                continue;
+            }
+            AssertType(name, args[i], guard, i+1);
+        }
+        return func.bind(this)(first, ...args);
+    }
+}
+
+
+export function GenerateJsGuardedFunction(name: string, guards: (TypeofTypes | "*")[], func: Function) {
+    return function(...args: PlStuff[]) {
+        ExpectedNArguments(name, args.length, guards.length);
+        for (let i = 0; i < guards.length; ++i) {
+            const guard = guards[i];
+            if (guard == "*") {
+                continue;
+            }
+            AssertTypeof(name, args[i], guard, i+1);
+        }
+        return func.bind(this)(...args);
+    }
+}
+
+
+export function GenerateJsGuardedTypeFunction(name: string, guards: (TypeofTypes | "*")[], func: Function) {
+    return function(...args: PlStuff[]) {
+        const first = args.shift();
+        ExpectedNArguments(name, args.length, guards.length);
+        for (let i = 0; i < guards.length; ++i) {
+            const guard = guards[i];
+            if (guard == "*") {
+                continue;
+            }
+            AssertTypeof(name, args[i], guard, i+1);
+        }
+        return func.bind(this)(first, ...args);
     }
 }
 
@@ -47,7 +119,7 @@ function wrapBool(value: Function) {
     }
 }
 
-export function generateCompare(type: PlStuffType, eq: Function | null = null, gt: Function | null = null) {
+export function GenerateCompare(type: PlStuffType, eq: Function | null = null, gt: Function | null = null) {
     let out = {};
     if (eq != null) {
         out = {
@@ -74,7 +146,7 @@ export function generateCompare(type: PlStuffType, eq: Function | null = null, g
 }
 
 
-export function generateForAll(name: string, func: Function) {
+export function GenerateForAll(name: string, func: Function) {
     const out = {};
     for (const item in PlStuffType) {
         if (!isNaN(Number(item))) {
@@ -84,7 +156,7 @@ export function generateForAll(name: string, func: Function) {
     return out;
 }
 
-export function generateForSome(name: string, types: PlStuffType[], func: Function) {
+export function GenerateForSome(name: string, types: PlStuffType[], func: Function) {
     const out = {};
     for (const item in PlStuffType) {
         if (!isNaN(Number(item))) {
@@ -96,6 +168,3 @@ export function generateForSome(name: string, types: PlStuffType[], func: Functi
     return out;
 }
 
-
-export type ExportNative = Record<string, (...args: PlStuff[]) => PlStuff>;
-export type ExportJs = Record<string, (...args: any[]) => any>;

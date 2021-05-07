@@ -1,3 +1,5 @@
+import {TypeofTypes} from "../../extension";
+
 export enum PlStuffType {
     Num,
     Str,
@@ -26,6 +28,25 @@ export function PlStuffTypeFromString(string: string) {
     return PlStuffType[string];
 }
 
+export function PlStuffTypeFromJsString(string: TypeofTypes) {
+    switch (string) {
+        case "boolean":
+            return PlStuffType.Bool;
+        case  "function":
+            return PlStuffType.Func;
+        case "number":
+            return PlStuffType.Num;
+        case "string":
+            return PlStuffType.Str;
+        case "undefined":
+            return PlStuffType.Null;
+        case "object":
+            return PlStuffType.Dict;
+    }
+    throw new Error(`PlStuffTypeFromJsString failed to match with value ${string}`);
+
+}
+
 export function PlStuffTypeToString(stuffType: PlStuffType): string {
     switch (stuffType) {
         case PlStuffType.Num:
@@ -46,6 +67,7 @@ export function PlStuffTypeToString(stuffType: PlStuffType): string {
         case PlStuffType.Dict:
             return "Dict";
     }
+    throw new Error(`PlStuffTypeToString failed to match with value ${stuffType}`);
 }
 
 // optimization

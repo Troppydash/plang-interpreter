@@ -1,53 +1,44 @@
-import { ScrambleFunction } from "../../scrambler";
-import { NewPlStuff, PlStuff, PlStuffType } from "../../stuff";
-import { assertType, assertTypeof, expectedNArguments, ExportJs, ExportNative } from "../helpers";
+import {ScrambleFunction} from "../../scrambler";
+import {NewPlStuff, PlStuff, PlStuffType} from "../../stuff";
+import {
+    GenerateJsGuardedTypeFunction
+} from "../helpers";
+import {ExportJs, ExportNative} from "../types";
+import {MakeOutOfRangeMessage} from "../messeger";
 
 export const jsStr: ExportJs = {
-    [ScrambleFunction("size", PlStuffType.Str)]: function(self) {
-        expectedNArguments(0, arguments);
+    [ScrambleFunction("size", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("size", [], function (self) {
         return self.length;
-    },
-    [ScrambleFunction("have", PlStuffType.Str)]: function(l, r) {
-        expectedNArguments(1, arguments);
-        assertTypeof(r, "string", "'have' needs a string as an argument");
+    }),
+    [ScrambleFunction("have", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("size", ["string"], function (l, r) {
         return l.indexOf(r) != -1;
-    },
-    [ScrambleFunction("get", PlStuffType.Str)]: function(self: string, index: number) {
-        expectedNArguments(1, arguments);
-        assertTypeof(index, "number", "'get' needs a number as an argument");
+    }),
+    [ScrambleFunction("get", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("get", ["number"], function (self: string, index: number) {
         index--;
         if (index < 0 || index >= self.length) {
-            throw new Error("string index out of range");
+            throw new Error(MakeOutOfRangeMessage("get", PlStuffType.Str, self.length, index+1));
         }
         return self[index];
-    },
-    [ScrambleFunction("replace", PlStuffType.Str)]: function(self, index, value) {
-        expectedNArguments(2, arguments);
-        assertTypeof(index, "number", "'replace' needs a number as the first argument");
-        assertTypeof(value,  "string", "'replace' needs a string as the second argument");
+    }),
+    [ScrambleFunction("replace", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("replace", ["number", "string"], function (self, index, value) {
         index--;
         if (index < 0 || index >= self.length) {
-            throw new Error("string index out of range");
+            throw new Error(MakeOutOfRangeMessage("replace", PlStuffType.Str, self.length, index+1));
         }
-        return self.substring(0, index) + value + self.substring(index+1);
-    },
-    [ScrambleFunction("insert", PlStuffType.Str)]: function(self, index, value) {
-        expectedNArguments(2, arguments);
-        assertTypeof(index, "number", "'insert' needs a number as the first argument");
-        assertTypeof(value,  "string", "'insert' needs a string as the second argument");
+        return self.substring(0, index) + value + self.substring(index + 1);
+    }),
+    [ScrambleFunction("insert", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("insert", ["number", "string"], function (self, index, value) {
         index--;
         if (index < 0 || index >= self.length) {
-            throw new Error("string index out of range");
+            throw new Error(MakeOutOfRangeMessage("insert", PlStuffType.Str, self.length, index+1));
         }
         return self.substring(0, index) + value + self.substring(index)
-    },
-    [ScrambleFunction("index", PlStuffType.Str)]: function(self: string, value) {
-        expectedNArguments(1, arguments);
-        assertTypeof(value,  "string", "'set' needs a string as the second argument");
+    }),
+    [ScrambleFunction("find", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("find", ["string"], function (self: string, value) {
         const result = self.indexOf(value);
-        return result == -1 ? null : result+1;
-    },
-    [ScrambleFunction("iter", PlStuffType.Str)]: function(self: string) {
+        return result == -1 ? null : result + 1;
+    }),
+    [ScrambleFunction("iter", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("iter", [], function (self: string) {
         let index = 0;
         return {
             next: () => {
@@ -57,17 +48,13 @@ export const jsStr: ExportJs = {
                 return [[self[index++], index], true];
             }
         }
-    },
-    [ScrambleFunction("upper", PlStuffType.Str)]: function(self: string) {
-        expectedNArguments(0, arguments);
+    }),
+    [ScrambleFunction("upper", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("upper", [], function (self: string) {
         return self.toUpperCase();
-    },
-    [ScrambleFunction("lower", PlStuffType.Str)]: function(self: string) {
-        expectedNArguments(0, arguments);
+    }),
+    [ScrambleFunction("lower", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("lower", [], function (self: string) {
         return self.toLowerCase();
-    },
+    }),
 };
 
-export const str: ExportNative = {
-
-}
+export const str: ExportNative = {}

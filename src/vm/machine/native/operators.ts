@@ -1,6 +1,12 @@
 import {ScrambleFunction} from "../scrambler";
 import {PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../stuff";
-import {assertTypeofEqual, assertTypeof, assertTypeEqual, generateCompare} from "./helpers";
+import {
+    AssertOperatorsSide,
+    AssertTypeof,
+    AssertTypeEqual,
+    GenerateCompare,
+    GenerateJsGuardedTypeFunction
+} from "./helpers";
 import {JsFunction, NativeFunction} from "./types";
 
 export function equals(l: PlStuff, r: PlStuff) {
@@ -8,7 +14,8 @@ export function equals(l: PlStuff, r: PlStuff) {
         return PlStuffFalse;
     }
 
-    let out;
+    // assume that l and r are the same type
+    let out = false;
     switch (l.type) {
         case PlStuffType.Num:
         case PlStuffType.Bool:
@@ -36,27 +43,26 @@ function greater(l: PlStuff, r: PlStuff) {
 
 export const jsOperators: Record<string, JsFunction> = {
     // numbers
-    [ScrambleFunction("+", PlStuffType.Num)]: assertTypeofEqual((l, r) => l + r),
-    [ScrambleFunction("-", PlStuffType.Num)]: assertTypeofEqual((l, r) => l - r),
-    [ScrambleFunction("*", PlStuffType.Num)]: assertTypeofEqual((l, r) => l * r),
-    [ScrambleFunction("/", PlStuffType.Num)]: assertTypeofEqual((l, r) => l / r),
-    [ScrambleFunction("mod", PlStuffType.Num)]: assertTypeofEqual((l, r) => l % r),
+    [ScrambleFunction("+", PlStuffType.Num)]: AssertOperatorsSide("+", (l, r) => l + r),
+    [ScrambleFunction("-", PlStuffType.Num)]: AssertOperatorsSide("-",(l, r) => l - r),
+    [ScrambleFunction("*", PlStuffType.Num)]: AssertOperatorsSide("*",(l, r) => l * r),
+    [ScrambleFunction("/", PlStuffType.Num)]: AssertOperatorsSide("/",(l, r) => l / r),
+    [ScrambleFunction("mod", PlStuffType.Num)]: AssertOperatorsSide("mod",(l, r) => l % r),
 
     // strings
-    [ScrambleFunction("+", PlStuffType.Str)]: assertTypeofEqual((l, r) => l + r),
-    [ScrambleFunction("*", PlStuffType.Str)]: (l, r) => {
-        assertTypeof(r, "number", "string can only multiply with numbers");
+    [ScrambleFunction("+", PlStuffType.Str)]: AssertOperatorsSide("+", (l, r) => l + r),
+    [ScrambleFunction("*", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("*", ["number"], (l, r) => {
         return l.repeat(r);
-    }
+    })
 };
 
 export const operators: Record<string, NativeFunction> = {
-    ...generateCompare(PlStuffType.Num, equals, assertTypeEqual(greater)),
-    ...generateCompare(PlStuffType.Str, equals, assertTypeEqual(greater)),
-    ...generateCompare(PlStuffType.Bool, equals),
-    ...generateCompare(PlStuffType.Null, equals),
-    ...generateCompare(PlStuffType.Type, equals),
-    ...generateCompare(PlStuffType.Func, equals),
-    ...generateCompare(PlStuffType.List, equals),
-    ...generateCompare(PlStuffType.Dict, equals),
+    ...GenerateCompare(PlStuffType.Num, equals, AssertTypeEqual(">", greater)),
+    ...GenerateCompare(PlStuffType.Str, equals, AssertTypeEqual(">", greater)),
+    ...GenerateCompare(PlStuffType.Bool, equals),
+    ...GenerateCompare(PlStuffType.Null, equals),
+    ...GenerateCompare(PlStuffType.Type, equals),
+    ...GenerateCompare(PlStuffType.Func, equals),
+    ...GenerateCompare(PlStuffType.List, equals),
+    ...GenerateCompare(PlStuffType.Dict, equals),
 };

@@ -1,11 +1,12 @@
 import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffNull, PlStuffTrue, PlStuffType, PlStuffTypeToString} from "../stuff";
 import {PlFunction, PlNativeFunction} from "../memory";
-import { PlProgramWithDebug } from "../../emitter";
-import { PlDebugWithin } from "../../emitter/debug";
-import { PlInout } from "../../../inout";
-import { PlStackMachine } from "../index";
+import {PlProgramWithDebug} from "../../emitter";
+import {PlDebugWithin} from "../../emitter/debug";
+import {PlInout} from "../../../inout";
+import {PlStackMachine} from "../index";
 
 export namespace PlConverter {
+    // plang type to js type
     export function PlToJs(object: PlStuff, runFunction: Function): any {
         switch (object.type) {
             case PlStuffType.Str: {
@@ -43,9 +44,10 @@ export namespace PlConverter {
                 };
             }
         }
-        throw new Error("Unimplemented convert from pltojs");
+        throw new Error(`PlConvert.PlToJs failed to match object of type ${PlStuffTypeToString(object.type)}`);
     }
 
+    // js type to plang type
     export function JsToPl(object: any, runFunction: Function): PlStuff {
         switch (typeof object) {
             case "number": {
@@ -85,11 +87,12 @@ export namespace PlConverter {
                 return NewPlStuff(PlStuffType.Dict, obj);
             }
         }
-        throw new Error("Unimplemented from jstopl");
+        throw new Error(`PlConvert.JsToPl failed to match object of type ${typeof object}`);
     }
 }
 
 export namespace PlActions {
+    // to string
     export function PlToString(object: PlStuff): string {
         switch (object.type) {
             case PlStuffType.Bool:
@@ -110,6 +113,7 @@ export namespace PlActions {
             case PlStuffType.Type:
                 return `${PlStuffTypeToString(object.value)}`;
         }
+        throw new Error(`PlActions.PlToString failed to match object of type ${PlStuffTypeToString(object.type)}`);
     }
 
     // shallow copying
@@ -129,7 +133,7 @@ export namespace PlActions {
             case PlStuffType.NFunc:
                 return object;
         }
-        throw new Error("Type not implemented for copy");
+        throw new Error(`PlActions.PlCopy failed to match type ${PlStuffTypeToString(object.type)}`);
     }
 
     // deep cloning
@@ -150,14 +154,12 @@ export namespace PlActions {
                     newObj[k] = PlClone(v as PlStuff);
                 });
                 return NewPlStuff(type, newObj);
-
-
             case PlStuffType.Type:
             case PlStuffType.Null:
             case PlStuffType.Bool:
             case PlStuffType.NFunc:
                 return object;
         }
-        throw new Error("Type not implemented for copy");
+        throw new Error(`PlActions.PlClone failed to match type ${PlStuffTypeToString(object.type)}`);
     }
 }

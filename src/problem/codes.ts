@@ -107,7 +107,7 @@ const templates = {
     RE0004: "there exists no operator '%0' on type '%1'",
     RE0005: "expect a number to negate with, got type '%0'",
     RE0006: "incorrect arity for a function call, needed %0 but got %1",
-    RE0007: "panic '%0'",
+    RE0007: "%0",
     RE0008: "attempted to call an uncallable value of type '%0'",
     RE0009: "cannot use 'continue' or 'break' outside a loop",
     RE0010: "saw a jump instruction but the value is not a boolean, got type '%0'",

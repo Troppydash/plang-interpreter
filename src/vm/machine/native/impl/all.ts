@@ -1,35 +1,30 @@
-import { assertType, expectedNArguments, generateForAll, generateForSome } from "../helpers";
-import { PlActions } from "../converter";
-import { NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType, PlStuffTypeFromString } from "../../stuff";
+import {AssertType, ExpectedNArguments, GenerateForAll, GenerateForSome, GenerateGuardedTypeFunction} from "../helpers";
+import {PlActions} from "../converter";
+import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType, PlStuffTypeFromString} from "../../stuff";
 import {StackMachine} from "../../index";
 import {ScrambleFunction} from "../../scrambler";
 import PlCopy = PlActions.PlCopy;
 
+
 export const all = {
-    ...generateForAll("copy", function (object) {
-        expectedNArguments(0, arguments);
+    ...GenerateForAll("copy", GenerateGuardedTypeFunction("copy", [], object => {
         return PlActions.PlCopy(object);
-    }),
-    ...generateForAll("clone", function (object) {
-        expectedNArguments(0, arguments);
+    })),
+    ...GenerateForAll("clone", GenerateGuardedTypeFunction("clone", [], object => {
         return PlActions.PlClone(object);
-    }),
-    ...generateForSome("isNative", [PlStuffType.NFunc, PlStuffType.Func], function (object) {
-        expectedNArguments(0, arguments);
+    })),
+    ...GenerateForSome("isNative", [PlStuffType.NFunc, PlStuffType.Func], GenerateGuardedTypeFunction("isNative", [], object => {
         return object.type == PlStuffType.NFunc ? PlStuffTrue : PlStuffFalse;
-    }),
-    ...generateForAll("is", function (object, type) {
-        expectedNArguments(1, arguments);
-        assertType(type, PlStuffType.Type, "'.is' requires a type as an argument");
+
+    })),
+    ...GenerateForAll("is", GenerateGuardedTypeFunction("is", [PlStuffType.Type], (object, type) => {
         let otype = object.type;
         if (object.type == PlStuffType.NFunc) {
             otype = PlStuffType.Func;
         }
         return otype == type.value ? PlStuffTrue : PlStuffFalse;
-    }),
-    ...generateForAll("to", function (object: PlStuff, type: PlStuff) {
-        expectedNArguments(1, arguments);
-        assertType(type, PlStuffType.Type, ".to requires a type as an argument");
+    })),
+    ...GenerateForAll("to", GenerateGuardedTypeFunction("to", [PlStuffType.Type], (object: PlStuff, type: PlStuff) => {
         if (object.type == type.type) {
             return PlActions.PlClone(object);
         }
@@ -101,30 +96,27 @@ export const all = {
         }
 
         return NewPlStuff(out == null ? PlStuffType.Null : type.value, out);
-    }),
-    ...generateForAll("type", function(object: PlStuff) {
-        expectedNArguments(0, arguments);
+    })),
+    ...GenerateForAll("type", GenerateGuardedTypeFunction("type", [], (object: PlStuff) => {
         if (object.type == PlStuffType.NFunc) {
             return NewPlStuff(PlStuffType.Type, PlStuffType.Func);
         }
         return NewPlStuff(PlStuffType.Type, object.type);
-    }),
-    ...generateForAll("in", function (this: StackMachine, self: PlStuff, other: PlStuff) {
-        expectedNArguments(1, arguments);
+    })),
+    ...GenerateForAll("in", GenerateGuardedTypeFunction("in", ["*"], function (this: StackMachine, self: PlStuff, other: PlStuff) {
         const value = this.findValue(ScrambleFunction("have", other.type));
         if (value == null) {
             throw new Error("no type function 'have' found on the other value");
         }
         // value is a native function for sure // TODO: make this work for all functions
         return value.value.callback(PlCopy(other), self);
-    }),
-    ...generateForAll("from", function (this: StackMachine, self: PlStuff, other: PlStuff) {
-        expectedNArguments(1, arguments);
+    })),
+    ...GenerateForAll("from", GenerateGuardedTypeFunction("from", ["*"], function (this: StackMachine, self: PlStuff, other: PlStuff) {
         const value = this.findValue(ScrambleFunction("get", other.type));
         if (value == null) {
             throw new Error("no type function 'get' found on the other value");
         }
         // value is a native function for sure // TODO: make this work for all functions
         return value.value.callback(PlCopy(other), self);
-    }),
+    })),
 };
