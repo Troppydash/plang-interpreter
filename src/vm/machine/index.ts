@@ -12,7 +12,7 @@ import {
     PlStuffTypeFromString,
     PlStuffTypeToString
 } from "./stuff";
-import { jsNatives, natives } from "./native";
+import {jsModules, jsNatives, natives} from "./native";
 import { ScrambleFunction } from "./scrambler";
 import { PlProblemCode } from "../../problem/codes";
 import { PlActions, PlConverter } from "./native/converter";
@@ -132,6 +132,13 @@ export class PlStackMachine implements StackMachine {
                     callback: entry,
                     native: entry,
                 } as PlNativeFunction )
+            );
+        }
+
+        for (const [key, entry] of Object.entries(jsModules)) {
+            this.stackFrame.createValue(
+                key,
+                PlConverter.JsToPl(entry, this.runFunction)
             );
         }
 

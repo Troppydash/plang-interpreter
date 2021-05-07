@@ -52,7 +52,7 @@ export const jsOperators: Record<string, JsFunction> = {
 
 export const operators: Record<string, NativeFunction> = {
     ...generateCompare(PlStuffType.Num, equals, assertTypeEqual(greater)),
-    ...generateCompare(PlStuffType.Str, equals),
+    ...generateCompare(PlStuffType.Str, equals, assertTypeEqual(greater)),
     ...generateCompare(PlStuffType.Bool, equals),
     ...generateCompare(PlStuffType.Null, equals),
     ...generateCompare(PlStuffType.Type, equals),

@@ -58,6 +58,14 @@ export const jsStr: ExportJs = {
             }
         }
     },
+    [ScrambleFunction("upper", PlStuffType.Str)]: function(self: string) {
+        expectedNArguments(0, arguments);
+        return self.toUpperCase();
+    },
+    [ScrambleFunction("lower", PlStuffType.Str)]: function(self: string) {
+        expectedNArguments(0, arguments);
+        return self.toLowerCase();
+    },
 };
 
 export const str: ExportNative = {

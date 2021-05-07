@@ -32,7 +32,7 @@ loop times {
     t = 1
     t = 1.2
     t = "Hello World"
-    t = Int
+    t = Num
     t = list()
     t = dict()
     t = null
@@ -87,6 +87,7 @@ func fib(n) {
     }
     return fib(n-1) + fib(n-2)
 }
+
 for i = 0; i <= 12; i++ {
     fib(i)
 }

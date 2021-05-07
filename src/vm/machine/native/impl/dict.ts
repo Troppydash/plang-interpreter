@@ -3,7 +3,6 @@ import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../..
 import {expectedNArguments} from "../helpers";
 import {PlActions} from "../converter";
 import PlToString = PlActions.PlToString;
-import {equals} from "../operators";
 
 export const dict = {
     [ScrambleFunction( "get", PlStuffType.Dict )]: function(self: PlStuff, key: PlStuff) {
@@ -41,5 +40,30 @@ export const dict = {
             }
         }
         return PlStuffFalse;
+    }
+}
+
+export const jsDict = {
+    [ScrambleFunction("iter", PlStuffType.Dict)]: function(self) {
+        expectedNArguments(0, arguments);
+        const keys = Object.keys(self);
+        let index = 0;
+        return {
+            next: () => {
+                if (index >= keys.length) {
+                    return [null, false];
+                }
+                const key = keys[index++];
+                return [[self[key], key], true];
+            }
+        };
+    },
+    [ScrambleFunction("keys", PlStuffType.Dict)]: function(self) {
+        expectedNArguments(0, arguments);
+        return Object.keys(self);
+    },
+    [ScrambleFunction("values", PlStuffType.Dict)]: function(self) {
+        expectedNArguments(0, arguments);
+        return Object.values(self);
     }
 }

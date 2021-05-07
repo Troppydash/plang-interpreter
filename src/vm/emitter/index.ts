@@ -290,7 +290,10 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
             programBuilder.addBytecode( makeVariable( param ) );
         }
 
-        const extraReturn = block.program[block.program.length - 1].type != PlBytecodeType.DORETN ;
+        let extraReturn = false;
+        if (block.program.length > 0 && block.program[block.program.length - 1].type != PlBytecodeType.DORETN) {
+            extraReturn = true;
+        }
         programBuilder.addBytecode( NewBytecode( PlBytecodeType.DEFNUM, '' + node.args.length ) )
             .addBytecode( NewBytecode( PlBytecodeType.DEFFUN, '' + (block.program.length + + (extraReturn ? 2 : 0)) ) )
             .addPWD( block );
@@ -312,7 +315,10 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
             programBuilder.addBytecode( makeVariable( param ) );
         }
 
-        const extraReturn = block.program[block.program.length - 1].type != PlBytecodeType.DORETN ;
+        let extraReturn = false;
+        if (block.program.length > 0 && block.program[block.program.length - 1].type != PlBytecodeType.DORETN) {
+            extraReturn = true;
+        }
         programBuilder.addBytecode( NewBytecode( PlBytecodeType.DEFNUM, '' + node.args.length ) )
             .addBytecode( NewBytecode( PlBytecodeType.DEFFUN, '' + (block.program.length + + (extraReturn ? 2 : 0)) ) )
             .addPWD( block );
@@ -329,7 +335,10 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
         for ( const param of node.args ) {
             programBuilder.addBytecode( makeVariable( param ) );
         }
-        const extraReturn = block.program[block.program.length - 1].type != PlBytecodeType.DORETN ;
+        let extraReturn = false;
+        if (block.program.length > 0 && block.program[block.program.length - 1].type != PlBytecodeType.DORETN) {
+            extraReturn = true;
+        }
         programBuilder.addBytecode( NewBytecode( PlBytecodeType.DEFNUM, '' + node.args.length ) )
             .addBytecode( NewBytecode( PlBytecodeType.DEFFUN, '' + (block.program.length + + (extraReturn ? 2 : 0)) ) )
             .addPWD( block );
