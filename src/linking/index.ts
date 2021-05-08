@@ -77,8 +77,12 @@ export function RunOnce(vm: PlStackMachine, file: PlFile) {
 
     const program = EmitProgram(ast);
     program.program.pop(); // remove final stkpop
+    // shift debug
+    for (const debug of program.debug) {
+        debug.endLine += vm.program.program.length;
+    }
 
-    vm.setProgram(program);
+    vm.addProgram(program);
     const out = vm.runProgram();
     if (out == null) {
         const trace = vm.getTrace();
@@ -108,7 +112,7 @@ export async function RunVM(file: PlFile) {
         }
     });
 
-    vm.setProgram(program);
+    vm.addProgram(program);
     const out = vm.runProgram();
     if (out == null) {
         const trace = vm.getTrace();

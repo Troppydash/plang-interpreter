@@ -17,5 +17,9 @@ export function MakeOutOfRangeMessage(name: string, type: PlStuffType, length: n
 }
 
 export function MakeNotFoundMessage(name: string, type: PlStuffType, key: string) {
-    return `'${name}' cannot find the key ${key} on a ${PlStuffTypeToString(type)}`;
+    return `'${name}' cannot find the key '${key}' on a ${PlStuffTypeToString(type)}`;
+}
+
+export function MakeNoTypeFunctionMessage(name: string, method: string, got: PlStuff) {
+    return `'${name}' need the method '${method}' on ${PlStuffTypeToString(got.type)}, but none was found`;
 }

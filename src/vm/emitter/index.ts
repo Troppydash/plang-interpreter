@@ -291,7 +291,7 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
         }
 
         let extraReturn = false;
-        if (block.program.length > 0 && block.program[block.program.length - 1].type != PlBytecodeType.DORETN) {
+        if (block.program.length == 0 || block.program[block.program.length - 1].type != PlBytecodeType.DORETN) {
             extraReturn = true;
         }
         programBuilder.addBytecode( NewBytecode( PlBytecodeType.DEFNUM, '' + node.args.length ) )
@@ -316,7 +316,7 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
         }
 
         let extraReturn = false;
-        if (block.program.length > 0 && block.program[block.program.length - 1].type != PlBytecodeType.DORETN) {
+        if (block.program.length == 0 || block.program[block.program.length - 1].type != PlBytecodeType.DORETN) {
             extraReturn = true;
         }
         programBuilder.addBytecode( NewBytecode( PlBytecodeType.DEFNUM, '' + node.args.length ) )
@@ -336,7 +336,7 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
             programBuilder.addBytecode( makeVariable( param ) );
         }
         let extraReturn = false;
-        if (block.program.length > 0 && block.program[block.program.length - 1].type != PlBytecodeType.DORETN) {
+        if (block.program.length == 0 || block.program[block.program.length - 1].type != PlBytecodeType.DORETN) {
             extraReturn = true;
         }
         programBuilder.addBytecode( NewBytecode( PlBytecodeType.DEFNUM, '' + node.args.length ) )

@@ -1,9 +1,9 @@
-import {AssertType, ExpectedNArguments, GenerateForAll, GenerateForSome, GenerateGuardedTypeFunction} from "../helpers";
+import { GenerateForAll, GenerateForSome, GenerateGuardedTypeFunction} from "../helpers";
 import {PlActions} from "../converter";
 import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType, PlStuffTypeFromString} from "../../stuff";
 import {StackMachine} from "../../index";
 import {ScrambleFunction} from "../../scrambler";
-import PlCopy = PlActions.PlCopy;
+import { MakeNoTypeFunctionMessage } from "../messeger";
 
 
 export const all = {
@@ -86,8 +86,7 @@ export const all = {
             case PlStuffType.Type:
                 if (object.type == PlStuffType.Str) {
                     try {
-                        const type = PlStuffTypeFromString(object.value);
-                        out = type;
+                        out = PlStuffTypeFromString(object.value);
                     } catch (e) {
                         // nothing
                     }
@@ -105,18 +104,21 @@ export const all = {
     })),
     ...GenerateForAll("in", GenerateGuardedTypeFunction("in", ["*"], function (this: StackMachine, self: PlStuff, other: PlStuff) {
         const value = this.findValue(ScrambleFunction("have", other.type));
-        if (value == null) {
-            throw new Error("no type function 'have' found on the other value");
+        if (value.type == PlStuffType.NFunc) {
+            return value.value.native(other, self);
+        } else if (value.type == PlStuffType.Func) {
+            return this.runFunction(value, other, self)
         }
-        // value is a native function for sure // TODO: make this work for all functions
-        return value.value.callback(PlCopy(other), self);
+        throw new Error(MakeNoTypeFunctionMessage("in", "have", other));
     })),
     ...GenerateForAll("from", GenerateGuardedTypeFunction("from", ["*"], function (this: StackMachine, self: PlStuff, other: PlStuff) {
         const value = this.findValue(ScrambleFunction("get", other.type));
-        if (value == null) {
-            throw new Error("no type function 'get' found on the other value");
+        if (value.type == PlStuffType.NFunc) {
+            return value.value.native(other, self);
+        } else if (value.type == PlStuffType.Func) {
+            return this.runFunction(value, other, self)
         }
-        // value is a native function for sure // TODO: make this work for all functions
-        return value.value.callback(PlCopy(other), self);
+        throw new Error(MakeNoTypeFunctionMessage("from", "get", other));
     })),
+
 };

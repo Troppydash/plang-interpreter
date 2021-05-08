@@ -32,10 +32,21 @@ export interface StackMachine {
 
     setValue( key: string, value: PlStuff );
 
-    runFunction( func: PlStuff ): PlStuff | null;
+    runFunction( func: PlStuff, ...args: PlStuff[] ): PlStuff | null;
+
+    saveState(): StackMachineState;
+    restoreState(state: StackMachineState);
 
     stack: PlStuff[];
+    problems: PlProblem[];
     readonly inout: PlInout;
+}
+
+interface StackMachineState {
+    stack: PlStuff[],
+    stackFrame: PlStackFrame;
+    closureFrames: PlStackFrame[];
+    pointer: number;
 }
 
 export class PlStackMachine implements StackMachine {
@@ -53,23 +64,51 @@ export class PlStackMachine implements StackMachine {
 
     constructor( inout: PlInout, global: Record<string, PlStuff> = {} ) {
         this.inout = inout;
-        this.problems = [];
 
         this.stackFrame = new PlStackFrame( null, NewPlTraceFrame( "file" ) );
         this.closureFrames = [];
 
-        this.stack = [];
-        this.program = null;
-        this.pointer = 0;
+        this.program = { program: [], debug: [] };
+        this.rearm();
 
         this.seedFrame( global );
     }
 
-    setProgram( program: PlProgramWithDebug ) {
-        this.program = program;
+    addProgram( program: PlProgramWithDebug ) {
+        this.program.program = [...this.program.program, ...program.program];
+        this.program.debug = [...this.program.debug, ...program.debug];
     }
 
-    runFunction( func: PlStuff, ...args ): PlStuff | null {
+    rearm() {
+        this.problems = [];
+        this.stack = [];
+        this.pointer = this.program.program.length;
+
+        // reset stackframe
+        let sf = this.stackFrame;
+        while (sf.outer != null) {
+            sf = sf.outer;
+        }
+        this.stackFrame = sf;
+    }
+
+    saveState(): StackMachineState {
+        return {
+            stack: [...this.stack],
+            stackFrame: this.stackFrame,
+            closureFrames: [...this.closureFrames],
+            pointer: this.pointer
+        };
+    }
+
+    restoreState( state: StackMachineState ) {
+        this.stack = state.stack;
+        this.stackFrame = state.stackFrame;
+        this.closureFrames = state.closureFrames;
+        this.pointer = state.pointer;
+    }
+
+    runFunction( func: PlStuff, ...args: PlStuff[] ): PlStuff | null {
         if ( this.program == null ) {
             throw new Error( "There is no program somehow, this would never happen?" );
         }
@@ -111,7 +150,7 @@ export class PlStackMachine implements StackMachine {
     seedFrame( global: Record<string, PlStuff> ) {
         for ( const [ key, entry ] of Object.entries( jsNatives ) ) {
             const pl = PlConverter.JsToPl( entry, this.runFunction.bind( this ) );
-            pl.value.name = UnscrambleFunction(key)[1];
+            pl.value.name = UnscrambleFunction( key )[1];
             this.stackFrame.createValue(
                 key,
                 pl
@@ -123,7 +162,7 @@ export class PlStackMachine implements StackMachine {
                 key,
                 NewPlStuff( PlStuffType.NFunc, {
                     native: entry,
-                    name: UnscrambleFunction(key)[1],
+                    name: UnscrambleFunction( key )[1],
                 } as PlNativeFunction )
             );
         }
@@ -221,7 +260,7 @@ export class PlStackMachine implements StackMachine {
         // for (let i = 0; i < trace.length-1; i++) {
         //     trace[i].name = trace[i+1].name;
         // }
-            trace.pop(); // this works because we pop the first and last trace
+        trace.pop(); // this works because we pop the first and last trace
         return trace;
     }
 
@@ -262,7 +301,7 @@ export class PlStackMachine implements StackMachine {
         return this.stackFrame.setValue( key, value );
     }
 
-    runProgram( position: number = 0 ): PlStuff | null {
+    runProgram( position: number = this.pointer ): PlStuff | null {
         /// WE ASSUME THAT THE PROGRAM IS VALID AND ONLY HANDLE RUNTIME ERRORS HERE NOT JS EXCEPTIONS
         const { program, debug } = this.program;
         this.pointer = position;
@@ -470,11 +509,11 @@ export class PlStackMachine implements StackMachine {
                                     this.pushStack( value.native.bind( this )( ...args ) );
                                 } catch ( e ) {
                                     // insert stackFrame
-                                    if (stackFrame == this.stackFrame) {
+                                    if ( stackFrame == this.stackFrame ) {
                                         this.stackFrame = new PlStackFrame( this.stackFrame, NewPlTraceFrame( value.name, callDebug.span.info ) );
                                     } else {
                                         let sf = this.stackFrame;
-                                        while (sf.outer != stackFrame) {
+                                        while ( sf.outer != stackFrame ) {
                                             sf = sf.outer;
                                         }
                                         sf.outer = new PlStackFrame( stackFrame, NewPlTraceFrame( value.name, callDebug.span.info ) )

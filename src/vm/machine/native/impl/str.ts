@@ -1,5 +1,5 @@
 import {ScrambleFunction} from "../../scrambler";
-import {NewPlStuff, PlStuff, PlStuffType} from "../../stuff";
+import {PlStuffType} from "../../stuff";
 import {
     GenerateJsGuardedTypeFunction
 } from "../helpers";

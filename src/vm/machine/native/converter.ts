@@ -1,5 +1,4 @@
 import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffNull, PlStuffTrue, PlStuffType, PlStuffTypeToString} from "../stuff";
-import {PlNativeFunction} from "../memory";
 
 export namespace PlConverter {
     // plang type to js type
@@ -62,7 +61,7 @@ export namespace PlConverter {
             case "function": {
                 return NewPlStuff(PlStuffType.NFunc, {
                     native: function (...args) {
-                        return JsToPl(object(...args.map(a => PlToJs(a, runFunction))), runFunction);
+                        return JsToPl(object.bind(this)(...args.map(a => PlToJs(a, runFunction))), runFunction);
                     },
                     name: "native"
                 });
@@ -90,25 +89,28 @@ export namespace PlConverter {
 
 export namespace PlActions {
     // to string
-    export function PlToString(object: PlStuff): string {
+    export function PlToString(object: PlStuff, quote: boolean = false): string {
         switch (object.type) {
             case PlStuffType.Bool:
                 return object.value ? "true" : "false";
             case PlStuffType.Dict:
-                return "[dictionary]";
+                return `dict(${Object.entries(object.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToString(value, true)}`).join(', ')})`;
             case PlStuffType.NFunc:
             case PlStuffType.Func:
                 return "[function]";
             case PlStuffType.List:
-                return `list(${object.value.map(v => PlToString(v)).join(', ')})`;
+                return `list(${object.value.map(v => PlToString(v, true)).join(', ')})`;
             case PlStuffType.Null:
                 return "null";
             case PlStuffType.Num:
                 return "" + object.value;
             case PlStuffType.Str:
-                return `${object.value}`;
+                if (quote) {
+                    return `"${object.value}"`;
+                }
+                return object.value;
             case PlStuffType.Type:
-                return `${PlStuffTypeToString(object.value)}`;
+                return PlStuffTypeToString(object.value);
         }
         throw new Error(`PlActions.PlToString failed to match object of type ${PlStuffTypeToString(object.type)}`);
     }

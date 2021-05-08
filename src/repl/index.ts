@@ -1,10 +1,9 @@
 import inout, { isNode } from "../inout";
-import {RunEmitter, RunOnce, TryRunParser} from "../linking";
+import { RunOnce, TryRunParser} from "../linking";
 import { LogProblemShort } from "../problem/printer";
 import { colors } from "../inout/color";
-import {PlActions, PlConverter} from "../vm/machine/native/converter";
+import {PlActions} from "../vm/machine/native/converter";
 import {PlStackMachine} from "../vm/machine";
-import {EmitProgram} from "../vm/emitter";
 import { NewPlFile } from "../inout/file";
 
 export function StartREPL( filename: string ): number {
@@ -88,7 +87,7 @@ export function StartREPL( filename: string ): number {
             if (stream == false && result != null) {
                 inout.print(`${' '.repeat(filename.length)}> ${PlActions.PlToString(result)}`);
             }
-            vm.problems = [];
+            vm.rearm();
         }
 
     inout.flush();

@@ -1,7 +1,11 @@
 import { ScrambleFunction } from "../scrambler";
 import { PlActions, PlConverter } from "./converter";
 import { NewPlStuff, PlStuff, PlStuffNull, PlStuffType } from "../stuff";
-import { AssertType, AssertTypeof, ExpectedNArguments, GenerateGuardedFunction } from "./helpers";
+import {
+    AssertTypeof,
+    GenerateGuardedFunction,
+    GenerateJsGuardedFunction
+} from "./helpers";
 import { StackMachine } from "../index"; // Hopefully this doesn't cause a circular dependency problem
 import PlToString = PlActions.PlToString;
 
@@ -43,6 +47,16 @@ export const jsSpecial = {
             }
         }
     },
+
+    [ScrambleFunction( "try" )]: GenerateJsGuardedFunction( "try", [ "function", "function" ], function ( this: StackMachine, attempt, error ) {
+        const saved = this.saveState();
+        try {
+            return attempt();
+        } catch ( e ) {
+            this.restoreState(saved);
+            return error(this.problems.pop());
+        }
+    } ),
 };
 
 export const special = {
@@ -62,17 +76,17 @@ export const special = {
         return NewPlStuff( PlStuffType.Str, str );
     },
     [ScrambleFunction( "javascript" )]: GenerateGuardedFunction( "javascript", [ PlStuffType.Str ], function ( this: StackMachine, code: PlStuff ) {
-        const _import = (function( key ) {
+        const _import = (function ( key ) {
             const value = this.findValue( key );
             if ( value == null ) {
                 return null;
             }
             return PlConverter.PlToJs( this.findValue( key ), this.runFunction.bind( this ) );
-        }).bind(this);
+        }).bind( this );
         const _export = (function ( key, value ) {
             this.createValue( key, PlConverter.JsToPl( value, this.runFunction.bind( this ) ) );
             return null;
-        }).bind(this);
+        }).bind( this );
 
         try {
             this.inout.execute( code.value, {
@@ -88,7 +102,6 @@ export const special = {
             throw new Error( `[Javascript ${e.name}] ${e.message}` );
         }
     } ),
-
     [ScrambleFunction( "panic" )]: ( ...message: PlStuff[] ) => {
         throw new Error( message.map( m => PlToString( m ) ).join( ' ' ) );
     },

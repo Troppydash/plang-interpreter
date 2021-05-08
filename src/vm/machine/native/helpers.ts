@@ -5,8 +5,6 @@ import {
     PlStuffTrue,
     PlStuffType,
     PlStuffTypeFromJsString,
-    PlStuffTypeFromString,
-    PlStuffTypeToString
 } from "../stuff";
 import {MakeArityMessage, MakeOperatorMessage, MakeTypeMessage} from "./messeger";
 import {TypeofTypes} from "../../../extension";
@@ -84,7 +82,7 @@ export function GenerateGuardedTypeFunction(name: string, guards: (PlStuffType |
 
 
 export function GenerateJsGuardedFunction(name: string, guards: (TypeofTypes | "*")[], func: Function) {
-    return function(...args: PlStuff[]) {
+    return function(...args: any[]) {
         ExpectedNArguments(name, args.length, guards.length);
         for (let i = 0; i < guards.length; ++i) {
             const guard = guards[i];
@@ -99,7 +97,7 @@ export function GenerateJsGuardedFunction(name: string, guards: (TypeofTypes | "
 
 
 export function GenerateJsGuardedTypeFunction(name: string, guards: (TypeofTypes | "*")[], func: Function) {
-    return function(...args: PlStuff[]) {
+    return function(...args: any[]) {
         const first = args.shift();
         ExpectedNArguments(name, args.length, guards.length);
         for (let i = 0; i < guards.length; ++i) {
