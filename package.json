@@ -6,7 +6,7 @@
   "scripts": {
     "build-browser": "tsc --module AMD --outFile \"./out/index.js\"",
     "build-cli": "npm run build && pkg .",
-    "build": "tsc",
+    "build": "node ./scripts/timestamp.js && tsc",
     "run": "node out/index.js",
     "run-build": "npm run clean && npm run build && npm run run",
     "watch-build": "tsc --watch",
@@ -15,8 +15,8 @@
   "pkg": {
     "scripts": "out/**/*.js",
     "targets": [
-      "node14-win-x64",
-      "node14-linux-x64"
+      "node12-win-x64",
+      "node12-linux-x64"
     ],
     "outputPath": "dist",
     "assets": "node_modules/blessed/**/*"

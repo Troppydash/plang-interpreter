@@ -5,9 +5,10 @@ import { colors } from "../inout/color";
 import {PlActions} from "../vm/machine/native/converter";
 import {PlStackMachine} from "../vm/machine";
 import { NewPlFile } from "../inout/file";
+import { timestamp } from "../timestamp";
 
 export function StartREPL( filename: string ): number {
-    inout.print( "Welcome to the Plang interactive console" );
+    inout.print( `Welcome to the Plang interactive console (version ${timestamp})` );
     if ( isNode ) {
         const os = require( 'os' );
         inout.print( `Running on ${os.platform()}-${os.arch()}. Hello ${os.hostname()}!` );
