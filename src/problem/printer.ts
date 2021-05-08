@@ -9,7 +9,7 @@ import {PlFileInfo} from "../compiler/lexing/info";
 const NLINESUP = 1;
 const NLINESDOWN = 2;
 const CHARWRAP = 80;
-export const TRACE_MAX = 2;
+export const TRACE_MAX = 3;
 
 
 function wrapLine(line: string, header: string) {
@@ -123,7 +123,7 @@ export function LogProblemShort(problem: PlProblem) {
 export function CreateFrame(name: string, info: PlFileInfo) {
     let text = `In frame '${name}'`;
     if (info) {
-        text += ` on line ${info.row + 1}, inside file "${info.filename}"`;
+        text += ` on line ${info.row + 1}`;
     }
     return text;
 }

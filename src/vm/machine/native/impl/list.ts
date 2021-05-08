@@ -18,7 +18,7 @@ export const jsList = {
                 return [[self[index++], index], true];
             }
         }
-    })
+    }),
 };
 
 export const list = {

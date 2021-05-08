@@ -104,7 +104,7 @@ export interface PlFunction {
 }
 
 export interface PlNativeFunction {
-    callback: Function;
     native: Function;
+    name: string;
     self?: PlStuff;
 }

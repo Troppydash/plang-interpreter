@@ -4,12 +4,13 @@ import { all } from "./impl/all";
 import { jsStr, str } from "./impl/str";
 import {dict, jsDict} from "./impl/dict";
 import {jsSpecial, special} from "./special";
-import {JsFunction, NativeFunction} from "./types";
+import { ExportJs, ExportNative } from "./types";
 import {maths} from "./modules/maths";
 import {jsNum} from "./impl/num";
+import { time } from "./modules/time";
 
 
-export const jsNatives: Record<string, JsFunction> = {
+export const jsNatives: ExportJs = {
     ...jsOperators,
     ...jsList,
     ...jsDict,
@@ -18,7 +19,7 @@ export const jsNatives: Record<string, JsFunction> = {
     ...jsSpecial,
 };
 
-export const natives: Record<string, NativeFunction> = {
+export const natives: ExportNative = {
     ...operators,
     ...str,
     ...list,
@@ -28,5 +29,6 @@ export const natives: Record<string, NativeFunction> = {
 };
 
 export const jsModules: Record<string, any> = {
-    ...maths
+    ...maths,
+    ...time,
 };

@@ -1,18 +1,18 @@
-import {ScrambleFunction} from "../scrambler";
-import {PlActions, PlConverter} from "./converter";
-import {NewPlStuff, PlStuff, PlStuffNull, PlStuffType} from "../stuff";
-import {AssertType, AssertTypeof, ExpectedNArguments, GenerateGuardedFunction} from "./helpers";
-import {StackMachine} from "../index"; // Hopefully this doesn't cause a circular dependency problem
+import { ScrambleFunction } from "../scrambler";
+import { PlActions, PlConverter } from "./converter";
+import { NewPlStuff, PlStuff, PlStuffNull, PlStuffType } from "../stuff";
+import { AssertType, AssertTypeof, ExpectedNArguments, GenerateGuardedFunction } from "./helpers";
+import { StackMachine } from "../index"; // Hopefully this doesn't cause a circular dependency problem
 import PlToString = PlActions.PlToString;
 
 export const jsSpecial = {
     [ScrambleFunction( "range" )]: function ( start, end, step ) {
         if ( start != undefined )
-            AssertTypeof("range", start, "number", 1);
+            AssertTypeof( "range", start, "number", 1 );
         if ( end != undefined )
-            AssertTypeof( "range", end, "number", 2);
+            AssertTypeof( "range", end, "number", 2 );
         if ( step != undefined )
-            AssertTypeof( "range", step, "number", 3);
+            AssertTypeof( "range", step, "number", 3 );
 
         if ( arguments.length > 3 ) {
             throw new Error( "'range' can only take a maximum of three arguments - start, end, step" );
@@ -46,40 +46,50 @@ export const jsSpecial = {
 };
 
 export const special = {
-    [ScrambleFunction("say")]: function (this: StackMachine, ...message: any) {
-        if (message.length == 0) {
-            this.inout.print('\n');
+    [ScrambleFunction( "say" )]: function ( this: StackMachine, ...message: any ) {
+        if ( message.length == 0 ) {
+            this.inout.print( '\n' );
         } else {
-            this.inout.print(message.map(m => PlActions.PlToString(m)).join(' '));
+            this.inout.print( message.map( m => PlActions.PlToString( m ) ).join( ' ' ) );
         }
         return PlStuffNull;
     },
-    [ScrambleFunction("ask")]: function (this: StackMachine, ...message: any) {
-        const str = this.inout.input(message.map(m => PlActions.PlToString(m)).join('\n'));
-        if (str == null) {
+    [ScrambleFunction( "ask" )]: function ( this: StackMachine, ...message: any ) {
+        const str = this.inout.input( message.map( m => PlActions.PlToString( m ) ).join( '\n' ) );
+        if ( str == null ) {
             return PlStuffNull;
         }
-        return NewPlStuff(PlStuffType.Str, str);
+        return NewPlStuff( PlStuffType.Str, str );
     },
-    [ScrambleFunction("javascript")]: GenerateGuardedFunction("javascript", [PlStuffType.Str], function (this: StackMachine, code: PlStuff) {
-        try {
-            this.inout.execute(code.value, {
-                pl: {
-                    import: (key) => {
-                        return PlConverter.PlToJs(this.findValue(key), this.runFunction.bind(this));
-                    },
-                    export: (key, value) => {
-                        this.createValue(key, PlConverter.JsToPl(value, this.runFunction.bind(this)));
-                        return null;
-                    }
-                }
-            })
-        } catch (e) {
-            throw new Error(`[Javascript ${e.name}] ${e.message}`);
-        }
-    }),
+    [ScrambleFunction( "javascript" )]: GenerateGuardedFunction( "javascript", [ PlStuffType.Str ], function ( this: StackMachine, code: PlStuff ) {
+        const _import = (function( key ) {
+            const value = this.findValue( key );
+            if ( value == null ) {
+                return null;
+            }
+            return PlConverter.PlToJs( this.findValue( key ), this.runFunction.bind( this ) );
+        }).bind(this);
+        const _export = (function ( key, value ) {
+            this.createValue( key, PlConverter.JsToPl( value, this.runFunction.bind( this ) ) );
+            return null;
+        }).bind(this);
 
-    [ScrambleFunction("panic")]: (...message: PlStuff[]) => {
-        throw new Error(message.map(m => PlToString(m)).join(' '));
+        try {
+            this.inout.execute( code.value, {
+                pl: {
+                    import: _import,
+                    export: _export
+                }
+            } )
+        } catch ( e ) {
+            if ( e == null ) {
+                throw null;
+            }
+            throw new Error( `[Javascript ${e.name}] ${e.message}` );
+        }
+    } ),
+
+    [ScrambleFunction( "panic" )]: ( ...message: PlStuff[] ) => {
+        throw new Error( message.map( m => PlToString( m ) ).join( ' ' ) );
     },
 }

@@ -1,4 +1,4 @@
-import { NewEmptyFileInfo, PlFileInfo } from "../compiler/lexing/info";
+import { PlFileInfo } from "../compiler/lexing/info";
 
 export interface PlTraceFrame {
     name: string;

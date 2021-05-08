@@ -1,9 +1,5 @@
 import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffNull, PlStuffTrue, PlStuffType, PlStuffTypeToString} from "../stuff";
-import {PlFunction, PlNativeFunction} from "../memory";
-import {PlProgramWithDebug} from "../../emitter";
-import {PlDebugWithin} from "../../emitter/debug";
-import {PlInout} from "../../../inout";
-import {PlStackMachine} from "../index";
+import {PlNativeFunction} from "../memory";
 
 export namespace PlConverter {
     // plang type to js type
@@ -35,12 +31,13 @@ export namespace PlConverter {
                 return out;
             }
             case PlStuffType.NFunc: {
-                const value = object.value as PlNativeFunction;
-                return value.native;
+                return function(...args) {
+                    return PlToJs(object.value.native(...args.map(a => JsToPl(a, runFunction))), runFunction);
+                };
             }
             case PlStuffType.Func: {
                 return (...args) => {
-                    return PlToJs(runFunction(object, ...args), runFunction);
+                    return PlToJs(runFunction(object, ...args.map(arg => JsToPl(arg, runFunction))), runFunction);
                 };
             }
         }
@@ -64,10 +61,10 @@ export namespace PlConverter {
             }
             case "function": {
                 return NewPlStuff(PlStuffType.NFunc, {
-                    callback: function (...args) {
+                    native: function (...args) {
                         return JsToPl(object(...args.map(a => PlToJs(a, runFunction))), runFunction);
                     },
-                    native: object
+                    name: "native"
                 });
             }
             case "undefined": {

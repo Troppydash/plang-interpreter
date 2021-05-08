@@ -2,12 +2,11 @@ import {ScrambleFunction} from "../scrambler";
 import {PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../stuff";
 import {
     AssertOperatorsSide,
-    AssertTypeof,
     AssertTypeEqual,
     GenerateCompare,
     GenerateJsGuardedTypeFunction
 } from "./helpers";
-import {JsFunction, NativeFunction} from "./types";
+import { ExportJs, ExportNative } from "./types";
 
 export function equals(l: PlStuff, r: PlStuff) {
     if (l.type != r.type) {
@@ -41,7 +40,7 @@ function greater(l: PlStuff, r: PlStuff) {
     return l.value > r.value;
 }
 
-export const jsOperators: Record<string, JsFunction> = {
+export const jsOperators: ExportJs = {
     // numbers
     [ScrambleFunction("+", PlStuffType.Num)]: AssertOperatorsSide("+", (l, r) => l + r),
     [ScrambleFunction("-", PlStuffType.Num)]: AssertOperatorsSide("-",(l, r) => l - r),
@@ -56,7 +55,7 @@ export const jsOperators: Record<string, JsFunction> = {
     })
 };
 
-export const operators: Record<string, NativeFunction> = {
+export const operators: ExportNative = {
     ...GenerateCompare(PlStuffType.Num, equals, AssertTypeEqual(">", greater)),
     ...GenerateCompare(PlStuffType.Str, equals, AssertTypeEqual(">", greater)),
     ...GenerateCompare(PlStuffType.Bool, equals),

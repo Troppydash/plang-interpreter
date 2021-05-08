@@ -10,7 +10,6 @@ import {EmitProgram} from "../vm/emitter/";
 import {ProgramWithDebugToString} from "../vm/emitter/pprinter";
 import {PlStackMachine} from "../vm/machine";
 import {StartInteractive} from "../problem/interactive";
-import {TRACE_MAX} from "../problem/printer";
 import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
 
 export function RunLinker(content: string, filename: string): PlToken[] | null {
@@ -78,7 +77,9 @@ export function RunOnce(vm: PlStackMachine, file: PlFile) {
 
     const program = EmitProgram(ast);
     program.program.pop(); // remove final stkpop
-    const out = vm.runProgram(program);
+
+    vm.setProgram(program);
+    const out = vm.runProgram();
     if (out == null) {
         const trace = vm.getTrace();
         const problems = vm.getProblems();
@@ -107,14 +108,15 @@ export async function RunVM(file: PlFile) {
         }
     });
 
-    const out = vm.runProgram(program);
+    vm.setProgram(program);
+    const out = vm.runProgram();
     if (out == null) {
         const trace = vm.getTrace();
         const problems = vm.getProblems();
         const ok = ReportProblems(file.content, problems, trace);
 
         // fancy
-        if (ok && trace.length > TRACE_MAX) {
+        if (ok && trace.length > 1) {
             // const answer = inout.input(`${colors.magenta("Start the interactive frame viewer?")} [${colors.green('y')}/n]: `);
             // if (answer == 'n' || answer == null) {
             //     return null;
