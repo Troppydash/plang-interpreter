@@ -8,6 +8,7 @@ import { ExportJs, ExportNative } from "./types";
 import {maths} from "./modules/maths";
 import {jsNum} from "./impl/num";
 import { time } from "./modules/time";
+import {random} from "./modules/random";
 
 
 export const jsNatives: ExportJs = {
@@ -31,4 +32,5 @@ export const natives: ExportNative = {
 export const jsModules: Record<string, any> = {
     ...maths,
     ...time,
+    ...random,
 };

@@ -1,6 +1,6 @@
 import {ScrambleFunction} from "../../scrambler";
-import {PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../../stuff";
-import {GenerateGuardedTypeFunction, GenerateJsGuardedTypeFunction} from "../helpers";
+import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../../stuff";
+import {AssertType, GenerateGuardedTypeFunction, GenerateJsGuardedTypeFunction} from "../helpers";
 import {equals} from "../operators";
 import {MakeOutOfRangeMessage} from "../messeger";
 
@@ -22,9 +22,27 @@ export const jsList = {
 };
 
 export const list = {
-    [ScrambleFunction("get", PlStuffType.List)]: GenerateGuardedTypeFunction("get", [PlStuffType.Num], function (self, index) {
-        const idx = index.value - 1;
+    [ScrambleFunction("get", PlStuffType.List)]: GenerateGuardedTypeFunction("get", ["*"], function (self, index: PlStuff) {
+        if (index.type != PlStuffType.List && index.type != PlStuffType.Num) {
+            throw new Error("'get' requires a number or a list as argument");
+        }
         const list = self.value;
+
+        if (index.type == PlStuffType.List) {
+            const indexes = index.value;
+            let out = [];
+            for (const index of indexes) {
+                AssertType("get", index, PlStuffType.Num, 1);
+                const idx = index.value - 1;
+                if (idx < 0 || idx >= list.length) {
+                    throw new Error(MakeOutOfRangeMessage("get", PlStuffType.List, list.length, idx));
+                }
+                out.push(list[idx]);
+            }
+            return NewPlStuff(PlStuffType.List, out);
+
+        }
+        const idx = index.value - 1;
         if (idx < 0 || idx >= list.length) {
             throw new Error(MakeOutOfRangeMessage("get", PlStuffType.List, list.length, index.value));
         }

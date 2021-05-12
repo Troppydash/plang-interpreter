@@ -1,7 +1,7 @@
-import { PlBytecodeType } from "../emitter/bytecode";
-import { PlDebug, PlDebugProgram } from "../emitter/debug";
-import { PlFunction, PlNativeFunction, PlStackFrame } from "./memory";
-import { NewPlProblem, PlProblem } from "../../problem/problem";
+import {PlBytecodeType} from "../emitter/bytecode";
+import {PlDebug, PlDebugProgram} from "../emitter/debug";
+import {PlFunction, PlNativeFunction, PlStackFrame} from "./memory";
+import {NewPlProblem, PlProblem} from "../../problem/problem";
 import {
     NewPlStuff,
     PlStuff,
@@ -12,13 +12,13 @@ import {
     PlStuffTypeFromString,
     PlStuffTypeToString
 } from "./stuff";
-import { jsModules, jsNatives, natives } from "./native";
-import { ScrambleFunction, UnscrambleFunction } from "./scrambler";
-import { PlProblemCode } from "../../problem/codes";
-import { PlActions, PlConverter } from "./native/converter";
-import { PlProgramWithDebug } from "../emitter";
-import { NewPlTraceFrame } from "../../problem/trace";
-import { PlInout } from "../../inout";
+import {jsModules, jsNatives, natives} from "./native";
+import {ScrambleFunction, UnscrambleFunction} from "./scrambler";
+import {PlProblemCode} from "../../problem/codes";
+import {PlActions, PlConverter} from "./native/converter";
+import {PlProgramWithDebug} from "../emitter";
+import {NewPlTraceFrame} from "../../problem/trace";
+import {PlInout} from "../../inout";
 
 const JUMP_ERRORS: Record<string, PlProblemCode> = {
     "*": "RE0010",
@@ -33,6 +33,8 @@ export interface StackMachine {
     setValue( key: string, value: PlStuff );
 
     runFunction( func: PlStuff, ...args: PlStuff[] ): PlStuff | null;
+
+    findFunction(name: string, target?: PlStuff): PlStuff;
 
     saveState(): StackMachineState;
     restoreState(state: StackMachineState);
@@ -108,7 +110,19 @@ export class PlStackMachine implements StackMachine {
         this.pointer = state.pointer;
     }
 
+    findFunction(name: string, target?: PlStuff): PlStuff | null {
+        const value = this.findValue(ScrambleFunction(name, target?.type));
+        if (value.type == PlStuffType.NFunc || value.type == PlStuffType.Func) {
+            return value;
+        }
+        return null;
+    }
+
     runFunction( func: PlStuff, ...args: PlStuff[] ): PlStuff | null {
+        if (func.type == PlStuffType.NFunc) {
+            return func.value.native(...args);
+        }
+
         if ( this.program == null ) {
             throw new Error( "There is no program somehow, this would never happen?" );
         }

@@ -13,7 +13,7 @@ export function MakeOperatorMessage(name: string, left: PlStuffType, right: PlSt
 }
 
 export function MakeOutOfRangeMessage(name: string, type: PlStuffType, length: number, got: number) {
-    return `'${name}' accessed an element out of range on a ${PlStuffTypeToString(type)}: expected ${length == 0 ? '0': '1'}-${length}, got ${got}`;
+    return `'${name}' accessed an element out of range on a ${PlStuffTypeToString(type)}: expected ${length == 0 ? '0': '1'}-${length}, got ${got+1}`;
 }
 
 export function MakeNotFoundMessage(name: string, type: PlStuffType, key: string) {
