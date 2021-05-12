@@ -1,4 +1,4 @@
-import {AssertTypeof} from "../helpers";
+import { AssertTypeof, GenerateJsGuardedFunction } from "../helpers";
 
 function randomNumber(lower, upper) {
     if (lower != null) {
@@ -28,10 +28,12 @@ export const random = {
             if (n == null) {
                 n = 10;
             }
+            // TODO: make this lower upper known
             let out = [];
             for (let i = 0; i < n; i++) {
                 out.push(randomNumber(lower, upper));
             }
+
             return out;
         }
     }

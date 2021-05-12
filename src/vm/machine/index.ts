@@ -34,7 +34,7 @@ export interface StackMachine {
 
     runFunction( func: PlStuff, ...args: PlStuff[] ): PlStuff | null;
 
-    findFunction(name: string, target?: PlStuff): PlStuff;
+    findFunction(name: string, target?: PlStuff): PlStuff | null;
 
     saveState(): StackMachineState;
     restoreState(state: StackMachineState);
