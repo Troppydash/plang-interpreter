@@ -8,7 +8,7 @@ import {
     ASTBreak,
     ASTCall,
     ASTClosure,
-    ASTContinue,
+    ASTContinue, ASTCreate,
     ASTDict,
     ASTDictKey,
     ASTDot,
@@ -35,11 +35,19 @@ import {
     ASTWhile,
     CreateSpanToken
 } from "./ast";
-import PlToken, { NewPlToken, PlTokenType, TOKEN_OPERATORS } from "../lexing/token";
+import PlToken, { PlTokenToPlVariable, PlTokenType, TOKEN_OPERATORS } from "../lexing/token";
 import { PlProblemCode } from "../../problem/codes";
 
 class ErrTokenException {
 
+}
+
+
+export const CREATE_MAGIC = '@';
+function stripSep(ast: ASTVariable) {
+    if (ast.content.startsWith(CREATE_MAGIC)) {
+        ast.content = ast.content.slice(1);
+    }
 }
 
 interface Parser {
@@ -272,6 +280,9 @@ export class PlAstParser implements Parser {
             case PlTokenType.MATCH:
                 statement = this.pMatch();
                 break;
+            case PlTokenType.TYPE:
+                statement = this.pType();
+                break;
             default:
                 statement = this.pExpression();
                 break;
@@ -326,10 +337,13 @@ export class PlAstParser implements Parser {
             return null;
         }
         const name = this.pVariable();
+        stripSep(name);
+
         const nextToken = this.expectedPeekToken( PlTokenType.LPAREN, "ET0014", nameToken );
         if ( nextToken == null ) {
             return null;
         }
+
         // parse parameters
         const param = this.pParam( nextToken, "ET0016", "ET0015" );
         if ( param == null ) {
@@ -357,12 +371,10 @@ export class PlAstParser implements Parser {
         const peekToken = this.peekToken();
         if (peekToken.type == PlTokenType.VARIABLE) {
             name = this.pVariable();
-            if ( name == null ) {
-                return null;
-            }
-        } else if (TOKEN_OPERATORS.includes(peekToken.type)) {
+            stripSep(name);
+        } else if (TOKEN_OPERATORS.includes(peekToken.type) || peekToken.type == PlTokenType.TYPE) {
             this.nextToken();
-            const token = NewPlToken(PlTokenType.VARIABLE, peekToken.content, peekToken.info);
+            const token = PlTokenToPlVariable(peekToken);
             name = new ASTVariable( [ token ], token.content )
         } else {
             this.newProblem(peekToken, "ET0027");
@@ -390,13 +402,13 @@ export class PlAstParser implements Parser {
             return null;
         }
 
-        if ( this.tryPeekToken( PlTokenType.TYPE, "ET0043", forToken ) == null ) {
+        if (this.peekToken().type == PlTokenType.EOF) {
+            this.newProblemAt(forToken, "ET0043", "after");
             return null;
         }
-        const type = this.pTypes();
-        if ( type == null ) {
-            return null;
-        }
+        const type = this.pVariable();
+        stripSep(type);
+
 
         if ( this.tryPeekToken( PlTokenType.LBRACE, "ET0030", type.getSpanToken() ) == null ) {
             return null;
@@ -407,6 +419,30 @@ export class PlAstParser implements Parser {
         }
 
         return new ASTImpl( [ ...tokens, ...param[1], forToken ], name, param[0], type, block );
+    }
+
+    pType(): ASTType | null {
+        const tokens = [this.nextToken()];
+
+        const nameToken = this.tryPeekToken(PlTokenType.VARIABLE, "ET0044", null);
+        if (nameToken == null) {
+            return null;
+        }
+        const name = this.pVariable();
+        stripSep(name);
+
+        const nextToken = this.expectedPeekToken( PlTokenType.LPAREN, "ET0045", tokens[0] );
+        if ( nextToken == null ) {
+            return null;
+        }
+        tokens.push(nextToken);
+
+        const param = this.pParam(nextToken, "ET0046", "ET0047", "CE0009");
+        tokens.push(...param[1]);
+
+        const members = param[0];
+
+        return new ASTType(tokens, name, members);
     }
 
     pImport(): ASTImport | null {
@@ -429,9 +465,7 @@ export class PlAstParser implements Parser {
                     return null;
                 }
                 alias = this.pVariable();
-                if ( alias == null ) {
-                    return null;
-                }
+                stripSep(alias);
                 break;
             }
             case PlTokenType.SELECT: {
@@ -562,6 +596,8 @@ export class PlAstParser implements Parser {
             return null;
         }
         const value = this.pVariable();
+        stripSep(value);
+
         let key = null;
         if ( this.peekToken().type == PlTokenType.COMMA ) {
             tokens.push( this.nextToken() );
@@ -569,9 +605,7 @@ export class PlAstParser implements Parser {
                 return null;
             }
             key = this.pVariable();
-            if ( key == null ) {
-                return null;
-            }
+            stripSep(key);
         }
 
         if ( this.tryPeekToken( PlTokenType.OF, "ET0025", key == null ? value.getSpanToken() : key.getSpanToken() ) == null ) {
@@ -813,6 +847,9 @@ export class PlAstParser implements Parser {
             if ( value == null ) {
                 return null;
             }
+            if (variable.content.startsWith(CREATE_MAGIC)) {
+                return new ASTCreate( [ peekToken ], pre, variable, value );
+            }
             return new ASTAssign( [ peekToken ], pre, variable, value );
         }
 
@@ -941,9 +978,8 @@ export class PlAstParser implements Parser {
                     return null;
                 }
                 const right = this.pVariable();
-                if ( right == null ) {
-                    return null;
-                }
+                stripSep(right);
+
                 left = new ASTDot( [ peekToken ], left, right );
                 continue;
             }
@@ -997,8 +1033,6 @@ export class PlAstParser implements Parser {
                 return this.pBoolean();
             case PlTokenType.NULL:
                 return this.pNull();
-            case PlTokenType.TYPE:
-                return this.pTypes();
             case PlTokenType.FUNC:
                 return this.pClosure();
         }
@@ -1032,7 +1066,7 @@ export class PlAstParser implements Parser {
     }
 
     pVariable(): ASTVariable | null {
-        const token = this.nextToken();
+        const token = PlTokenToPlVariable(this.nextToken());
         return new ASTVariable( [ token ], token.content );
     }
 
@@ -1118,11 +1152,6 @@ export class PlAstParser implements Parser {
         return new ASTDict( tokens, keys, values );
     }
 
-    pTypes(): ASTType | null {
-        const token = this.nextToken();
-        return new ASTType( [ token ], token.content );
-    }
-
     pGroup(): ASTExpression | null {
         const left = this.nextToken();
         const expression = this.pExpression();
@@ -1138,14 +1167,17 @@ export class PlAstParser implements Parser {
 
     // this is only used for dict() parsing
     pPair(): [ ASTDictKey, PlToken, ASTExpression ] | null {
-        const token = this.tryPeekTokens( [ PlTokenType.VARIABLE, PlTokenType.NUMBER, PlTokenType.STR ], "ET0009", null );
-        if ( token == null ) {
+        const token = this.peekToken();
+        if (token.type == PlTokenType.EOF) {
+            this.newProblem(token, "ET0009");
             return null;
         }
-        const key = this.pPrimary();
+        const key = this.pVariable();
         if ( key == null ) {
             return null;
         }
+        stripSep(key);
+
         const colon = this.expectedPeekToken( PlTokenType.COLON, "ET0011", token );
         if ( colon == null ) {
             return null;
@@ -1245,11 +1277,15 @@ export class PlAstParser implements Parser {
             if ( token.type == endToken ) {
                 break;
             }
-            const variableToken = this.tryPeekToken( PlTokenType.VARIABLE, variableError, null );
-            if ( variableToken == null ) {
+
+            const variableToken = this.peekToken();
+            if (variableToken.type == PlTokenType.EOF) {
+                this.newProblem(variableToken, variableError);
                 return null;
             }
             const variable = this.pVariable();
+            stripSep(variable);
+
             if ( !keep ) {
                 this.clearLF();
             }

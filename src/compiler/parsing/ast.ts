@@ -101,10 +101,10 @@ export class ASTFunction extends ASTStatement {
 export class ASTImpl extends ASTStatement {
     name: ASTVariable;
     args: ASTVariable[];
-    target: ASTType;
+    target: ASTVariable;
     block: ASTBlock;
 
-    constructor( tokens: PlToken[], name: ASTVariable, args: ASTVariable[], target: ASTType, block: ASTBlock ) {
+    constructor( tokens: PlToken[], name: ASTVariable, args: ASTVariable[], target: ASTVariable, block: ASTBlock ) {
         super( tokens );
         this.name = name;
         this.args = args;
@@ -382,11 +382,13 @@ export class ASTUnary extends ASTExpression {
 }
 
 export class ASTType extends ASTExpression {
-    content: string;
+    name: ASTVariable;
+    members: ASTVariable[];
 
-    constructor( tokens: PlToken[], content: string ) {
+    constructor( tokens: PlToken[], name: ASTVariable, members: ASTVariable[] ) {
         super( tokens );
-        this.content = content;
+        this.name = name;
+        this.members = members;
     }
 }
 

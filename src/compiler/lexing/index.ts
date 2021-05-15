@@ -284,7 +284,7 @@ class PlLexer implements Lexer {
                 break;
             }
             case 't': {
-                for (const pair of [["true", PlTokenType.BOOLEAN]]) {
+                for (const pair of [["true", PlTokenType.BOOLEAN], ["type", PlTokenType.TYPE]]) {
                     const [str, type] = (pair as [string, PlTokenType]);
                     const token = this.testNextKeyword(str, type);
                     if (token) {
@@ -500,64 +500,64 @@ class PlLexer implements Lexer {
         }
 
         // data types
-        if (iscap(c)) {
-            // check datatypes
-            switch (c) {
-                case "S": {
-                    const token = this.testNextKeyword("Str", PlTokenType.TYPE);
-                    if (token) {
-                        return token;
-                    }
-                    break;
-                }
-                case "N": {
-                    let token = this.testNextKeyword("Num", PlTokenType.TYPE);
-                    if (token) {
-                        return token;
-                    }
-                    token = this.testNextKeyword("Null", PlTokenType.TYPE);
-                    if (token) {
-                        return token;
-                    }
-                    break;
-                }
-                case "L": {
-                    const token = this.testNextKeyword("List", PlTokenType.TYPE);
-                    if (token) {
-                        return token;
-                    }
-                    break;
-                }
-                case "D": {
-                    const token = this.testNextKeyword("Dict", PlTokenType.TYPE);
-                    if (token) {
-                        return token;
-                    }
-                    break;
-                }
-                case "F": {
-                    const token = this.testNextKeyword("Func", PlTokenType.TYPE);
-                    if (token) {
-                        return token;
-                    }
-                    break;
-                }
-                case "T": {
-                    const token = this.testNextKeyword("Type", PlTokenType.TYPE);
-                    if (token) {
-                        return token;
-                    }
-                    break;
-                }
-                case "B": {
-                    const token = this.testNextKeyword("Bool", PlTokenType.TYPE);
-                    if (token) {
-                        return token;
-                    }
-                    break;
-                }
-            }
-        }
+        // if (iscap(c)) {
+        //     // check datatypes
+        //     switch (c) {
+        //         case "S": {
+        //             const token = this.testNextKeyword("Str", PlTokenType.TYPE);
+        //             if (token) {
+        //                 return token;
+        //             }
+        //             break;
+        //         }
+        //         case "N": {
+        //             let token = this.testNextKeyword("Num", PlTokenType.TYPE);
+        //             if (token) {
+        //                 return token;
+        //             }
+        //             token = this.testNextKeyword("Null", PlTokenType.TYPE);
+        //             if (token) {
+        //                 return token;
+        //             }
+        //             break;
+        //         }
+        //         case "L": {
+        //             const token = this.testNextKeyword("List", PlTokenType.TYPE);
+        //             if (token) {
+        //                 return token;
+        //             }
+        //             break;
+        //         }
+        //         case "D": {
+        //             const token = this.testNextKeyword("Dict", PlTokenType.TYPE);
+        //             if (token) {
+        //                 return token;
+        //             }
+        //             break;
+        //         }
+        //         case "F": {
+        //             const token = this.testNextKeyword("Func", PlTokenType.TYPE);
+        //             if (token) {
+        //                 return token;
+        //             }
+        //             break;
+        //         }
+        //         case "T": {
+        //             const token = this.testNextKeyword("Type", PlTokenType.TYPE);
+        //             if (token) {
+        //                 return token;
+        //             }
+        //             break;
+        //         }
+        //         case "B": {
+        //             const token = this.testNextKeyword("Bool", PlTokenType.TYPE);
+        //             if (token) {
+        //                 return token;
+        //             }
+        //             break;
+        //         }
+        //     }
+        // }
 
         // variables
         if (isalpha(c) || c === '_' || c === '@') {

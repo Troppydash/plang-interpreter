@@ -1,8 +1,16 @@
 import { GenerateForAll, GenerateForSome, GenerateGuardedTypeFunction} from "../helpers";
 import {PlActions} from "../converter";
-import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType, PlStuffTypeFromString} from "../../stuff";
+import {
+    NewPlStuff,
+    PlStuff,
+    PlStuffFalse, PlStuffGetType,
+    PlStuffTrue,
+    PlStuffType,
+    PlStuffTypeFromString,
+    PlStuffTypeToString
+} from "../../stuff";
 import {StackMachine} from "../../index";
-import {ScrambleFunction} from "../../scrambler";
+import {ScrambleType} from "../../scrambler";
 import { MakeNoTypeFunctionMessage } from "../messeger";
 
 
@@ -18,13 +26,11 @@ export const all = {
 
     })),
     ...GenerateForAll("is", GenerateGuardedTypeFunction("is", [PlStuffType.Type], (object, type) => {
-        let otype = object.type;
-        if (object.type == PlStuffType.NFunc) {
-            otype = PlStuffType.Func;
-        }
-        return otype == type.value ? PlStuffTrue : PlStuffFalse;
+        let otypestr = PlStuffGetType(object);
+        return otypestr == type.value.type;
     })),
     ...GenerateForAll("to", GenerateGuardedTypeFunction("to", [PlStuffType.Type], (object: PlStuff, type: PlStuff) => {
+        throw new Error("Unimplemneted");
         if (object.type == type.type) {
             return PlActions.PlClone(object);
         }
@@ -103,20 +109,20 @@ export const all = {
         return NewPlStuff(PlStuffType.Type, object.type);
     })),
     ...GenerateForAll("in", GenerateGuardedTypeFunction("in", ["*"], function (this: StackMachine, self: PlStuff, other: PlStuff) {
-        const value = this.findValue(ScrambleFunction("have", other.type));
+        const value = this.findValue(ScrambleType("have", other.type));
         if (value.type == PlStuffType.NFunc) {
             return value.value.native(other, self);
         } else if (value.type == PlStuffType.Func) {
-            return this.runFunction(value, other, self)
+            return this.runFunction(value, [other, self])
         }
         throw new Error(MakeNoTypeFunctionMessage("in", "have", other));
     })),
     ...GenerateForAll("from", GenerateGuardedTypeFunction("from", ["*"], function (this: StackMachine, self: PlStuff, other: PlStuff) {
-        const value = this.findValue(ScrambleFunction("get", other.type));
+        const value = this.findValue(ScrambleType("get", other.type));
         if (value.type == PlStuffType.NFunc) {
             return value.value.native(other, self);
         } else if (value.type == PlStuffType.Func) {
-            return this.runFunction(value, other, self)
+            return this.runFunction(value, [other, self])
         }
         throw new Error(MakeNoTypeFunctionMessage("from", "get", other));
     })),

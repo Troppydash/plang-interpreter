@@ -147,8 +147,6 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
         return programBuilder.addBytecode( makeBool( node ) ).toProgram();
     } else if ( node instanceof ASTString ) {
         return programBuilder.addBytecode( makeString( node ) ).toProgram();
-    } else if ( node instanceof ASTType ) {
-        return programBuilder.addBytecode( makeType( node ) ).toProgram();
     } else if ( node instanceof ASTBreak ) {
         return programBuilder.addBytecodeSingle( NewBytecode( PlBytecodeType.DOBRAK ), node ).toProgram();
     } else if ( node instanceof ASTContinue ) {
@@ -180,6 +178,19 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
             .addBytecode( NewBytecode( PlBytecodeType.DEFNUM, "" + node.keys.length ) )
             .addBytecodeStretch( NewBytecode( PlBytecodeType.DEFDIC ), node )
             .toProgram();
+    } else if (node instanceof ASTType) {
+        const length = node.members.length;
+        for (let i = length-1; i >= 0; i--) {
+            programBuilder.addBytecode(makeVariable(node.members[i]));
+        }
+        return programBuilder
+            .addBytecode(NewBytecode(PlBytecodeType.DEFNUM, ''+length))
+            .addBytecode(makeVariable(node.name))
+            .addBytecode(NewBytecode(PlBytecodeType.DEFTYP))
+            .addEmpty()
+            .addBytecode(makeVariable(node.name))
+            .addBytecode(NewBytecode(PlBytecodeType.DOCRET))
+            .toProgram();
     } else if ( node instanceof ASTCreate ) {
         programBuilder.addPWD( traverseAST( node.value ) );
         if ( node.pre ) {
@@ -198,15 +209,18 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
             programBuilder.addEmpty();
         }
 
-        const content = node.variable.content;
-        if ( content[0] == '@' && content.length > 1 ) {
-            node.variable.content = content.substring( 1 )
-            programBuilder.addBytecode( makeVariable( node.variable ) );
-            programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOCRET ), node );
-        } else {
-            programBuilder.addBytecode( makeVariable( node.variable ) );
-            programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOASGN ), node );
-        }
+        // const content = node.variable.content;
+        // TODO: put this in the parser instead
+        // if ( content[0] == '@' && content.length > 1 ) {
+        //     node.variable.content = content.substring( 1 )
+        //     programBuilder.addBytecode( makeVariable( node.variable ) );
+        //     programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOCRET ), node );
+        // } else {
+        //     programBuilder.addBytecode( makeVariable( node.variable ) );
+        //     programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOASGN ), node );
+        // }
+        programBuilder.addBytecode( makeVariable( node.variable ) );
+        programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOASGN ), node );
         return programBuilder.toProgram();
     } else if ( node instanceof ASTDot ) {
         return programBuilder
@@ -330,6 +344,10 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
         }
         return programBuilder.toProgram();
     } else if ( node instanceof ASTImpl ) {
+        programBuilder
+            .addBytecode(NewBytecode( PlBytecodeType.DEFVAR, node.target.content ))
+        // TODO: this is risky as it doesn't assert that such target type exist
+
         const block = makePureBlock( node.block );
         node.args.reverse();
         for ( const param of node.args ) {
@@ -349,7 +367,8 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
                 .addBytecode( NewBytecode( PlBytecodeType.DORETN ) );
         }
         programBuilder.addEmpty();
-        const value = `${node.target.content}${node.name.content.startsWith( METHOD_SEP ) ? '' : METHOD_SEP}${node.name.content}`;
+
+        const value = `${node.target.content}${METHOD_SEP}${node.name.content}`;
         programBuilder.addBytecode( NewBytecode( PlBytecodeType.DEFSTR, value ) );
         programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOCRET ), node );
         return programBuilder.toProgram();
@@ -708,10 +727,6 @@ function makeBool( node: ASTBoolean ) {
 
 function makeString( node: ASTString ) {
     return NewBytecode( PlBytecodeType.DEFSTR, `${node.content}` );
-}
-
-function makeType( node: ASTType ) {
-    return NewBytecode( PlBytecodeType.DEFTYP, `${node.content}` );
 }
 
 function makeEvalBlock( node: ASTBlock ): PlProgramWithDebug {

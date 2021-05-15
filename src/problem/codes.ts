@@ -83,6 +83,12 @@ const templates = {
     ET0040: "expected variables for import select items",
     ET0041: "expected at least one select item in an import statement",
 
+    // type
+    ET0044: "expected a variable as the type name",
+    ET0045: "expected a left parenthesis '(' after the keyword 'type'",
+    ET0046: "expected commas between type members",
+    ET0047: "expected type members to be variables, got '%0'",
+
 
     CE0001: "reached EOF with an unclosed '}'",
     CE0002: "reached LF with an unclosed ')'",
@@ -92,6 +98,7 @@ const templates = {
     CE0006: "reached EOF with an unclosed ')'",
     CE0007: "reached LF or EOF with an unclosed '}'",
     CE0008: "reached EOF with an unclosed '\"\"\"'",
+    CE0009: "reached EOF with an unclosed ')'",
 
 
     LP0001: "found two or more default options in a match statement",
@@ -123,7 +130,7 @@ const templates = {
 }
 
 // because I am lazy
-function simplyPutA(item: string = "left brace '{'", where: string = "'here' is pointing to"): string {
+function simplyPutA( item: string = "left brace '{'", where: string = "'here' is pointing to" ): string {
     return `simply put a ${item} after where ${where}`;
 }
 
@@ -147,7 +154,7 @@ const hints: Record<PlProblemCode, string> = {
     ET0013: "you cannot have a function name that is not text",
     ET0014: "simply put a parenthesis '(' after 'here',\nif the function doesn't take any parameters, put an empty set of '()' after the function name",
     ET0015: "a variable can only began with an underscore '_' or a character",
-    ET0016: simplyPutA("comma ','"),
+    ET0016: simplyPutA( "comma ','" ),
     ET0017: simplyPutA(),
     ET0018: simplyPutA(),
     ET0019: simplyPutA(),
@@ -159,8 +166,8 @@ const hints: Record<PlProblemCode, string> = {
     ET0025: "maybe check the syntax for an each..of statement: each value, key in array {}",
     ET0026: simplyPutA(),
     ET0027: "a variable begins with a letter or an underscore",
-    ET0028: simplyPutA("a parenthesis '('"),
-    ET0029: simplyPutA("keyword for"),
+    ET0028: simplyPutA( "a parenthesis '('" ),
+    ET0029: simplyPutA( "keyword for" ),
     ET0030: simplyPutA(),
     ET0031: "the conditions of a for loop needs to be separated by semicolons ';', simply put one after 'here'",
     ET0032: simplyPutA(),
@@ -176,6 +183,11 @@ const hints: Record<PlProblemCode, string> = {
     ET0042: "check your match statement syntax, there is likely an unexpected token where the keywords are",
     ET0043: "an imply statement targets a type only, check the expression after the 'for' keyword here",
 
+    ET0044: "",
+    ET0045: "",
+    ET0046: "",
+    ET0047: "",
+
     CE0001: "did you forget to close a block?",
     CE0002: "did you forget to close a group?",
     CE0003: "did you forget to close a dict?",
@@ -184,7 +196,7 @@ const hints: Record<PlProblemCode, string> = {
     CE0006: "did you forget to close an parameter list",
     CE0007: "did you forget to close your match statement?",
     CE0008: "did you forget to close a multiline string?",
-
+    CE0009: "",
 
     LP0001: "there can be only one default block in a match statement, try removing all other default blocks in the match",
     LP0002: "the first parameter in an impl statement is by convention 'self'",
@@ -223,16 +235,16 @@ const problemFullName = {
     RE: "RuntimeError",
 }
 
-export function PCHint(pc: PlProblemCode): string {
+export function PCHint( pc: PlProblemCode ): string {
     const hint = hints[pc];
-    if (hint.length == 0) {
+    if ( hint.length == 0 ) {
         return "there are no hints";
     }
     return hint;
 }
 
-export function PCFullName(pc: PlProblemCode): string {
-    return problemFullName[pc.substring(0, 2)];
+export function PCFullName( pc: PlProblemCode ): string {
+    return problemFullName[pc.substring( 0, 2 )];
 }
 
 export default templates;

@@ -1,4 +1,5 @@
 import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffNull, PlStuffTrue, PlStuffType, PlStuffTypeToString} from "../stuff";
+import { PlInstance, PlType } from "../memory";
 
 export namespace PlConverter {
     // plang type to js type
@@ -11,7 +12,7 @@ export namespace PlConverter {
                 return +object.value;
             }
             case PlStuffType.Type: {
-                return PlStuffTypeToString(object.value);
+                return object.value.type; // a string
             }
             case PlStuffType.Bool: {
                 return object.value;
@@ -21,6 +22,13 @@ export namespace PlConverter {
             }
             case PlStuffType.List: {
                 return object.value.map(v => PlToJs(v, runFunction));
+            }
+            case PlStuffType.Inst: {
+                const out = {};
+                Object.entries(object.value.value).forEach(([key, value]) => {
+                    out[key] = PlToJs(value as PlStuff, runFunction);
+                });
+                return out;
             }
             case PlStuffType.Dict: {
                 const out = {};
@@ -85,6 +93,11 @@ export namespace PlConverter {
         }
         throw new Error(`PlConvert.JsToPl failed to match object of type ${typeof object}`);
     }
+
+    // Plang Type To Plang Type
+    export function PlToPl(source: PlStuff, target: PlType): PlStuff | null {
+        return null;
+    }
 }
 
 export namespace PlActions {
@@ -126,6 +139,7 @@ export namespace PlActions {
             case PlStuffType.Dict:
                 return NewPlStuff(type, value);
 
+            case PlStuffType.Inst:
             case PlStuffType.Type:
             case PlStuffType.Null:
             case PlStuffType.Bool:
@@ -147,12 +161,20 @@ export namespace PlActions {
                 return NewPlStuff(type, value.map(v => PlClone(v)));
             case PlStuffType.Func:
                 return NewPlStuff(type, {...value});
-            case PlStuffType.Dict:
+            case PlStuffType.Inst: {
+                const newObj = {};
+                Object.entries(value.value).forEach(([k, v]) => {
+                    newObj[k] = PlClone(v as PlStuff);
+                });
+                return NewPlStuff(type, newObj);
+            }
+            case PlStuffType.Dict: {
                 const newObj = {};
                 Object.entries(value).forEach(([k, v]) => {
                     newObj[k] = PlClone(v as PlStuff);
                 });
                 return NewPlStuff(type, newObj);
+            }
             case PlStuffType.Type:
             case PlStuffType.Null:
             case PlStuffType.Bool:
@@ -160,5 +182,9 @@ export namespace PlActions {
                 return object;
         }
         throw new Error(`PlActions.PlClone failed to match type ${PlStuffTypeToString(object.type)}`);
+    }
+
+    export function PlDefault(type: PlStuffType): PlStuff {
+        return null;
     }
 }

@@ -1,4 +1,4 @@
-import {ScrambleFunction} from "../scrambler";
+import {ScrambleType} from "../scrambler";
 import {PlActions, PlConverter} from "./converter";
 import {NewPlStuff, PlStuff, PlStuffNull, PlStuffType} from "../stuff";
 import {AssertTypeof, GenerateGuardedFunction, GenerateJsGuardedFunction} from "./helpers";
@@ -72,18 +72,18 @@ export const special = {
         }
 
         // trust that the iterator is correct
-        let iterator = this.runFunction(iter, target);
+        let iterator = this.runFunction(iter, [target]);
         const next = iterator.value.next;
 
         let out = [];
         let result;
-        while ((result = this.runFunction(next)).value[1].value == true) {
+        while ((result = this.runFunction(next, [])).value[1].value == true) {
             out.push(result.value[0].value[0]);
         }
 
         return NewPlStuff(PlStuffType.List, out);
     }),
-    [ScrambleFunction("say")]: function (this: StackMachine, ...message: any) {
+    [ScrambleType("say")]: function ( this: StackMachine, ...message: any) {
         if (message.length == 0) {
             this.inout.print('\n');
         } else {
@@ -91,14 +91,14 @@ export const special = {
         }
         return PlStuffNull;
     },
-    [ScrambleFunction("ask")]: function (this: StackMachine, ...message: any) {
+    [ScrambleType("ask")]: function ( this: StackMachine, ...message: any) {
         const str = this.inout.input(message.map(m => PlActions.PlToString(m)).join('\n'));
         if (str == null) {
             return PlStuffNull;
         }
         return NewPlStuff(PlStuffType.Str, str);
     },
-    [ScrambleFunction("javascript")]: GenerateGuardedFunction("javascript", [PlStuffType.Str], function (this: StackMachine, code: PlStuff) {
+    [ScrambleType("javascript")]: GenerateGuardedFunction("javascript", [PlStuffType.Str], function ( this: StackMachine, code: PlStuff) {
         const _import = (function (key) {
             const value = this.findValue(key);
             if (value == null) {
@@ -125,7 +125,7 @@ export const special = {
             throw new Error(`[Javascript ${e.name}] ${e.message}`);
         }
     }),
-    [ScrambleFunction("panic")]: (...message: PlStuff[]) => {
+    [ScrambleType("panic")]: ( ...message: PlStuff[]) => {
         throw new Error(message.map(m => PlToString(m)).join(' '));
     },
 }

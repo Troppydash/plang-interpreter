@@ -1,4 +1,4 @@
-import {ScrambleFunction} from "../scrambler";
+import {ScrambleType} from "../scrambler";
 import {
     PlStuff,
     PlStuffFalse,
@@ -122,22 +122,22 @@ export function GenerateCompare(type: PlStuffType, eq: Function | null = null, g
     if (eq != null) {
         out = {
             ...out,
-            [ScrambleFunction("==", type)]: wrapBool(eq),
-            [ScrambleFunction("/=", type)]: wrapBool((l, r) => !eq(l, r)),
+            [ScrambleType("==", type)]: wrapBool(eq),
+            [ScrambleType("/=", type)]: wrapBool((l, r) => !eq(l, r)),
         };
     }
     if (gt != null) {
         out = {
             ...out,
-            [ScrambleFunction(">", type)]: wrapBool(gt),
-            [ScrambleFunction("<=", type)]: wrapBool((l, r) => !gt(l, r)),
+            [ScrambleType(">", type)]: wrapBool(gt),
+            [ScrambleType("<=", type)]: wrapBool((l, r) => !gt(l, r)),
         };
     }
     if (eq != null && gt != null) {
         out = {
             ...out,
-            [ScrambleFunction("<", type)]: wrapBool((l, r) => !eq(l, r) && !gt(l, r)),
-            [ScrambleFunction(">=", type)]: wrapBool((l, r) => eq(l, r) || gt(l, r)),
+            [ScrambleType("<", type)]: wrapBool((l, r) => !eq(l, r) && !gt(l, r)),
+            [ScrambleType(">=", type)]: wrapBool((l, r) => eq(l, r) || gt(l, r)),
         };
     }
     return out;
@@ -148,7 +148,7 @@ export function GenerateForAll(name: string, func: Function) {
     const out = {};
     for (const item in PlStuffType) {
         if (!isNaN(Number(item))) {
-            out[ScrambleFunction(name, +item)] = func;
+            out[ScrambleType(name, +item)] = func;
         }
     }
     return out;
@@ -159,7 +159,7 @@ export function GenerateForSome(name: string, types: PlStuffType[], func: Functi
     for (const item in PlStuffType) {
         if (!isNaN(Number(item))) {
             if (types.includes(+item)) {
-                out[ScrambleFunction(name, +item)] = func;
+                out[ScrambleType(name, +item)] = func;
             }
         }
     }

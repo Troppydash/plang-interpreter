@@ -1,5 +1,4 @@
-import { PlStuff } from "./stuff";
-import { PlProgramWithDebug } from "../emitter";
+import { PlStuff, PlStuffType } from "./stuff";
 import { PlTraceFrame } from "../../problem/trace";
 import { PlFileInfo } from "../../compiler/lexing/info";
 
@@ -107,4 +106,14 @@ export interface PlNativeFunction {
     native: Function;
     name: string;
     self?: PlStuff;
+}
+
+export interface PlInstance {
+    type: string; // true instance type
+    value: Record<string, PlStuff>; // instance value
+}
+
+export interface PlType {
+    type: string;
+    format: any;
 }

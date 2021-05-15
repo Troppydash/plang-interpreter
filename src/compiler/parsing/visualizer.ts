@@ -7,7 +7,7 @@ import {
     ASTDot, ASTEach, ASTExport, ASTFor, ASTFunction, ASTIf, ASTImpl, ASTImport,
     ASTList, ASTLoop, ASTMatch,
     ASTNode, ASTNumber,
-    ASTProgram, ASTReturn, ASTString,
+    ASTProgram, ASTReturn, ASTString, ASTType,
     ASTUnary, ASTWhile
 } from "./ast";
 import { PlTokenType } from "../lexing/token";
@@ -68,6 +68,8 @@ function ats( node: ASTNode | null ): string {
         return `${c.mt( 'list' )}(${node.values.map( v => ats( v ) ).join( ', ' )})`;
     } else if ( node instanceof ASTDict ) {
         return `${c.mt( 'dict' )}(\n${indentString(node.keys.map( ( k, i ) =>  ats( k ) + ': ' + ats( node.values[i] ) ).join( ',\n' ))}\n)`;
+    } else if (node instanceof ASTType) {
+        return `${c.kw('type')} ${ats(node.name)} (\n${indentString(node.members.map(m => ats(m)).join(',\n'))}\n)`
     } else if ( node instanceof ASTCall ) {
         if ( node.target instanceof ASTDot ) {
             return `${ats( node.target.left )}.${c.mt( ats( node.target.right ) )}(${node.args.map( v => ats( v ) ).join( ', ' )})`;

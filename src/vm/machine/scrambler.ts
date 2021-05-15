@@ -1,8 +1,12 @@
 import { METHOD_SEP } from "../emitter";
-import { PlStuffTypeToString, PlStuffType } from "./stuff";
+import { PlStuff, PlStuffGetType, PlStuffType, PlStuffTypeToString } from "./stuff";
 
-export function ScrambleFunction(name: string, impl?: PlStuffType): string {
+export function ScrambleType( name: string, impl?: PlStuffType): string {
     return `${impl != undefined ? PlStuffTypeToString(impl)+METHOD_SEP : ''}${name}`;
+}
+
+export function ScrambleImpl(name: string, impl: PlStuff) {
+    return `${PlStuffGetType(impl)}${METHOD_SEP}${name}`;
 }
 
 export function UnscrambleFunction(scrambled: string) {

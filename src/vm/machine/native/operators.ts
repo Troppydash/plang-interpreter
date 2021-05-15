@@ -1,4 +1,4 @@
-import {ScrambleFunction} from "../scrambler";
+import {ScrambleType} from "../scrambler";
 import {PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../stuff";
 import {
     AssertOperatorsSide,
@@ -42,15 +42,15 @@ function greater(l: PlStuff, r: PlStuff) {
 
 export const jsOperators: ExportJs = {
     // numbers
-    [ScrambleFunction("+", PlStuffType.Num)]: AssertOperatorsSide("+", (l, r) => l + r),
-    [ScrambleFunction("-", PlStuffType.Num)]: AssertOperatorsSide("-",(l, r) => l - r),
-    [ScrambleFunction("*", PlStuffType.Num)]: AssertOperatorsSide("*",(l, r) => l * r),
-    [ScrambleFunction("/", PlStuffType.Num)]: AssertOperatorsSide("/",(l, r) => l / r),
-    [ScrambleFunction("mod", PlStuffType.Num)]: AssertOperatorsSide("mod",(l, r) => l % r),
+    [ScrambleType("+", PlStuffType.Num)]: AssertOperatorsSide("+", (l, r) => l + r),
+    [ScrambleType("-", PlStuffType.Num)]: AssertOperatorsSide("-",(l, r) => l - r),
+    [ScrambleType("*", PlStuffType.Num)]: AssertOperatorsSide("*",(l, r) => l * r),
+    [ScrambleType("/", PlStuffType.Num)]: AssertOperatorsSide("/",(l, r) => l / r),
+    [ScrambleType("mod", PlStuffType.Num)]: AssertOperatorsSide("mod",(l, r) => l % r),
 
     // strings
-    [ScrambleFunction("+", PlStuffType.Str)]: AssertOperatorsSide("+", (l, r) => l + r),
-    [ScrambleFunction("*", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("*", ["number"], (l, r) => {
+    [ScrambleType("+", PlStuffType.Str)]: AssertOperatorsSide("+", (l, r) => l + r),
+    [ScrambleType("*", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("*", ["number"], (l, r) => {
         return l.repeat(r);
     })
 };

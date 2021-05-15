@@ -42,7 +42,6 @@ export enum PlTokenType {
     LPAREN,     // (
     RPAREN,     // )
     COMMA,      // ,
-    // FSLASH,     // /
     COLON,      // :
     SEMICOLON,  // ;
 
@@ -79,6 +78,13 @@ interface PlToken {
     type: PlTokenType;
     content: string;
     info: PlFileInfo;
+}
+
+export function PlTokenToPlVariable(token: PlToken) {
+    if (token.type == PlTokenType.VARIABLE) {
+        return token;
+    }
+    return NewPlToken(PlTokenType.VARIABLE, token.content, token.info);
 }
 
 export function NewPlToken(type: PlTokenType, content: string, info: PlFileInfo) {

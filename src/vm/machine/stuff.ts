@@ -1,4 +1,5 @@
 import {TypeofTypes} from "../../extension";
+import { PlInstance, PlType } from "./memory";
 
 export enum PlStuffType {
     Num,
@@ -9,8 +10,12 @@ export enum PlStuffType {
     Func,
     NFunc,
     List,
-    Dict
+    Dict,
+    Inst,
 }
+
+export const PlStuffTypes = ["Num", "Str", "Bool", "Null", "Type", "Func", "List", "Dict"];
+
 
 export interface PlStuff {
     type: PlStuffType;
@@ -46,7 +51,6 @@ export function PlStuffTypeFromJsString(string: TypeofTypes) {
     throw new Error(`PlStuffTypeFromJsString failed to match with value ${string}`);
 
 }
-
 export function PlStuffTypeToString(stuffType: PlStuffType): string {
     switch (stuffType) {
         case PlStuffType.Num:
@@ -64,13 +68,25 @@ export function PlStuffTypeToString(stuffType: PlStuffType): string {
             return "Null";
         case PlStuffType.List:
             return "List";
+        case PlStuffType.Inst:
+            return "Inst";
         case PlStuffType.Dict:
             return "Dict";
     }
     throw new Error(`PlStuffTypeToString failed to match with value ${stuffType}`);
+}
+export function PlStuffGetType(stuff: PlStuff): string {
+    switch (stuff.type) {
+        case PlStuffType.Inst:
+            return stuff.value.type;
+        case PlStuffType.Type:
+            return (stuff.value as PlType).type;
+    }
+    return PlStuffTypeToString(stuff.type);
 }
 
 // optimization
 export const PlStuffTrue = NewPlStuff(PlStuffType.Bool, true);
 export const PlStuffFalse = NewPlStuff(PlStuffType.Bool, false);
 export const PlStuffNull = NewPlStuff(PlStuffType.Null, null);
+
