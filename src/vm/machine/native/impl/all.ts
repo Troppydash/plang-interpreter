@@ -1,16 +1,8 @@
-import { GenerateForAll, GenerateForSome, GenerateGuardedTypeFunction} from "../helpers";
-import {PlActions} from "../converter";
-import {
-    NewPlStuff,
-    PlStuff,
-    PlStuffFalse, PlStuffGetType,
-    PlStuffTrue,
-    PlStuffType,
-    PlStuffTypeFromString,
-    PlStuffTypeToString
-} from "../../stuff";
-import {StackMachine} from "../../index";
-import {ScrambleType} from "../../scrambler";
+import { GenerateForAll, GenerateForSome, GenerateGuardedTypeFunction } from "../helpers";
+import { PlActions, PlConverter } from "../converter";
+import { NewPlStuff, PlStuff, PlStuffFalse, PlStuffGetType, PlStuffTrue, PlStuffType } from "../../stuff";
+import { StackMachine } from "../../index";
+import { ScrambleType } from "../../scrambler";
 import { MakeNoTypeFunctionMessage } from "../messeger";
 
 
@@ -21,86 +13,23 @@ export const all = {
     ...GenerateForAll("clone", GenerateGuardedTypeFunction("clone", [], object => {
         return PlActions.PlClone(object);
     })),
-    ...GenerateForSome("isNative", [PlStuffType.NFunc, PlStuffType.Func], GenerateGuardedTypeFunction("isNative", [], object => {
+    ...GenerateForSome("isNative", [PlStuffType.Func], GenerateGuardedTypeFunction("isNative", [], object => {
         return object.type == PlStuffType.NFunc ? PlStuffTrue : PlStuffFalse;
 
     })),
     ...GenerateForAll("is", GenerateGuardedTypeFunction("is", [PlStuffType.Type], (object, type) => {
         let otypestr = PlStuffGetType(object);
-        return otypestr == type.value.type;
+        return otypestr == type.value.type ? PlStuffTrue : PlStuffFalse;
     })),
-    ...GenerateForAll("to", GenerateGuardedTypeFunction("to", [PlStuffType.Type], (object: PlStuff, type: PlStuff) => {
-        throw new Error("Unimplemneted");
-        if (object.type == type.type) {
-            return PlActions.PlClone(object);
-        }
-
-        let out = null;
-        switch (type.value) {
-            case PlStuffType.Null:
-                break;
-            case PlStuffType.Bool:
-                switch (object.type) {
-                    case PlStuffType.Num:
-                        out = object.value != 0;
-                        break;
-                    case PlStuffType.List:
-                    case PlStuffType.Str:
-                        out = object.value.length != 0;
-                        break;
-                    case PlStuffType.Dict:
-                        out = Object.keys(object.value).length != 0;
-                        break;
-                    case PlStuffType.Func:
-                    case PlStuffType.Type:
-                        out = true;
-                        break;
-                    case PlStuffType.Null:
-                        out = false;
-                        break;
-                }
-                break;
-            case PlStuffType.Str:
-                out = PlActions.PlToString(object);
-                break;
-
-            case PlStuffType.Num: {
-                let num = null;
-                switch (object.type) {
-                    case PlStuffType.Bool:
-                        num = object.value == true ? 1 : 0;
-                        break;
-                    case PlStuffType.Str: {
-                        const out = parseFloat(object.value);
-                        if (!isNaN(out)) {
-                            num = out;
-                        }
-                        break;
-                    }
-                    case PlStuffType.Null:
-                        num = 0;
-                        break;
-                    case PlStuffType.Dict:
-                    case PlStuffType.List:
-                    case PlStuffType.Func:
-                    case PlStuffType.Type:
-                        break;
-                }
-                out = num;
-                break;
-            }
-            case PlStuffType.Type:
-                if (object.type == PlStuffType.Str) {
-                    try {
-                        out = PlStuffTypeFromString(object.value);
-                    } catch (e) {
-                        // nothing
-                    }
-                }
-                break;
-        }
-
-        return NewPlStuff(out == null ? PlStuffType.Null : type.value, out);
+    /// TYPES
+    ...GenerateForAll("bool", GenerateGuardedTypeFunction("bool", [], function(self) {
+        return PlConverter.PlToPl(self, "Bool")
+    })),
+    ...GenerateForAll("str", GenerateGuardedTypeFunction("str", [], function(self) {
+        return PlConverter.PlToPl(self, "Str")
+    })),
+    ...GenerateForSome("num", [PlStuffType.Bool, PlStuffType.Str, PlStuffType.Null, PlStuffType.Num], GenerateGuardedTypeFunction("num", [], function(self) {
+        return PlConverter.PlToPl(self, "Num");
     })),
     ...GenerateForAll("type", GenerateGuardedTypeFunction("type", [], (object: PlStuff) => {
         if (object.type == PlStuffType.NFunc) {

@@ -1,10 +1,10 @@
-import {ScrambleType} from "../scrambler";
+import { ScrambleName, ScrambleType } from "../scrambler";
 import {
     PlStuff,
     PlStuffFalse,
     PlStuffTrue,
     PlStuffType,
-    PlStuffTypeFromJsString,
+    PlStuffTypeFromJsString, PlStuffTypes, PlStuffTypeToString,
 } from "../stuff";
 import {MakeArityMessage, MakeOperatorMessage, MakeTypeMessage} from "./messeger";
 import {TypeofTypes} from "../../../extension";
@@ -146,21 +146,18 @@ export function GenerateCompare(type: PlStuffType, eq: Function | null = null, g
 
 export function GenerateForAll(name: string, func: Function) {
     const out = {};
-    for (const item in PlStuffType) {
-        if (!isNaN(Number(item))) {
-            out[ScrambleType(name, +item)] = func;
-        }
+    for (const item of PlStuffTypes) {
+        out[ScrambleName(name, item)] = func;
     }
     return out;
 }
 
 export function GenerateForSome(name: string, types: PlStuffType[], func: Function) {
+    const strs = types.map(t => PlStuffTypeToString(t));
     const out = {};
-    for (const item in PlStuffType) {
-        if (!isNaN(Number(item))) {
-            if (types.includes(+item)) {
-                out[ScrambleType(name, +item)] = func;
-            }
+    for (const item of PlStuffTypes) {
+        if (strs.includes(item)) {
+            out[ScrambleName(name, item)] = func;
         }
     }
     return out;

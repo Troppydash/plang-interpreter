@@ -28,6 +28,8 @@ class PlLexer implements Lexer {
 
     private problems: PlProblem[];
 
+    private buffer: PlToken[];
+
     constructor(file: PlFile) {
         this.filename = file.filename;
         this.content = file.content;
@@ -38,6 +40,8 @@ class PlLexer implements Lexer {
         this.currentCol = 0;
 
         this.problems = [];
+
+        this.buffer = [];
     }
 
     currentChar() {
@@ -498,66 +502,6 @@ class PlLexer implements Lexer {
             }
             return NewPlToken(PlTokenType.STR, content.substring(0, content.length - 1), fi);
         }
-
-        // data types
-        // if (iscap(c)) {
-        //     // check datatypes
-        //     switch (c) {
-        //         case "S": {
-        //             const token = this.testNextKeyword("Str", PlTokenType.TYPE);
-        //             if (token) {
-        //                 return token;
-        //             }
-        //             break;
-        //         }
-        //         case "N": {
-        //             let token = this.testNextKeyword("Num", PlTokenType.TYPE);
-        //             if (token) {
-        //                 return token;
-        //             }
-        //             token = this.testNextKeyword("Null", PlTokenType.TYPE);
-        //             if (token) {
-        //                 return token;
-        //             }
-        //             break;
-        //         }
-        //         case "L": {
-        //             const token = this.testNextKeyword("List", PlTokenType.TYPE);
-        //             if (token) {
-        //                 return token;
-        //             }
-        //             break;
-        //         }
-        //         case "D": {
-        //             const token = this.testNextKeyword("Dict", PlTokenType.TYPE);
-        //             if (token) {
-        //                 return token;
-        //             }
-        //             break;
-        //         }
-        //         case "F": {
-        //             const token = this.testNextKeyword("Func", PlTokenType.TYPE);
-        //             if (token) {
-        //                 return token;
-        //             }
-        //             break;
-        //         }
-        //         case "T": {
-        //             const token = this.testNextKeyword("Type", PlTokenType.TYPE);
-        //             if (token) {
-        //                 return token;
-        //             }
-        //             break;
-        //         }
-        //         case "B": {
-        //             const token = this.testNextKeyword("Bool", PlTokenType.TYPE);
-        //             if (token) {
-        //                 return token;
-        //             }
-        //             break;
-        //         }
-        //     }
-        // }
 
         // variables
         if (isalpha(c) || c === '_' || c === '@') {

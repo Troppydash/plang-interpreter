@@ -1,4 +1,14 @@
-import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffNull, PlStuffTrue, PlStuffType, PlStuffTypeToString} from "../stuff";
+import {
+    NewPlStuff,
+    PlStuff,
+    PlStuffFalse,
+    PlStuffGetType,
+    PlStuffNull,
+    PlStuffTrue,
+    PlStuffType,
+    PlStuffTypeFromString,
+    PlStuffTypeToString
+} from "../stuff";
 import { PlInstance, PlType } from "../memory";
 
 export namespace PlConverter {
@@ -95,8 +105,85 @@ export namespace PlConverter {
     }
 
     // Plang Type To Plang Type
-    export function PlToPl(source: PlStuff, target: PlType): PlStuff | null {
-        return null;
+    export function PlToPl(source: PlStuff, target: string): PlStuff {
+        const sourceStr = PlStuffGetType(source);
+        const targetStr = target;
+        if (sourceStr == targetStr) {
+            return source;
+        }
+
+        const targetType: PlStuffType = PlStuffTypeFromString(target);
+        switch (targetType) {
+            case PlStuffType.Dict:
+            case PlStuffType.Inst:
+            case PlStuffType.Func:
+            case PlStuffType.NFunc:
+            case PlStuffType.List:
+            case PlStuffType.Null:
+                return PlStuffNull;
+
+            case PlStuffType.Type:
+                // TODO: Write this
+                return PlStuffNull;
+            case PlStuffType.Bool: {
+                let out;
+                switch (source.type) {
+                    case PlStuffType.Num:
+                        out = source.value != 0;
+                        break;
+                    case PlStuffType.List:
+                    case PlStuffType.Str:
+                        out = source.value.length != 0;
+                        break;
+                    case PlStuffType.Dict:
+                        out = Object.keys(source.value).length != 0;
+                        break;
+
+                    case PlStuffType.NFunc:
+                    case PlStuffType.Inst:
+                    case PlStuffType.Func:
+                    case PlStuffType.Type:
+                        out = true;
+                        break;
+                    case PlStuffType.Null:
+                        out = false;
+                        break;
+                }
+                return out == true ? PlStuffTrue : PlStuffFalse;
+            }
+            case PlStuffType.Num: {
+                let num = null;
+                switch (source.type) {
+                    case PlStuffType.Bool:
+                        num = source.value == true ? 1 : 0;
+                        break;
+                    case PlStuffType.Str: {
+                        const out = parseFloat(source.value);
+                        if (!isNaN(out)) {
+                            num = out;
+                        }
+                        break;
+                    }
+                    case PlStuffType.Null:
+                        num = 0;
+                        break;
+
+                    case PlStuffType.Inst:
+                    case PlStuffType.NFunc:
+                    case PlStuffType.Dict:
+                    case PlStuffType.List:
+                    case PlStuffType.Func:
+                    case PlStuffType.Type:
+                        return PlStuffNull;
+                }
+                return NewPlStuff(PlStuffType.Num, num);
+            }
+            case PlStuffType.Str: {
+                return NewPlStuff(PlStuffType.Str, PlActions.PlToString(source));
+            }
+        }
+
+        return PlStuffNull;
     }
 }
 
@@ -123,7 +210,9 @@ export namespace PlActions {
                 }
                 return object.value;
             case PlStuffType.Type:
-                return PlStuffTypeToString(object.value);
+                return PlStuffGetType(object);
+            case PlStuffType.Inst:
+                return `${(object.value as PlInstance).type}(${Object.entries(object.value.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToString(value, true)}`).join(', ')})`
         }
         throw new Error(`PlActions.PlToString failed to match object of type ${PlStuffTypeToString(object.type)}`);
     }

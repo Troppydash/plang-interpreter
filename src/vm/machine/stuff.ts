@@ -14,7 +14,7 @@ export enum PlStuffType {
     Inst,
 }
 
-export const PlStuffTypes = ["Num", "Str", "Bool", "Null", "Type", "Func", "List", "Dict"];
+export const PlStuffTypes = ["Num", "Str", "Bool", "Null", "Type", "Func", "List", "Dict", "Inst"];
 
 
 export interface PlStuff {

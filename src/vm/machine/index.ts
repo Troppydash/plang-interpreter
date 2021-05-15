@@ -5,15 +5,14 @@ import { NewPlProblem, PlProblem } from "../../problem/problem";
 import {
     NewPlStuff,
     PlStuff,
-    PlStuffFalse,
+    PlStuffFalse, PlStuffGetType,
     PlStuffNull,
     PlStuffTrue,
     PlStuffType,
     PlStuffTypes,
-    PlStuffTypeToString
 } from "./stuff";
 import { jsModules, jsNatives, natives } from "./native";
-import { ScrambleImpl, UnscrambleFunction } from "./scrambler";
+import { ScrambleImpl, ScrambleType, UnscrambleFunction } from "./scrambler";
 import { PlProblemCode } from "../../problem/codes";
 import { PlActions, PlConverter } from "./native/converter";
 import { PlProgramWithDebug } from "../emitter";
@@ -44,6 +43,7 @@ export interface StackMachine {
     stack: PlStuff[];
     problems: PlProblem[];
     readonly inout: PlInout;
+    readonly stackFrame: PlStackFrame;
 }
 
 interface StackMachineState {
@@ -131,6 +131,10 @@ export class PlStackMachine implements StackMachine {
     }
 
     jumpFunction(func: PlStuff, callDebug: PlDebug, args: PlStuff[]) {
+        if (func.type == PlStuffType.NFunc) {
+            throw new Error("jumpFunction cannot run a native function");
+        }
+
         const value = func.value as PlFunction;
 
         const parameters = value.parameters;
@@ -422,7 +426,7 @@ export class PlStackMachine implements StackMachine {
                         this.newProblem( {
                             "ASTVariable": "RE0003",
                             "ASTBinary": "RE0004",
-                        }, this.pointer, debug, name, left ? PlStuffTypeToString( left.type ) : undefined );
+                        }, this.pointer, debug, name, left ? PlStuffGetType( left ) : undefined );
                         return null;
                     }
                     case PlBytecodeType.DEFLST: {
@@ -478,7 +482,7 @@ export class PlStackMachine implements StackMachine {
                         this.newProblem( {
                             "*": "RE0011",
                             "ASTCondition": "RE0015",
-                        }, this.pointer, debug, PlStuffTypeToString( value.type ) );
+                        }, this.pointer, debug,PlStuffGetType( value ) );
                         return null;
                     }
 
@@ -489,7 +493,7 @@ export class PlStackMachine implements StackMachine {
                             this.pushStack( value );
                             break;
                         }
-                        this.newProblem( "RE0005", this.pointer, debug, PlStuffTypeToString( value.type ) );
+                        this.newProblem( "RE0005", this.pointer, debug, PlStuffGetType( value ) );
                         return null;
                     }
 
@@ -499,7 +503,7 @@ export class PlStackMachine implements StackMachine {
                             this.pushStack( value.value == true ? PlStuffFalse : PlStuffTrue );
                             break;
                         }
-                        this.newProblem( "RE0017", this.pointer, debug, PlStuffTypeToString( value.type ) );
+                        this.newProblem( "RE0017", this.pointer, debug,  PlStuffGetType( value ) );
                         return null;
                     }
 
@@ -539,14 +543,14 @@ export class PlStackMachine implements StackMachine {
                             }
                         }
 
-                        this.newProblem( "RE0013", this.pointer, debug, PlStuffTypeToString( target.type ) );
+                        this.newProblem( "RE0013", this.pointer, debug, PlStuffGetType( target ) );
                         return null;
                     }
 
                     case PlBytecodeType.DOCALL: {
                         const func = this.popStack();
                         if ( func.type != PlStuffType.Func && func.type != PlStuffType.NFunc && func.type != PlStuffType.Type ) {
-                            this.newProblem( "RE0008", this.pointer, debug, PlStuffTypeToString( func.type ) );
+                            this.newProblem( "RE0008", this.pointer, debug,  PlStuffGetType( func ) );
                             return null;
                         }
 
@@ -577,8 +581,20 @@ export class PlStackMachine implements StackMachine {
                                         return null;
                                     }
                                     const got = args[0];
+
+                                    // try to find lower case ones
+                                    const fn = this.findFunction(value.type.toLowerCase(), got);
+                                    if (fn != null) {
+                                        if (fn.type == PlStuffType.NFunc) {
+                                            this.pushStack(this.runFunction(fn, [got]));
+                                            break;
+                                        }
+                                        this.jumpFunction(fn, callDebug, [got]);
+                                        break;
+                                    }
+
                                     // convert to type
-                                    this.pushStack(PlConverter.PlToPl(got, value));
+                                    this.pushStack(PlConverter.PlToPl(got, value.type));
                                     break;
                                 }
 
@@ -596,12 +612,19 @@ export class PlStackMachine implements StackMachine {
                                 // get new method if exists
                                 const ctor = this.findFunction(CTOR_NAME, instance);
                                 if (ctor == null) {
-                                    if (args.length > 0) {
-                                        this.newProblem( "RE0006", this.pointer, debug, '0', '' + args.length );
-                                        return null;
+                                    if (args.length == 0) { // default value type
+                                        this.pushStack(instance);
+                                        break;
                                     }
-                                    this.pushStack(instance);
-                                    break;
+                                    if (args.length == value.format.length) {
+                                        for (let i = 0; i < value.format.length; i++) {
+                                            instance.value.value[value.format[i]] = args[i];
+                                        }
+                                        this.pushStack(instance);
+                                        break;
+                                    }
+                                    this.newProblem( "RE0006", this.pointer, debug, `0 or ${value.format.length}`, '' + args.length );
+                                    return null;
                                 }
                                 // call constructor // TODO: make this a jump sometime
                                 try {
@@ -661,11 +684,16 @@ export class PlStackMachine implements StackMachine {
                                 this.pushStack(instance.value[name]);
                                 break;
                             }
+                            const value = this.findValue( ScrambleType(name, bTarget.type) );
+                            if ( value != null ) {
+                                value.value.self = bTarget;
+                                this.pushStack( value );
+                                break;
+                            }
                         }
 
                         // try finding impl
-                        const scrambledName = ScrambleImpl( name, bTarget );
-                        const value = this.findValue( scrambledName );
+                        const value = this.findValue( ScrambleImpl( name, bTarget ) );
                         if ( value != null ) {
                             value.value.self = bTarget;
                             this.pushStack( value );
@@ -675,7 +703,7 @@ export class PlStackMachine implements StackMachine {
                         this.newProblem( {
                             "*": "RE0012",
                             "ASTCondition": "RE0016",
-                        }, this.pointer, debug, name, PlStuffTypeToString( bTarget.type ) );
+                        }, this.pointer, debug, name,  PlStuffGetType( bTarget ) );
                         return null;
                     }
 
@@ -732,7 +760,7 @@ export class PlStackMachine implements StackMachine {
                             }
                             break;
                         }
-                        this.newProblem( JUMP_ERRORS, this.pointer, debug, PlStuffTypeToString( peek.type ) );
+                        this.newProblem( JUMP_ERRORS, this.pointer, debug,  PlStuffGetType( peek ) );
                         return null;
                     }
 
@@ -744,7 +772,7 @@ export class PlStackMachine implements StackMachine {
                             }
                             break;
                         }
-                        this.newProblem( JUMP_ERRORS, this.pointer, debug, PlStuffTypeToString( peek.type ) );
+                        this.newProblem( JUMP_ERRORS, this.pointer, debug,  PlStuffGetType( peek ) );
                         return null;
                     }
 
@@ -756,7 +784,7 @@ export class PlStackMachine implements StackMachine {
                             }
                             break;
                         }
-                        this.newProblem( JUMP_ERRORS, this.pointer, debug, PlStuffTypeToString( peek.type ) );
+                        this.newProblem( JUMP_ERRORS, this.pointer, debug,  PlStuffGetType( peek ) );
                         return null;
                     }
 
@@ -768,7 +796,7 @@ export class PlStackMachine implements StackMachine {
                             }
                             break;
                         }
-                        this.newProblem( JUMP_ERRORS, this.pointer, debug, PlStuffTypeToString( peek.type ) );
+                        this.newProblem( JUMP_ERRORS, this.pointer, debug,   PlStuffGetType( peek ) );
                         return null;
                     }
 

@@ -1,9 +1,8 @@
-import {ScrambleType} from "../scrambler";
-import {PlActions, PlConverter} from "./converter";
-import {NewPlStuff, PlStuff, PlStuffNull, PlStuffType} from "../stuff";
-import {AssertTypeof, GenerateGuardedFunction, GenerateJsGuardedFunction} from "./helpers";
-import {StackMachine} from "../index"; // Hopefully this doesn't cause a circular dependency problem
-import {MakeNoTypeFunctionMessage} from "./messeger";
+import { PlActions, PlConverter } from "./converter";
+import { NewPlStuff, PlStuff, PlStuffNull, PlStuffType } from "../stuff";
+import { AssertTypeof, GenerateGuardedFunction, GenerateJsGuardedFunction } from "./helpers";
+import { StackMachine } from "../index"; // Hopefully this doesn't cause a circular dependency problem
+import { MakeNoTypeFunctionMessage } from "./messeger";
 import PlToString = PlActions.PlToString;
 
 export const jsSpecial = {
@@ -54,6 +53,7 @@ export const jsSpecial = {
             return error(this.problems.pop());
         }
     }),
+
 };
 
 export const special = {
@@ -83,22 +83,14 @@ export const special = {
 
         return NewPlStuff(PlStuffType.List, out);
     }),
-    [ScrambleType("say")]: function ( this: StackMachine, ...message: any) {
-        if (message.length == 0) {
-            this.inout.print('\n');
-        } else {
-            this.inout.print(message.map(m => PlActions.PlToString(m)).join(' '));
-        }
-        return PlStuffNull;
-    },
-    [ScrambleType("ask")]: function ( this: StackMachine, ...message: any) {
+    "ask": function ( this: StackMachine, ...message: any) {
         const str = this.inout.input(message.map(m => PlActions.PlToString(m)).join('\n'));
         if (str == null) {
             return PlStuffNull;
         }
         return NewPlStuff(PlStuffType.Str, str);
     },
-    [ScrambleType("javascript")]: GenerateGuardedFunction("javascript", [PlStuffType.Str], function ( this: StackMachine, code: PlStuff) {
+    "javascript": GenerateGuardedFunction("javascript", [PlStuffType.Str], function ( this: StackMachine, code: PlStuff) {
         const _import = (function (key) {
             const value = this.findValue(key);
             if (value == null) {
@@ -125,7 +117,28 @@ export const special = {
             throw new Error(`[Javascript ${e.name}] ${e.message}`);
         }
     }),
-    [ScrambleType("panic")]: ( ...message: PlStuff[]) => {
+    "panic": ( ...message: PlStuff[]) => {
         throw new Error(message.map(m => PlToString(m)).join(' '));
+    },
+    "locals": GenerateGuardedFunction("locals", [], function (this: StackMachine) {
+        const obj = this.stackFrame.values;
+        return NewPlStuff(PlStuffType.Dict, obj);
+    }),
+    "say": function ( this: StackMachine, ...message: PlStuff[]) {
+
+        if (message.length == 0) {
+            this.inout.print('\n');
+        } else {
+            const combined = message.map(mess => {
+                // call item.str()
+                const fn = this.findFunction("str", mess);
+                if (fn == null) {
+                    return PlActions.PlToString(mess);
+                }
+                return this.runFunction(fn, [mess]).value;
+            }).join(' ');
+            this.inout.print(combined);
+        }
+        return PlStuffNull;
     },
 }

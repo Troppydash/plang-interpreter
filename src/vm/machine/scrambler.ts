@@ -9,6 +9,10 @@ export function ScrambleImpl(name: string, impl: PlStuff) {
     return `${PlStuffGetType(impl)}${METHOD_SEP}${name}`;
 }
 
+export function ScrambleName(name: string, type: string) {
+    return `${type}${METHOD_SEP}${name}`;
+}
+
 export function UnscrambleFunction(scrambled: string) {
     if (scrambled.includes('@')) {
         return scrambled.split('@');
