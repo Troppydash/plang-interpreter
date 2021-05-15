@@ -54,7 +54,7 @@ export namespace PlConverter {
             }
             case PlStuffType.Func: {
                 return (...args) => {
-                    return PlToJs(runFunction(object, ...args.map(arg => JsToPl(arg, runFunction))), runFunction);
+                    return PlToJs(runFunction(object, args.map(arg => JsToPl(arg, runFunction))), runFunction);
                 };
             }
         }

@@ -125,18 +125,23 @@ export const special = {
         return NewPlStuff(PlStuffType.Dict, obj);
     }),
     "say": function ( this: StackMachine, ...message: PlStuff[]) {
-
         if (message.length == 0) {
             this.inout.print('\n');
         } else {
-            const combined = message.map(mess => {
-                // call item.str()
-                const fn = this.findFunction("str", mess);
+            const machine = this;
+            let toStr = (obj) => {
+                const fn = machine.findFunction("str", obj);
                 if (fn == null) {
-                    return PlActions.PlToString(mess);
+                    return PlActions.PlToString(obj);
                 }
-                return this.runFunction(fn, [mess]).value;
-            }).join(' ');
+                const out = machine.runFunction(fn, [obj]);
+                if (out.type == PlStuffType.Str) {
+                    return out.value;
+                }
+                return toStr(out);
+            }
+
+            const combined = message.map(mess => toStr(mess)).join(' ');
             this.inout.print(combined);
         }
         return PlStuffNull;

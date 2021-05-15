@@ -848,6 +848,7 @@ export class PlAstParser implements Parser {
                 return null;
             }
             if (variable.content.startsWith(CREATE_MAGIC)) {
+                variable.content = variable.content.slice(1);
                 return new ASTCreate( [ peekToken ], pre, variable, value );
             }
             return new ASTAssign( [ peekToken ], pre, variable, value );

@@ -12,6 +12,7 @@ export const maths = {
         sin: "sin",
         cos: "cos",
         tan: "tan",
+        log2: "log2",
         pi: "PI",
         e: "E",
     })
