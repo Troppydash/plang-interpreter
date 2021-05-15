@@ -147,7 +147,7 @@ export async function RunFile(filePath: string): Promise<number> {
     }
 
 
-    RunEmitter(content, filename);
+    // RunEmitter(content, filename);
     const file = NewPlFile(filename, content);
     // console.log(AttemptPrettyPrint(RunParser(content, filename)));
     await RunVM(file);

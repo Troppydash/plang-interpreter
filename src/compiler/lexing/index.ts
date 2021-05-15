@@ -1,9 +1,9 @@
-import {PlFile} from "../../inout/file";
-import PlToken, {NewPlToken, PlTokenType} from "./token";
-import {NewFileInfo, PlFileInfo} from "./info";
-import {isalpha, isblank, iscap, isnum, isvariablerest} from "../../extension/types";
-import {NewPlProblem, PlProblem} from "../../problem/problem";
-import {PlProblemCode} from "../../problem/codes";
+import { PlFile } from "../../inout/file";
+import PlToken, { NewPlToken, PlTokenType } from "./token";
+import { NewFileInfo, PlFileInfo } from "./info";
+import { isalpha, isblank, isnum, isvariablerest } from "../../extension/types";
+import { NewPlProblem, PlProblem } from "../../problem/problem";
+import { PlProblemCode } from "../../problem/codes";
 
 
 export interface Lexer {
@@ -135,7 +135,20 @@ class PlLexer implements Lexer {
         return NewPlToken(PlTokenType.ERR, "", info);
     }
 
+    popBuffer(): PlToken {
+        return this.buffer.shift();
+    }
+
+    haveBuffered(): boolean {
+        return this.buffer.length > 0;
+    }
+
+
     nextToken(): PlToken {
+        if (this.haveBuffered()) {
+            return this.popBuffer();
+        }
+
         if (this.isEOF()) {
             return NewPlToken(PlTokenType.EOF, "eof", this.eofFileInfo());
         }
@@ -419,27 +432,53 @@ class PlLexer implements Lexer {
         // string
         if (c === '"') {
             let content = '';
-            let multi = false;
-            if (this.testNextChars('"""', PlTokenType.STR) != null) {
-                multi = true;
-            } else {
-                this.advancePointer();
-            }
 
-            const oldRow = this.currentRow;
-            const oldCol = this.currentCol;
-            while (true) {
-                if (this.isEOF()) {
-                    if (multi) {
+
+            // multiline string
+            if (this.testNextChars('"""', PlTokenType.STR) != null) {
+                const oldRow = this.currentRow;
+                const oldCol = this.currentCol;
+                while (true) {
+                    if (this.isEOF()) {
                         return this.newErrorToken("CE0008", NewFileInfo(oldRow, oldCol, 3, this.filename));
                     }
-                    return this.newErrorToken("LE0002", NewFileInfo(oldRow, oldCol, 1, this.filename));
+                    c = this.currentChar();
+                    content += c;
+                    if (this.testNextChars('"""', PlTokenType.STR) != null) {
+                        break;
+                    }
+                    if (c == '\n') {
+                        this.advanceRow();
+                        ++this.charPointer;
+                    } else {
+                        this.advancePointer();
+                    }
+                }
+
+                let fi;
+                if (this.currentRow != oldRow) {
+                    fi = this.currentFileInfo(3);
+                } else {
+                    fi = this.currentFileInfo(this.currentCol - oldCol);
+                }
+                return NewPlToken(PlTokenType.STR, content.substring(0, content.length - 1), fi);
+            }
+
+
+            // regular string
+            this.advancePointer();
+            let oldCol = this.currentCol;
+            let lastCol = oldCol;
+            const tokens = [];
+            while (true) {
+                if (this.isEOF()) {
+                    return this.newErrorToken("LE0002", NewFileInfo(this.currentRow, oldCol, 1, this.filename));
                 }
                 c = this.currentChar();
-                if (!multi && c == '\n') {
-                    return this.newErrorToken("LE0002", NewFileInfo(oldRow, oldCol, 1, this.filename));
+                if (c == '\n') {
+                    return this.newErrorToken("LE0002", NewFileInfo(this.currentRow, oldCol, 1, this.filename));
                 }
-                if (!multi && c === '\\') { // TODO: Fix this \n thing
+                if (c === '\\') {
                     this.advancePointer();
                     c = this.currentChar();
                     switch (c) {
@@ -467,6 +506,34 @@ class PlLexer implements Lexer {
                             content += "\\";
                             break;
                         }
+                        case '(': {
+                            tokens.push(NewPlToken(PlTokenType.STR, content.substring(0, content.length), this.currentFileInfo(this.currentCol - oldCol)) );
+                            content = '';
+
+                            tokens.push(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(1)))
+                            tokens.push(NewPlToken(PlTokenType.VARIABLE, 'str', this.currentFileInfo(1)));
+                            tokens.push(NewPlToken(PlTokenType.LPAREN, '(', this.currentFileInfo(1)));
+
+                            this.advancePointer();
+                            while (true) {
+                                const token = this.nextToken();
+                                if (token.type == PlTokenType.ERR) {
+                                    return token;
+                                }
+                                if (token.type === PlTokenType.EOF || token.type == PlTokenType.LF) {
+                                    return this.newErrorToken("LE0004", token.info);
+                                }
+
+                                tokens.push(token);
+                                if (token.type === PlTokenType.RPAREN) {
+                                    break;
+                                }
+                            }
+                            tokens.push(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(1)))
+
+                            lastCol = this.currentCol;
+                            continue;
+                        }
                         default: {
                             return this.newErrorToken("LE0003", NewFileInfo(this.currentRow, this.currentCol + 1, 2, this.filename), c);
                         }
@@ -475,32 +542,20 @@ class PlLexer implements Lexer {
                     continue;
                 }
                 content += c;
-                if (multi) {
-                    if (this.testNextChars('"""', PlTokenType.STR) != null) {
-                        break;
-                    }
-                } else {
-                    if (c == '"') {
-                        this.advancePointer();
-                        break;
-                    }
-                }
-                if (c == '\n') {
-                    this.advanceRow();
-                    ++this.charPointer;
-                } else {
+                if (c == '"') {
                     this.advancePointer();
+                    break;
                 }
+                this.advancePointer();
             }
 
-            let fi;
-            if (this.currentRow != oldRow) {
-                fi = this.currentFileInfo(3);
-            } else {
-                fi = this.currentFileInfo(this.currentCol - oldCol);
+            tokens.push(
+                NewPlToken(PlTokenType.STR, content.substring(0, content.length - 1), this.currentFileInfo(this.currentCol - lastCol))
+            );
 
-            }
-            return NewPlToken(PlTokenType.STR, content.substring(0, content.length - 1), fi);
+            const first = tokens.shift();
+            this.buffer.push(...tokens);
+            return first;
         }
 
         // variables

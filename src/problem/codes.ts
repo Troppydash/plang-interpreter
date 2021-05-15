@@ -5,6 +5,7 @@ const templates = {
     LE0001: "found an unknown character '%0'",
     LE0002: "reached EOF or LF with an unclosed double quote",
     LE0003: "unknown escape character '%0'",
+    LE0004: "reached EOF or LF with an unclosed left parenthesis during a string replacement expression",
 
     // statement
     ET0001: "expected a newline at the end of a statement",
@@ -138,6 +139,7 @@ const hints: Record<PlProblemCode, string> = {
     LE0001: 'this character does not belong here, maybe check your spelling?',
     LE0002: 'did you forget to close your strings?',
     LE0003: "if you intended to type '\\', write two forward-slashes '\\\\' to escape the first slash",
+    LE0004: "",
 
     ET0001: "statements have to be on different lines, simply press 'enter' after where 'here' is pointing to.\nthis often occurs when there is an syntax error",
     ET0002: "you cannot assign to an rvalue, maybe check your spelling?",
