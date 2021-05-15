@@ -35,7 +35,7 @@ import {
     ASTWhile,
     CreateSpanToken
 } from "./ast";
-import PlToken, { PlTokenType } from "../lexing/token";
+import PlToken, { NewPlToken, PlTokenType, TOKEN_OPERATORS } from "../lexing/token";
 import { PlProblemCode } from "../../problem/codes";
 
 class ErrTokenException {
@@ -352,11 +352,20 @@ export class PlAstParser implements Parser {
 
     pImpl(): ASTImpl | null {
         const tokens = [ this.nextToken() ];
-        if ( this.tryPeekToken( PlTokenType.VARIABLE, "ET0027", null ) == null ) {
-            return null;
-        }
-        const name = this.pVariable();
-        if ( name == null ) {
+
+        let name: ASTVariable;
+        const peekToken = this.peekToken();
+        if (peekToken.type == PlTokenType.VARIABLE) {
+            name = this.pVariable();
+            if ( name == null ) {
+                return null;
+            }
+        } else if (TOKEN_OPERATORS.includes(peekToken.type)) {
+            this.nextToken();
+            const token = NewPlToken(PlTokenType.VARIABLE, peekToken.content, peekToken.info);
+            name = new ASTVariable( [ token ], token.content )
+        } else {
+            this.newProblem(peekToken, "ET0027");
             return null;
         }
 

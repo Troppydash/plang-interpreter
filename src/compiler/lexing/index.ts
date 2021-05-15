@@ -560,7 +560,7 @@ class PlLexer implements Lexer {
         }
 
         // variables
-        if (isalpha(c) || c === '_') {
+        if (isalpha(c) || c === '_' || c === '@') {
             let content = '';
             const oldCol = this.currentCol;
             do {
@@ -568,18 +568,6 @@ class PlLexer implements Lexer {
                 this.advancePointer();
                 c = this.currentChar();
             } while (!this.isEOF() && isvariablerest(c));
-            return NewPlToken(PlTokenType.VARIABLE, content, this.currentFileInfo(this.currentCol - oldCol));
-        }
-
-        // special variables
-        if (c == '@') {
-            let content = '';
-            const oldCol = this.currentCol;
-            do {
-                content += c;
-                this.advancePointer();
-                c = this.currentChar();
-            } while (!this.isEOF() && (isvariablerest(c) || c == '+' || c == '-' || c == '*' || c == '/'));
             return NewPlToken(PlTokenType.VARIABLE, content, this.currentFileInfo(this.currentCol - oldCol));
         }
 

@@ -62,6 +62,19 @@ export enum PlTokenType {
     ERR,
 }
 
+export const TOKEN_OPERATORS = [
+    PlTokenType.ADD,
+    PlTokenType.SUB,
+    PlTokenType.MUL,
+    PlTokenType.DIV,
+    PlTokenType.GT,
+    PlTokenType.GTE,
+    PlTokenType.LT,
+    PlTokenType.LTE,
+    PlTokenType.EQ,
+    PlTokenType.NEQ,
+];
+
 interface PlToken {
     type: PlTokenType;
     content: string;
