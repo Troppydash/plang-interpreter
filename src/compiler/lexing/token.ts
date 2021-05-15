@@ -61,6 +61,34 @@ export enum PlTokenType {
     ERR,
 }
 
+// tokens that cannot be used as dict names
+export const NAME_BLACKLIST: PlTokenType[] = [
+    PlTokenType.LPAREN,
+    PlTokenType.RPAREN,
+    PlTokenType.LBRACE,
+    PlTokenType.RBRACE,
+    PlTokenType.COMMA,
+    PlTokenType.COLON,
+    PlTokenType.SEMICOLON,
+
+    PlTokenType.DOT,
+    PlTokenType.ADD,
+    PlTokenType.SUB,
+    PlTokenType.MUL,
+    PlTokenType.DIV,
+    PlTokenType.ASGN,
+    PlTokenType.INC,
+    PlTokenType.DEC,
+    PlTokenType.GT,
+    PlTokenType.LT,
+    PlTokenType.GTE,
+    PlTokenType.LTE,
+    PlTokenType.EQ,
+    PlTokenType.NEQ,
+
+    PlTokenType.LF, PlTokenType.EOF
+];
+
 export const TOKEN_OPERATORS = [
     PlTokenType.ADD,
     PlTokenType.SUB,

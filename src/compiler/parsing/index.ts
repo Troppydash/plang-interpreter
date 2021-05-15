@@ -35,7 +35,7 @@ import {
     ASTWhile,
     CreateSpanToken
 } from "./ast";
-import PlToken, { PlTokenToPlVariable, PlTokenType, TOKEN_OPERATORS } from "../lexing/token";
+import PlToken, { PlTokenToPlVariable, PlTokenType, TOKEN_OPERATORS, NAME_BLACKLIST } from "../lexing/token";
 import { PlProblemCode } from "../../problem/codes";
 
 class ErrTokenException {
@@ -424,9 +424,9 @@ export class PlAstParser implements Parser {
     pType(): ASTType | null {
         const tokens = [this.nextToken()];
 
-        const nameToken = this.tryPeekToken(PlTokenType.VARIABLE, "ET0044", null);
-        if (nameToken == null) {
-            return null;
+        const nameToken = this.peekToken();
+        if (NAME_BLACKLIST.includes(nameToken.type)) {
+            return this.newProblem(nameToken, "ET0044");
         }
         const name = this.pVariable();
         stripSep(name);
@@ -975,8 +975,9 @@ export class PlAstParser implements Parser {
             }
             if ( peekToken.type == PlTokenType.DOT ) {
                 this.nextToken();
-                if ( this.tryPeekToken( PlTokenType.VARIABLE, "ET0003", null ) == null ) { // TODO: make numbers too
-                    return null;
+                const peek = this.peekToken();
+                if (NAME_BLACKLIST.includes(peek.type)) {
+                    return this.newProblem(peek, "ET0003");
                 }
                 const right = this.pVariable();
                 stripSep(right);
@@ -1128,7 +1129,7 @@ export class PlAstParser implements Parser {
                 this.newProblem( peek, "CE0003" );
                 return null;
             }
-            // need to bind this for some damn reason or this is not defined
+
             const result = this.pPair();
             if ( result == null ) {
                 return null;
@@ -1169,7 +1170,7 @@ export class PlAstParser implements Parser {
     // this is only used for dict() parsing
     pPair(): [ ASTDictKey, PlToken, ASTExpression ] | null {
         const token = this.peekToken();
-        if (token.type == PlTokenType.EOF) {
+        if (NAME_BLACKLIST.includes(token.type)) {
             this.newProblem(token, "ET0009");
             return null;
         }

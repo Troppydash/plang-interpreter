@@ -5,7 +5,8 @@ import { NewPlProblem, PlProblem } from "../../problem/problem";
 import {
     NewPlStuff,
     PlStuff,
-    PlStuffFalse, PlStuffGetType,
+    PlStuffFalse,
+    PlStuffGetType,
     PlStuffNull,
     PlStuffTrue,
     PlStuffType,
@@ -535,6 +536,16 @@ export class PlStackMachine implements StackMachine {
                                 this.pushStack( value );
                                 break;
                             }
+                        } else if (target.type == PlStuffType.List) {
+                            let parsed = Number.parseFloat(''+name.value);
+                            if (!Number.isNaN(parsed)) {
+                                parsed--;
+                                if (parsed in target.value) {
+                                    target.value[parsed] = value;
+                                    this.pushStack(value);
+                                    break;
+                                }
+                            }
                         } else if (target.type == PlStuffType.Inst) {
                             if (name.value in target.value.value) {
                                 target.value.value[name.value] = value;
@@ -672,11 +683,21 @@ export class PlStackMachine implements StackMachine {
                         const bKey = this.popStack();
                         const bTarget = this.popStack();
 
+                        // TODO: Maybe make this call .get or something
                         const name = bKey.value;
                         if ( bTarget.type == PlStuffType.Dict ) {
                             if ( name in bTarget.value ) {
                                 this.pushStack( bTarget.value[name] );
                                 break;
+                            }
+                        } else if (bTarget.type == PlStuffType.List) {
+                            let parsed = Number.parseFloat(''+name);
+                            if (!Number.isNaN(parsed)) {
+                                parsed--;
+                                if (parsed in bTarget.value) {
+                                    this.pushStack(bTarget.value[parsed]);
+                                    break;
+                                }
                             }
                         } else if (bTarget.type == PlStuffType.Inst) {
                             const instance = bTarget.value as PlInstance;
