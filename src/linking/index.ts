@@ -6,53 +6,35 @@ import inout from "../inout";
 import {ASTProgram} from "../compiler/parsing/ast";
 import {PlAstParser} from "../compiler/parsing";
 import {PlProblem} from "../problem/problem";
-import {EmitProgram} from "../vm/emitter/";
+import { EmitProgram, PlProgramWithDebug } from "../vm/emitter/";
 import {ProgramWithDebugToString} from "../vm/emitter/pprinter";
 import {PlStackMachine} from "../vm/machine";
 import {StartInteractive} from "../problem/interactive";
 import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
 
-export function RunLinker(content: string, filename: string): PlToken[] | null {
-    const lexer = new PlLexer(NewPlFile(filename, content));
-    const result = lexer.parseAll();
 
-    const problems = lexer.getProblems();
-    if (problems.length != 0) {
-        for (const problem of problems) {
-            ReportProblem(problem, content);
-        }
-        return null;
-    }
-
-    return result;
-}
-
-export function RunParser(content: string, filename: string): ASTProgram | null {
-    const lexer = new PlLexer(NewPlFile(filename, content));
+export function RunParser(file: PlFile): ASTProgram | null {
+    const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
     const result = parser.parseAll();
 
     const problems = parser.getProblems();
     if (problems.length != 0) {
-        ReportProblems(content, problems);
+        ReportProblems(file.content, problems);
         return null;
     }
 
     return result;
 }
 
-export function RunEmitter(content: string, filename: string): null {
-    const ast = RunParser(content, filename);
+export function RunEmitter(file: PlFile): PlProgramWithDebug | null {
+    const ast = RunParser(file);
     if (ast == null) {
         return null;
     }
 
-    const program = EmitProgram(ast);
-    inout.print(ProgramWithDebugToString(program));
-    inout.print(`Emitted ${program.program.length} instructions, with ${program.debug.length} debug messages`);
-    // inout.print(ProgramToPlb(program.program));
+    return EmitProgram(ast);
 }
-
 
 
 export function TryRunParser(file: PlFile): PlProblem[] | null {
@@ -134,7 +116,7 @@ export async function RunVM(file: PlFile) {
     return out;
 }
 
-export async function RunFile(filePath: string): Promise<number> {
+export function ReadFile(filePath: string): PlFile | null {
     const path = require('path');
     inout.setRootPath(filePath);
 
@@ -143,13 +125,12 @@ export async function RunFile(filePath: string): Promise<number> {
     if (content === null) {
         inout.print(`Cannot read file ${filePath}: file doesn't exist or can't be read`);
         inout.flush();
-        return 1;
+        return null;
     }
+    return NewPlFile(filename, content);
+}
 
-
-    // RunEmitter(content, filename);
-    const file = NewPlFile(filename, content);
-    // console.log(AttemptPrettyPrint(RunParser(content, filename)));
+export async function RunFile(file: PlFile): Promise<number> {
     await RunVM(file);
     return 0;
 }
