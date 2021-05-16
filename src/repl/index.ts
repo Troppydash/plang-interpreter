@@ -6,6 +6,64 @@ import { PlActions, PlConverter } from "../vm/machine/native/converter";
 import {PlStackMachine} from "../vm/machine";
 import { NewPlFile } from "../inout/file";
 import { timestamp } from "../timestamp";
+import PlLexer from "../compiler/lexing";
+import {PlAstParser} from "../compiler/parsing";
+import {ReportProblems} from "../problem";
+import {EmitProgram} from "../vm/emitter";
+import {StartInteractive} from "../problem/interactive";
+import {AttemptPrettyPrint} from "../compiler/parsing/visualizer";
+import {ProgramWithDebugToString} from "../vm/emitter/pprinter";
+
+export function GetLine(filename: string): string | null {
+    let content = "";
+    let firstPrompt = true;
+    let linenum = 1;
+
+    completer:
+        while (true) {
+            let out = firstPrompt ? `${filename}> ` : `${('' + linenum).padStart(filename.length, ' ')}| `;
+            linenum += 1;
+
+            const message = inout.input(out);
+            if (message === null) {
+                if (firstPrompt) {
+                    return null;
+                }
+                break;
+            }
+
+            let oldContent = content;
+            content += message;
+
+            const file = NewPlFile(filename, content);
+            const outcome = TryRunParser(file);
+            content += '\n';
+
+            let oldFirstPrompt = firstPrompt;
+            if (firstPrompt) {
+                firstPrompt = false;
+            }
+
+            if (outcome != null) {
+                for (const problem of outcome) {
+                    if (problem.code.startsWith('CE')) {
+                        continue completer;
+                    }
+                }
+                if (!oldFirstPrompt) {
+                    inout.print(`${LogProblemShort(outcome[0])}`);
+                    const result = inout.input(colors.magenta(`Undo line ${linenum - 1}? `) + `[${colors.green('y')}/n]: `);
+                    if (result != 'n') {
+                        linenum -= 1;
+                        content = oldContent;
+                        continue;
+                    }
+                }
+            }
+            break;
+        }
+    return content;
+}
 
 export function StartREPL( filename: string ): number {
     inout.print( `Welcome to the Plang interactive console (version ${timestamp})` );
@@ -29,68 +87,87 @@ export function StartREPL( filename: string ): number {
         }
     });
 
-    outer:
-        while ( true ) {
-            let content = "";
-            let firstPrompt = true;
-            let linenum = 1;
-
-            stream = false;
-
-            completer:
-            while ( true ) {
-                let out = firstPrompt ? `${filename}> ` : `${(''+linenum).padStart( filename.length, ' ')}| `;
-                linenum += 1;
-
-                const message = inout.input( out );
-                if ( message === null ) {
-                    if (firstPrompt) {
-                        inout.print( "Input terminated, goodbye" );
-                        break outer;
-                    }
-                    break;
-                }
-
-                let oldContent = content;
-                content += message;
-
-                const file = NewPlFile(filename, content);
-                const outcome = TryRunParser(file);
-                content += '\n';
-
-                let oldFirstPrompt = firstPrompt;
-                if (firstPrompt) {
-                    firstPrompt = false;
-                }
-
-                if (outcome != null) {
-                    for (const problem of outcome) {
-                        if (problem.code.startsWith('CE')) {
-                            continue completer;
-                        }
-                    }
-                    if (!oldFirstPrompt) {
-                        inout.print(`${LogProblemShort(outcome[0])}`);
-                        const result = inout.input(colors.magenta(`Undo line ${linenum-1}? `) + `[${colors.green('y')}/n]: `);
-                        if (result != 'n') {
-                            linenum -= 1;
-                            content = oldContent;
-                            continue completer;
-                        }
-                    }
-                }
-                break;
-            }
-
-            // RunEmitter(content, filename);
-            const file = NewPlFile(filename, content);
-            const result = RunOnce(vm, file);
-            if (stream == false && result != null) {
-                inout.print(`${' '.repeat(filename.length)}> ${PlConverter.PlToString(result, vm)}`);
-            }
-            vm.rearm();
+    while (true) {
+        stream = false;
+        const line = GetLine(filename);
+        if (line == null) {
+            break;
         }
 
+        const file = NewPlFile(filename, line);
+        const result = RunOnce(vm, file);
+        if (stream == false && result != null) {
+            inout.print(`${' '.repeat(filename.length)}> ${PlConverter.PlToString(result, vm)}`);
+        }
+        vm.rearm();
+    }
+
+
+    inout.print("Input Terminated, Goodbye");
+    inout.flush();
+    return 0;
+}
+
+export function StartDemo(filename: string): number {
+    inout.print( `Running Plang in demo mode (version ${timestamp})` );
+    if (isNode) {
+        inout.print("Press ctrl-c to quit");
+    }
+
+    const vm = new PlStackMachine({
+        ...inout,
+        input: _ => {return ''},
+        print: _ => {}
+    });
+
+    while (true) {
+        const line = GetLine(filename);
+        if (line == null) {
+            break;
+        }
+
+        const file = NewPlFile(filename, line);
+
+        // steps
+        inout.print("[Running] Lexing and Parsing...");
+
+        const lexer = new PlLexer(file);
+        const parser = new PlAstParser(lexer);
+        const ast = parser.parseAll();
+        if (ast == null) {
+            inout.print("[Error] Parser error found, try again?");
+            continue;
+        }
+        inout.print("[Display] Printing Parser output");
+        inout.print(AttemptPrettyPrint(ast));
+        inout.print('');
+
+        inout.print("[Running] Emitting bytecodes...");
+        const program = EmitProgram(ast);
+        inout.print("[Display] Printing bytecodes");
+        inout.print(ProgramWithDebugToString(program));
+        inout.print('');
+
+        inout.print("[Running] Executing Virtual Machine");
+        program.program.pop();
+        vm.addProgram(program);
+        const result = vm.runProgram();
+        if (result == null) {
+            inout.print("[Error] VM error found, try again?");
+            continue;
+        }
+
+        const out = vm.popStack();
+        if (out != null) {
+            inout.print("[Display] Printing expression result");
+            inout.print(`${' '.repeat(filename.length)}> ${PlConverter.PlToString(out, vm)}`);
+        } else {
+            inout.print("[Error] Evaluating returned null, try again?");
+        }
+        vm.rearm();
+    }
+
+    inout.print("Input Terminated, demo stopped");
     inout.flush();
     return 0;
 }

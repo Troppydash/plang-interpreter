@@ -2,7 +2,9 @@ import { CliError, NewCliError } from "./error";
 
 type CliRaw = string;
 
-const FLAGS = ["demo", "repl", "parser", "emitter"] as const;
+// run: what mode to run
+// op: options
+const FLAGS = ["run-demo", "run-repl", "run-parser", "run-emitter"] as const;
 type CliFlag = typeof FLAGS[number];
 
 

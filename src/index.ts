@@ -29,7 +29,7 @@ if (!cont) {
 }
 
 
-if (!isNode || args.raw.length == 0 || args.is("repl")) { // If running in repl
+if (!isNode || args.raw.length == 0 || args.is("run-repl")) { // If running in repl
     const result = StartREPL("repl");
     process.exit(result);
 } else { // Else if running a file
@@ -40,14 +40,14 @@ if (!isNode || args.raw.length == 0 || args.is("repl")) { // If running in repl
     }
 
     // Different modes
-    if (args.is("parser")) {
+    if (args.is("run-parser")) {
         const out = RunParser(file);
         if (out != null) {
             inout.print(AttemptPrettyPrint(RunParser(file)));
         }
         process.exit(0);
     }
-    if (args.is("emitter")) {
+    if (args.is("run-emitter")) {
         const out = RunEmitter(file);
         if (out != null) {
             inout.print(ProgramWithDebugToString(out));
