@@ -8,7 +8,8 @@ import {
     ASTBreak,
     ASTCall,
     ASTClosure,
-    ASTContinue, ASTCreate,
+    ASTContinue,
+    ASTCreate,
     ASTDict,
     ASTDictKey,
     ASTDot,
@@ -35,7 +36,7 @@ import {
     ASTWhile,
     CreateSpanToken
 } from "./ast";
-import PlToken, { PlTokenToPlVariable, PlTokenType, TOKEN_OPERATORS, NAME_BLACKLIST } from "../lexing/token";
+import PlToken, { NAME_BLACKLIST, PlTokenToPlVariable, PlTokenType, TOKEN_OPERATORS } from "../lexing/token";
 import { PlProblemCode } from "../../problem/codes";
 
 class ErrTokenException {

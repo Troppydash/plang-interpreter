@@ -48,9 +48,9 @@ function ats( node: ASTNode | null ): string {
     } else if ( node instanceof ASTBinary ) {
         const left = ats( node.left );
         const right = ats( node.right );
-        if ( node.right instanceof ASTBinary ) {
-            if ( IsPreLower( node.operator.type, node.right.operator.type ) ) {
-                return `${left} ${node.operator.content} (${right})`;
+        if ( node.left instanceof ASTBinary ) {
+            if ( IsPreLower( node.operator.type, node.left.operator.type ) ) {
+                return `(${left}) ${node.operator.content} ${right}`;
             }
         }
         return `${left} ${node.operator.content} ${right}`;

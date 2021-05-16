@@ -135,6 +135,10 @@ class PlLexer implements Lexer {
         return NewPlToken(PlTokenType.ERR, "", info);
     }
 
+    addBuffer(token: PlToken) {
+        this.buffer.push(token);
+    }
+
     popBuffer(): PlToken {
         return this.buffer.shift();
     }
@@ -144,8 +148,8 @@ class PlLexer implements Lexer {
     }
 
 
-    nextToken(): PlToken {
-        if (this.haveBuffered()) {
+    nextToken(consume: boolean = true): PlToken {
+        if (consume && this.haveBuffered()) {
             return this.popBuffer();
         }
 
@@ -467,16 +471,21 @@ class PlLexer implements Lexer {
 
             // regular string
             this.advancePointer();
-            let oldCol = this.currentCol;
-            let lastCol = oldCol;
-            const tokens = [];
+
+            let oldCol = this.currentCol; // first string segment col
+            let lastCol = oldCol; // last string segment col
+
+            // initial buffer length
+            const lastBuffer = this.buffer.length;
+            // inital file info
+            const info = this.currentFileInfo(1);
             while (true) {
                 if (this.isEOF()) {
-                    return this.newErrorToken("LE0002", NewFileInfo(this.currentRow, oldCol, 1, this.filename));
+                    return this.newErrorToken("LE0002", info);
                 }
                 c = this.currentChar();
                 if (c == '\n') {
-                    return this.newErrorToken("LE0002", NewFileInfo(this.currentRow, oldCol, 1, this.filename));
+                    return this.newErrorToken("LE0002", info);
                 }
                 if (c === '\\') {
                     this.advancePointer();
@@ -507,16 +516,25 @@ class PlLexer implements Lexer {
                             break;
                         }
                         case '(': {
-                            tokens.push(NewPlToken(PlTokenType.STR, content.substring(0, content.length), this.currentFileInfo(this.currentCol - oldCol)) );
+                            // THIS PART DOES THE STRING CONCATENATION
+
+                            // emit ("a" + str(b) + "c")
+
+                            // emit "a" + str(
+                            this.addBuffer(NewPlToken(PlTokenType.STR, content.substring(0, content.length), this.currentFileInfo(this.currentCol - oldCol)) );
                             content = '';
 
-                            tokens.push(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(1)))
-                            tokens.push(NewPlToken(PlTokenType.VARIABLE, 'str', this.currentFileInfo(1)));
-                            tokens.push(NewPlToken(PlTokenType.LPAREN, '(', this.currentFileInfo(1)));
+                            this.addBuffer(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(1)))
+                            this.addBuffer(NewPlToken(PlTokenType.VARIABLE, 'str', this.currentFileInfo(1)));
+                            this.addBuffer(NewPlToken(PlTokenType.LPAREN, '(', this.currentFileInfo(1)));
 
                             this.advancePointer();
+
+                            // used for counting parenthesis
+                            let lparens = 0;
                             while (true) {
-                                const token = this.nextToken();
+                                const last = this.buffer.length;
+                                const token = this.nextToken(false);
                                 if (token.type == PlTokenType.ERR) {
                                     return token;
                                 }
@@ -524,12 +542,26 @@ class PlLexer implements Lexer {
                                     return this.newErrorToken("LE0004", token.info);
                                 }
 
-                                tokens.push(token);
-                                if (token.type === PlTokenType.RPAREN) {
-                                    break;
+                                // if multiple tokens emitted in buffer, this puts the popped into place
+                                if (this.buffer.length - last > 1) {
+                                    this.buffer.splice(last, 0, token);
+                                } else {  // if only one token emitted - not an another concat
+                                    this.addBuffer(token);
+
+                                    // check for lparen and rparen
+                                    if (token.type == PlTokenType.LPAREN) {
+                                        lparens++;
+                                    } else if (token.type === PlTokenType.RPAREN) {
+                                        if (lparens == 0) {
+                                            break;
+                                        }
+                                        lparens--;
+                                    }
                                 }
                             }
-                            tokens.push(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(1)))
+
+                            // emit +
+                            this.addBuffer(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(1)))
 
                             lastCol = this.currentCol;
                             continue;
@@ -549,13 +581,21 @@ class PlLexer implements Lexer {
                 this.advancePointer();
             }
 
-            tokens.push(
+            // add the final/first string segment
+            this.addBuffer(
                 NewPlToken(PlTokenType.STR, content.substring(0, content.length - 1), this.currentFileInfo(this.currentCol - lastCol))
             );
 
-            const first = tokens.shift();
-            this.buffer.push(...tokens);
-            return first;
+            // if there is more than one emitted
+            if (this.buffer.length - lastBuffer > 1) {
+                // add final )
+                this.addBuffer( NewPlToken(PlTokenType.RPAREN, ")", this.currentFileInfo(1)));
+                // return/add initial (
+                return NewPlToken(PlTokenType.LPAREN, "(", info);
+            }
+
+            // return the only one string segment
+            return this.buffer.pop();
         }
 
         // variables
