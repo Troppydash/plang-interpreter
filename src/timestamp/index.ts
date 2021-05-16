@@ -1,1 +1,0 @@
-export const timestamp = '2021-05-15T11:24:22.607Z';
