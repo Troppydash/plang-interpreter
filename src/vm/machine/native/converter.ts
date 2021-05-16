@@ -10,10 +10,55 @@ import {
     PlStuffTypeToString
 } from "../stuff";
 import { PlInstance, PlType } from "../memory";
+import { StackMachine } from "../index";
 
 export namespace PlConverter {
+    const VERSION = 1;
+
+    function instanceToJs(instance: PlInstance, sm: StackMachine) {
+        const out = {};
+        Object.entries(instance.value).forEach(([key, value]) => {
+            out[key] = PlToJs(value as PlStuff, sm);
+        });
+
+        // custom js instance format
+        return {
+            _version: VERSION,
+            type: instance.type,
+            value: out
+        };
+    }
+
+    function jsIsInstance(js: object): boolean {
+        if ("_version" in js) {
+            switch (js["_version"]) {
+                case 1:
+                    if ("type" in js && typeof js["type"] == "string") {
+                        if ("value" in js && typeof js["value"] === 'object' &&  js["value"] !== null) {
+                            return true;
+                        }
+                    }
+                    return false;
+                default:
+                    return false;
+            }
+        }
+        return false;
+    }
+
+    function jsToInstance(js: object, sm: StackMachine): PlStuff {
+        const out = {};
+        for (const [key, value] of Object.entries(js["value"])) {
+            out[key] = JsToPl(value, sm);
+        }
+        return NewPlStuff(PlStuffType.Inst, {
+            type: js["type"],
+            value: out
+        } as PlInstance);
+    }
+
     // plang type to js type
-    export function PlToJs(object: PlStuff, runFunction: Function): any {
+    export function PlToJs(object: PlStuff, sm: StackMachine): any {
         switch (object.type) {
             case PlStuffType.Str: {
                 return object.value;
@@ -31,30 +76,27 @@ export namespace PlConverter {
                 return null;
             }
             case PlStuffType.List: {
-                return object.value.map(v => PlToJs(v, runFunction));
+                return object.value.map(v => PlToJs(v, sm));
             }
             case PlStuffType.Inst: {
-                const out = {};
-                Object.entries(object.value.value).forEach(([key, value]) => {
-                    out[key] = PlToJs(value as PlStuff, runFunction);
-                });
-                return out;
+                const value = object.value as PlInstance;
+                return instanceToJs(value, sm);
             }
             case PlStuffType.Dict: {
                 const out = {};
                 Object.entries(object.value).forEach(([key, value]) => {
-                    out[key] = PlToJs(value as PlStuff, runFunction);
+                    out[key] = PlToJs(value as PlStuff, sm);
                 });
                 return out;
             }
             case PlStuffType.NFunc: {
                 return function(...args) {
-                    return PlToJs(object.value.native(...args.map(a => JsToPl(a, runFunction))), runFunction);
+                    return PlToJs(object.value.native(...args.map(a => JsToPl(a, sm))), sm);
                 };
             }
             case PlStuffType.Func: {
                 return (...args) => {
-                    return PlToJs(runFunction(object, args.map(arg => JsToPl(arg, runFunction))), runFunction);
+                    return PlToJs(sm.runFunction(object, args.map(arg => JsToPl(arg, sm))), sm);
                 };
             }
         }
@@ -62,7 +104,7 @@ export namespace PlConverter {
     }
 
     // js type to plang type
-    export function JsToPl(object: any, runFunction: Function): PlStuff {
+    export function JsToPl(object: any, sm: StackMachine): PlStuff {
         switch (typeof object) {
             case "number": {
                 return NewPlStuff(PlStuffType.Num, object);
@@ -79,7 +121,7 @@ export namespace PlConverter {
             case "function": {
                 return NewPlStuff(PlStuffType.NFunc, {
                     native: function (...args) {
-                        return JsToPl(object.bind(this)(...args.map(a => PlToJs(a, runFunction))), runFunction);
+                        return JsToPl(object.bind(this)(...args.map(a => PlToJs(a, sm))), sm);
                     },
                     name: "native"
                 });
@@ -92,11 +134,16 @@ export namespace PlConverter {
                     return PlStuffNull;
                 }
                 if (Array.isArray(object)) {
-                    return NewPlStuff(PlStuffType.List, object.map(i => JsToPl(i, runFunction)));
+                    return NewPlStuff(PlStuffType.List, object.map(i => JsToPl(i, sm)));
                 }
+
+                if (jsIsInstance(object)) {
+                    return jsToInstance(object, sm);
+                }
+
                 const obj = {};
                 for (const [key, value] of Object.entries(object)) {
-                    obj[key] = JsToPl(value, runFunction);
+                    obj[key] = JsToPl(value, sm);
                 }
                 return NewPlStuff(PlStuffType.Dict, obj);
             }
@@ -105,7 +152,7 @@ export namespace PlConverter {
     }
 
     // Plang Type To Plang Type
-    export function PlToPl(source: PlStuff, target: string): PlStuff {
+    export function PlToPl(source: PlStuff, target: string, sm: StackMachine): PlStuff {
         const sourceStr = PlStuffGetType(source);
         const targetStr = target;
         if (sourceStr == targetStr) {
@@ -179,27 +226,25 @@ export namespace PlConverter {
                 return NewPlStuff(PlStuffType.Num, num);
             }
             case PlStuffType.Str: {
-                return NewPlStuff(PlStuffType.Str, PlActions.PlToString(source));
+                return NewPlStuff(PlStuffType.Str, PlToString(source, sm));
             }
         }
 
         return PlStuffNull;
     }
-}
 
-export namespace PlActions {
     // to string
-    export function PlToString(object: PlStuff, quote: boolean = false): string {
+    export function PlToString(object: PlStuff, sm: StackMachine, quote: boolean = false): string {
         switch (object.type) {
             case PlStuffType.Bool:
                 return object.value ? "true" : "false";
             case PlStuffType.Dict:
-                return `dict(${Object.entries(object.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToString(value, true)}`).join(', ')})`;
+                return `dict(${Object.entries(object.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToString(value, sm,true)}`).join(', ')})`;
             case PlStuffType.NFunc:
             case PlStuffType.Func:
                 return "[function]";
             case PlStuffType.List:
-                return `list(${object.value.map(v => PlToString(v, true)).join(', ')})`;
+                return `list(${object.value.map(v => PlToString(v, sm, true)).join(', ')})`;
             case PlStuffType.Null:
                 return "null";
             case PlStuffType.Num:
@@ -210,12 +255,23 @@ export namespace PlActions {
                 }
                 return object.value;
             case PlStuffType.Type:
-                return PlStuffGetType(object);
-            case PlStuffType.Inst:
-                return `${(object.value as PlInstance).type}(${Object.entries(object.value.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToString(value, true)}`).join(', ')})`
+                return PlStuffGetType(object); // TODO: Do the same here as with instances
+            case PlStuffType.Inst: {
+                let fn;
+                if ((fn = sm.findFunction("str", object))) {
+                    const out = sm.runFunction(fn, [object]);
+                    return PlToString(out, sm, quote);
+                } else {
+                    return `${(object.value as PlInstance).type}(${Object.entries(object.value.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToString(value, sm, true)}`).join(', ')})`
+                }
+            }
         }
         throw new Error(`PlActions.PlToString failed to match object of type ${PlStuffTypeToString(object.type)}`);
     }
+}
+
+export namespace PlActions {
+
 
     // shallow copying
     export function PlCopy(object: PlStuff): PlStuff {

@@ -190,6 +190,7 @@ const hints: Record<PlProblemCode, string> = {
     ET0046: "",
     ET0047: "",
 
+
     CE0001: "did you forget to close a block?",
     CE0002: "did you forget to close a group?",
     CE0003: "did you forget to close a dict?",
@@ -225,7 +226,7 @@ const hints: Record<PlProblemCode, string> = {
     RE0014: "a boolean is expected here, check if the expression returns a true or a false",
     RE0015: "a number is expected here, check if the expression returns a number",
     RE0016: "only a value that contain the '.iter' type function can be used in a each..of loop, is the value a list or a dictionary?",
-    RE0017: "maybe check if the expression returns a boolean value?"
+    RE0017: "maybe check if the expression returns a boolean value?",
 }
 
 const problemFullName = {

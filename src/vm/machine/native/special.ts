@@ -3,7 +3,7 @@ import { NewPlStuff, PlStuff, PlStuffNull, PlStuffType } from "../stuff";
 import { AssertTypeof, GenerateGuardedFunction, GenerateJsGuardedFunction } from "./helpers";
 import { StackMachine } from "../index"; // Hopefully this doesn't cause a circular dependency problem
 import { MakeNoTypeFunctionMessage } from "./messeger";
-import PlToString = PlActions.PlToString;
+import PlToString = PlConverter.PlToString;
 
 export const jsSpecial = {
     "range": function (start, end, step) {
@@ -84,7 +84,7 @@ export const special = {
         return NewPlStuff(PlStuffType.List, out);
     }),
     "ask": function ( this: StackMachine, ...message: any) {
-        const str = this.inout.input(message.map(m => PlActions.PlToString(m)).join('\n'));
+        const str = this.inout.input(message.map(m => PlToString(m, this)).join('\n'));
         if (str == null) {
             return PlStuffNull;
         }
@@ -117,8 +117,8 @@ export const special = {
             throw new Error(`[Javascript ${e.name}] ${e.message}`);
         }
     }),
-    "panic": ( ...message: PlStuff[]) => {
-        throw new Error(message.map(m => PlToString(m)).join(' '));
+    "panic": function( ...message: PlStuff[]) {
+        throw new Error(message.map(m => PlToString(m, this)).join(' '));
     },
     "locals": GenerateGuardedFunction("locals", [], function (this: StackMachine) {
         const obj = this.stackFrame.values;
@@ -128,20 +128,7 @@ export const special = {
         if (message.length == 0) {
             this.inout.print('\n');
         } else {
-            const machine = this;
-            let toStr = (obj) => {
-                const fn = machine.findFunction("str", obj);
-                if (fn == null) {
-                    return PlActions.PlToString(obj);
-                }
-                const out = machine.runFunction(fn, [obj]);
-                if (out.type == PlStuffType.Str) {
-                    return out.value;
-                }
-                return toStr(out);
-            }
-
-            const combined = message.map(mess => toStr(mess)).join(' ');
+            const combined = message.map(mess => PlToString(mess, this)).join(' ');
             this.inout.print(combined);
         }
         return PlStuffNull;

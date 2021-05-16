@@ -13,7 +13,7 @@ import JsToPl = PlConverter.JsToPl;
 
 export function AssertTypeof(name: string, got: any, expected: TypeofTypes, position: number = 1) {
     if (typeof got != expected) {
-        throw new Error(MakeTypeMessage(name, PlStuffTypeFromJsString(expected), JsToPl(got, ()=>{}), position));
+        throw new Error(MakeTypeMessage(name, PlStuffTypeFromJsString(expected), JsToPl(got, null), position));
     }
 }
 
@@ -26,7 +26,7 @@ export function AssertType(name: string, got: PlStuff, expected: PlStuffType, po
 export function AssertOperatorsSide(name: string, closure: Function) {
     return (l, r) => {
         if (typeof l != typeof r) {
-            throw new Error(MakeOperatorMessage(name, JsToPl(l, ()=>{}).type, JsToPl(r, ()=>{}).type));
+            throw new Error(MakeOperatorMessage(name, JsToPl(l, null).type, JsToPl(r, null).type));
         }
         return closure(l, r);
     }

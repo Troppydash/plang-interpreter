@@ -1,25 +1,25 @@
 import {ScrambleType} from "../../scrambler";
 import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../../stuff";
 import {GenerateGuardedTypeFunction, GenerateJsGuardedTypeFunction} from "../helpers";
-import {PlActions} from "../converter";
+import { PlActions, PlConverter } from "../converter";
 import {MakeNotFoundMessage} from "../messeger";
-import PlToString = PlActions.PlToString;
+import PlToString = PlConverter.PlToString;
 
 export const dict = {
     [ScrambleType("get", PlStuffType.Dict)]: GenerateGuardedTypeFunction("get", ["*"], function ( self: PlStuff, key: PlStuff) {
-        const skey = PlToString(key);
+        const skey = PlToString(key, this);
         if (skey in self.value) {
             return self.value[skey];
         }
         throw new Error(MakeNotFoundMessage("get", PlStuffType.Dict, skey));
     }),
     [ScrambleType("set", PlStuffType.Dict)]: GenerateGuardedTypeFunction("set", ["*", "*"], function ( self: PlStuff, key: PlStuff, value: PlStuff) {
-        const skey = PlToString(key);
+        const skey = PlToString(key, this);
         self.value[skey] = value;
         return self;
     }),
     [ScrambleType("delete", PlStuffType.Dict)]: GenerateGuardedTypeFunction("delete", ["*"], function ( self: PlStuff, key: PlStuff) {
-        const skey = PlToString(key);
+        const skey = PlToString(key, this);
         if (skey in self.value) {
             delete self.value[skey];
             return self;
@@ -31,7 +31,7 @@ export const dict = {
     }),
     [ScrambleType("have", PlStuffType.Dict)]: GenerateGuardedTypeFunction("have", ["*"], function ( self: PlStuff, value: PlStuff) {
         for (const key of Object.keys(self.value)) {
-            if (key == PlToString(value)) {
+            if (key == PlToString(value, this)) {
                 return PlStuffTrue;
             }
         }

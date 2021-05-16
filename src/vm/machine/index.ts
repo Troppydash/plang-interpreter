@@ -605,7 +605,7 @@ export class PlStackMachine implements StackMachine {
                                     }
 
                                     // convert to type
-                                    this.pushStack(PlConverter.PlToPl(got, value.type));
+                                    this.pushStack(PlConverter.PlToPl(got, value.type, this));
                                     break;
                                 }
 

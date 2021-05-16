@@ -23,13 +23,13 @@ export const all = {
     })),
     /// TYPES
     ...GenerateForAll("bool", GenerateGuardedTypeFunction("bool", [], function(self) {
-        return PlConverter.PlToPl(self, "Bool")
+        return PlConverter.PlToPl(self, "Bool", this)
     })),
     ...GenerateForAll("str", GenerateGuardedTypeFunction("str", [], function(self) {
-        return PlConverter.PlToPl(self, "Str")
+        return PlConverter.PlToPl(self, "Str", this)
     })),
     ...GenerateForSome("num", [PlStuffType.Bool, PlStuffType.Str, PlStuffType.Null, PlStuffType.Num], GenerateGuardedTypeFunction("num", [], function(self) {
-        return PlConverter.PlToPl(self, "Num");
+        return PlConverter.PlToPl(self, "Num", this);
     })),
     ...GenerateForAll("type", GenerateGuardedTypeFunction("type", [], (object: PlStuff) => {
         if (object.type == PlStuffType.NFunc) {

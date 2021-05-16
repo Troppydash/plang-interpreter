@@ -345,8 +345,9 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
         return programBuilder.toProgram();
     } else if ( node instanceof ASTImpl ) {
         programBuilder
-            .addBytecode(NewBytecode( PlBytecodeType.DEFVAR, node.target.content ))
-        // TODO: this is risky as it doesn't assert that such target type exist
+            .addBytecode(NewBytecode(PlBytecodeType.DEFVAR, node.target.content ))
+            .addBytecode(NewBytecode(PlBytecodeType.STKPOP))
+            .addStretch(node.target);
 
         const block = makePureBlock( node.block );
         node.args.reverse();
