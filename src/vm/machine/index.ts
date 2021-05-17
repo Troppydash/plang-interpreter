@@ -67,7 +67,7 @@ export class PlStackMachine implements StackMachine {
     program: PlProgramWithDebug | null;
     pointer: number;
 
-    constructor( inout: PlInout, global: Record<string, PlStuff> = {} ) {
+    constructor( inout: PlInout, args: string[] = []) {
         this.inout = inout;
 
         this.stackFrame = new PlStackFrame( null, NewPlTraceFrame( "file" ) );
@@ -76,7 +76,7 @@ export class PlStackMachine implements StackMachine {
         this.program = { program: [], debug: [] };
         this.rearm();
 
-        this.seedFrame( global );
+        this.seedFrame( args );
     }
 
 
@@ -200,7 +200,7 @@ export class PlStackMachine implements StackMachine {
         return out;
     }
 
-    seedFrame( global: Record<string, PlStuff> ) {
+    seedFrame( args: string[] ) {
         for ( const [ key, entry ] of Object.entries( jsNatives ) ) {
             const pl = PlConverter.JsToPl( entry, this.runFunction.bind( this ) );
             pl.value.name = UnscrambleFunction( key )[1];
@@ -227,12 +227,12 @@ export class PlStackMachine implements StackMachine {
             );
         }
 
-        for ( const [ key, entry ] of Object.entries( global ) ) {
-            this.stackFrame.createValue(
-                key,
-                entry
-            );
-        }
+        this.stackFrame.createValue(
+            "plang",
+            PlConverter.JsToPl({
+                arguments: args
+            }, null)
+        )
 
         // types
         for (const key of PlStuffTypes) {

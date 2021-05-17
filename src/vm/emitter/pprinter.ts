@@ -2,7 +2,7 @@ import {BytecodeToString, PlProgram} from "./bytecode";
 import {PlDebugToString} from "./debug";
 import { PlProgramWithDebug } from "./index";
 
-export function ProgramWithDebugToString(program: PlProgramWithDebug): string {
+export function PrettyPrintProgram( program: PlProgramWithDebug): string {
     let bytecodes = ProgramToString(program.program).split('\n');
 
     // pad bytecode

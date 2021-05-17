@@ -1,24 +1,19 @@
 import { CliError, NewCliError } from "./error";
+import { CLI_FLAGS, MatchFlag, MatchPrefix } from "./options";
 
 type CliRaw = string;
-
-// run: what mode to run
-// op: options
-const FLAGS = ["run-demo", "run-repl", "run-parser", "run-emitter"] as const;
-type CliFlag = typeof FLAGS[number];
-
-
+type CliFlag = typeof CLI_FLAGS[number];
 type CliOption = {
     key: string;
     value: string;
 }
 
 export class CliArguments {
-    raw: CliRaw[];
-    flags: CliFlag[];
-    options: CliOption[];
+    readonly raw: CliRaw[];
+    readonly flags: CliFlag[];
+    readonly options: CliOption[];
 
-    error: CliError | null;
+    readonly error: CliError | null;
 
     constructor(error: CliError | null, raw: CliRaw[] = [], flags: CliFlag[] = [], options: CliOption[] = []) {
         this.raw = raw;
@@ -36,37 +31,66 @@ export class CliArguments {
         return this.error;
     }
 
+    getArgSize(): number {
+        return this.raw.length;
+    }
+
+    getArgFirst(): CliRaw {
+        return this.raw[0];
+    }
+
+    getArgRest(): CliRaw[] {
+        return this.raw.slice(1);
+    }
+
     /**
      * Takes process.args as parameter, return a structure containing flags, options, and raw values
      * @param args List of string arguments
      * @return A CliArgument structure
      */
     static Parse(args: string[]): CliArguments {
+        /**
+         *  How it would parse
+         *  It will parse for flags until one fail to match
+         *  Then all raw
+         */
+
+        let parsingRaw = false;
         const raw = [], flags = [], options = [];
 
-        for (let i = 2; i < args.length; i++) {
+        for (let i = 0; i < args.length; i++) {
             let arg = args[i];
-            if (arg.startsWith("--")) {
-                arg = arg.substring(2);
-                const eq = arg.indexOf("=");
-                if (eq == -1) {
-                    // no =, flag it is
-                    if (FLAGS.includes(arg as any)) {
-                        flags.push(arg);
-                        continue;
-                    }
-                    return new CliArguments(NewCliError(i, `flag '${arg}' is not a valid flag`));
-                }
+            if (parsingRaw) {
+                raw.push(arg);
+                continue;
+            }
 
-                // parse option
-                const key = arg.substring(0, eq);
-                const value = arg.substring(eq);
+            if (!arg.startsWith("--")) {
+                raw.push(arg);
+                parsingRaw = true;
+                continue;
+            }
+
+            const flag = MatchPrefix(arg.substring(2));
+            if (flag == null) {
+                raw.push(arg);
+                parsingRaw = true;
+                continue;
+            }
+
+            const index = flag.indexOf("=");
+            if (index == -1 ) {
+                if (MatchFlag(flag)) {
+                    flags.push(flag);
+                } else {
+                    return new CliArguments(NewCliError(i, `there is no flag called '${arg}'`));
+                }
+            } else {
+                const key = arg.substring(0, index);
+                const value = arg.substring(index);
                 options.push({
                     key, value
                 });
-            } else {
-                // parse raw
-                raw.push(arg);
             }
         }
 

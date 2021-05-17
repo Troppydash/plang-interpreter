@@ -7,10 +7,8 @@ import {ASTProgram} from "../compiler/parsing/ast";
 import {PlAstParser} from "../compiler/parsing";
 import {PlProblem} from "../problem/problem";
 import { EmitProgram, PlProgramWithDebug } from "../vm/emitter/";
-import {ProgramWithDebugToString} from "../vm/emitter/pprinter";
 import {PlStackMachine} from "../vm/machine";
 import {StartInteractive} from "../problem/interactive";
-import { AttemptPrettyPrint } from "../compiler/parsing/visualizer";
 
 
 export function RunParser(file: PlFile): ASTProgram | null {
@@ -75,7 +73,7 @@ export function RunOnce(vm: PlStackMachine, file: PlFile) {
     return vm.popStack();
 }
 
-export async function RunVM(file: PlFile) {
+export async function RunVM(file: PlFile, args: string[]): Promise<number> {
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
     const ast = parser.parseAll();
@@ -92,7 +90,7 @@ export async function RunVM(file: PlFile) {
             inout.print(message);
             inout.flush();
         }
-    });
+    }, args);
 
     vm.addProgram(program);
     const out = vm.runProgram();
@@ -103,17 +101,16 @@ export async function RunVM(file: PlFile) {
 
         // fancy
         if (ok && trace.length > 1) {
-            // const answer = inout.input(`${colors.magenta("Start the interactive frame viewer?")} [${colors.green('y')}/n]: `);
-            // if (answer == 'n' || answer == null) {
-            //     return null;
-            // }
             await StartInteractive(file.content, problems, trace);
         }
 
         return null;
     }
     inout.flush();
-    return out;
+
+    if (typeof out.value == "number")
+        return out.value;
+    return 0;
 }
 
 export function ReadFile(filePath: string): PlFile | null {
@@ -123,14 +120,10 @@ export function ReadFile(filePath: string): PlFile | null {
     const filename = path.basename(filePath);
     const content = inout.readFile(filename, "rootPath");
     if (content === null) {
-        inout.print(`Cannot read file ${filePath}: file doesn't exist or can't be read`);
+        inout.print(`Cannot read file '${filePath}'`);
+        inout.print(`Reason: file doesn't exist or can't be read`);
         inout.flush();
         return null;
     }
     return NewPlFile(filename, content);
-}
-
-export async function RunFile(file: PlFile): Promise<number> {
-    await RunVM(file);
-    return 0;
 }

@@ -5,20 +5,21 @@
 // Starting repl
 import { StartREPL } from "./repl";
 import inout, { isNode } from "./inout";
-import { ReadFile, RunEmitter, RunFile, RunParser } from "./linking";
+import { ReadFile, RunEmitter, RunParser, RunVM } from "./linking";
 import { CliArguments } from "./cli";
 import { CliHandleMagicFlags } from "./cli/magic";
 import { LogCliError } from "./cli/error";
-import { AttemptPrettyPrint } from "./compiler/parsing/visualizer";
-import { ProgramWithDebugToString } from "./vm/emitter/pprinter";
+import { PrettyPrintAST } from "./compiler/parsing/visualizer";
+import { PrettyPrintProgram } from "./vm/emitter/pprinter";
 
 // Parse arguments
-const args = CliArguments.Parse(process.argv);
+const striped = process.argv.slice(2);
+const args = CliArguments.Parse(striped);
 
 // Arguments error
 let error;
 if ((error = args.getError()) != null) {
-    LogCliError(process.argv, error);
+    LogCliError(striped, error);
     process.exit(1);
 }
 
@@ -29,28 +30,28 @@ if (!cont) {
 }
 
 
-if (!isNode || args.raw.length == 0 || args.is("run-repl")) { // If running in repl
+if (!isNode || args.getArgSize() == 0 || args.is("run-repl")) { // If running in repl
     const result = StartREPL("repl");
     process.exit(result);
 } else { // Else if running a file
-    const filePath = args.raw[0];
+    const filePath = args.getArgFirst();
     const file = ReadFile(filePath);
     if (file == null) {
         process.exit(1);
     }
 
     // Different modes
-    if (args.is("run-parser")) {
+    if (args.is("run-compiler")) {
         const out = RunParser(file);
         if (out != null) {
-            inout.print(AttemptPrettyPrint(RunParser(file)));
+            inout.print(PrettyPrintAST(RunParser(file)));
         }
         process.exit(0);
     }
     if (args.is("run-emitter")) {
         const out = RunEmitter(file);
         if (out != null) {
-            inout.print(ProgramWithDebugToString(out));
+            inout.print(PrettyPrintProgram(out));
             inout.print(`Emitted ${out.program.length} instructions, with ${out.debug.length} debug messages`);
         }
         process.exit(0);
@@ -58,7 +59,7 @@ if (!isNode || args.raw.length == 0 || args.is("run-repl")) { // If running in r
 
     // Default run vm
     (async () => {
-        const result = await RunFile(file);
+        const result = await RunVM(file, args.getArgRest());
         process.exit(result);
     })();
 }

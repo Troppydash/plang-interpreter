@@ -2,17 +2,15 @@ import inout, { isNode } from "../inout";
 import { RunOnce, TryRunParser} from "../linking";
 import { LogProblemShort } from "../problem/printer";
 import { colors } from "../inout/color";
-import { PlActions, PlConverter } from "../vm/machine/native/converter";
+import { PlConverter } from "../vm/machine/native/converter";
 import {PlStackMachine} from "../vm/machine";
 import { NewPlFile } from "../inout/file";
 import { timestamp } from "../timestamp";
 import PlLexer from "../compiler/lexing";
 import {PlAstParser} from "../compiler/parsing";
-import {ReportProblems} from "../problem";
 import {EmitProgram} from "../vm/emitter";
-import {StartInteractive} from "../problem/interactive";
-import {AttemptPrettyPrint} from "../compiler/parsing/visualizer";
-import {ProgramWithDebugToString} from "../vm/emitter/pprinter";
+import {PrettyPrintAST} from "../compiler/parsing/visualizer";
+import { PrettyPrintProgram } from "../vm/emitter/pprinter";
 
 export function GetLine(filename: string): string | null {
     let content = "";
@@ -139,13 +137,13 @@ export function StartDemo(filename: string): number {
             continue;
         }
         inout.print("[Display] Printing Parser output");
-        inout.print(AttemptPrettyPrint(ast));
+        inout.print(PrettyPrintAST(ast));
         inout.print('');
 
         inout.print("[Running] Emitting bytecodes...");
         const program = EmitProgram(ast);
         inout.print("[Display] Printing bytecodes");
-        inout.print(ProgramWithDebugToString(program));
+        inout.print(PrettyPrintProgram(program));
         inout.print('');
 
         inout.print("[Running] Executing Virtual Machine");
@@ -154,16 +152,19 @@ export function StartDemo(filename: string): number {
         const result = vm.runProgram();
         if (result == null) {
             inout.print("[Error] VM error found, try again?");
+            vm.rearm();
             continue;
         }
 
         const out = vm.popStack();
+        let str = "empty";
         if (out != null) {
-            inout.print("[Display] Printing expression result");
-            inout.print(`${' '.repeat(filename.length)}> ${PlConverter.PlToString(out, vm)}`);
-        } else {
-            inout.print("[Error] Evaluating returned null, try again?");
+            str = PlConverter.PlToString(out, vm);
         }
+
+        inout.print("[Display] Printing expression result");
+        inout.print(`${' '.repeat(filename.length)}> ${str}`);
+
         vm.rearm();
     }
 
