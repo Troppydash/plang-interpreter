@@ -1,6 +1,7 @@
 import { CliArguments } from "./index";
 import {StartDemo} from "../repl";
 import inout from "../inout";
+import {colors} from "../inout/color";
 
 export function CliHandleMagicFlags(args: CliArguments): boolean {
 
@@ -8,7 +9,12 @@ export function CliHandleMagicFlags(args: CliArguments): boolean {
         const exe = process.platform == "win32" ? "plang.exe" : "./plang";
         inout.print(`Usage: ${exe} ...flags [file] ...program_arguments
 
-Flags (all flags begin with --pl-)
+${colors.cyan('Examples')}
+${exe} code.plang               ~ Run the file called [code.plang]
+${exe}                          ~ Start the repl
+${exe} --run-emitter code.plang ~ Run the file called [code.plang] with the emitter only 
+
+${colors.cyan('Flags')} (all flags begin with --)
 help            ~ Show this message
 run-repl        ~ Start the repl (default method if no [file] is supplied
 run-demo        ~ Start the repl in demo mode

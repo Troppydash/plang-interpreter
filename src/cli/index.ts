@@ -65,13 +65,13 @@ export class CliArguments {
                 continue;
             }
 
-            if (!arg.startsWith("--")) {
-                raw.push(arg);
-                parsingRaw = true;
-                continue;
-            }
+            // if (!arg.startsWith("--")) {
+            //     raw.push(arg);
+            //     parsingRaw = true;
+            //     continue;
+            // }
 
-            const flag = MatchPrefix(arg.substring(2));
+            const flag = MatchPrefix(arg);
             if (flag == null) {
                 raw.push(arg);
                 parsingRaw = true;

@@ -30,6 +30,6 @@ export function LogCliError(args: string[], error: CliError) {
 
     inout.print('');
     const exe = process.platform == "win32" ? "plang.exe" : "./plang";
-    inout.print(`${colors.yellow('Tip')}: run '${exe} --pl-help' to see the correct usages`);
+    inout.print(`${colors.yellow('Tip')}: run '${exe} --help' to see the correct usages`);
     inout.print(`${colors.cyan('Reason')}: ${reason}`);
 }

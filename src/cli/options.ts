@@ -1,4 +1,4 @@
-export const CLI_PREFIX = "pl-"; // unchanged cli argument prefix
+export const CLI_PREFIX = "--"; // unchanged cli argument prefix
 
 
 // run: what mode to run
