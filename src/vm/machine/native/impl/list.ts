@@ -4,6 +4,8 @@ import { AssertType, GenerateGuardedTypeFunction, GenerateJsGuardedTypeFunction 
 import { equals } from "../operators";
 import { MakeNoTypeFunctionMessage, MakeOutOfRangeMessage } from "../messeger";
 import { StackMachine } from "../../index";
+import { PlConverter } from "../converter";
+import PlToString = PlConverter.PlToString;
 
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 function shuffle(array) {
@@ -115,6 +117,12 @@ export const list = {
 
         list.splice(idx, 1);
         return list;
+    }),
+    [ScrambleType("join", PlStuffType.List)]: GenerateGuardedTypeFunction("join", [PlStuffType.Str], function ( this: StackMachine, self: PlStuff, sep: PlStuff ) {
+        const strs = self.value.map(item => {
+            return PlToString(item, this);
+        });
+        return NewPlStuff(PlStuffType.Str, strs.join(sep.value));
     }),
     [ScrambleType("sort", PlStuffType.List)]: GenerateGuardedTypeFunction("sort", [], function(this: StackMachine, self: PlStuff) {
         self.value.sort((l, r) => {

@@ -27,12 +27,17 @@ export const jsSpecial = {
             start = step = 1;
         }
 
+        let forward = true;
+        if (step < 0) {
+            forward = false;
+        }
+
         let current = start;
         return {
             iter: () => {
                 return {
                     next: () => {
-                        if (current > end) {
+                        if (forward ? current > end : current < end) {
                             return [[null, null], false];
                         }
                         const out = [[current, current], true];

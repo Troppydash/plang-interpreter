@@ -255,7 +255,7 @@ export namespace PlConverter {
                 }
                 return object.value;
             case PlStuffType.Type:
-                return PlStuffGetType(object); // TODO: Do the same here as with instances
+                return PlStuffGetType(object);
             case PlStuffType.Inst: {
                 let fn;
                 if ((fn = sm.findFunction("str", object))) {

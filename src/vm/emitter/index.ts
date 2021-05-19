@@ -209,16 +209,6 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
             programBuilder.addEmpty();
         }
 
-        // const content = node.variable.content;
-        // TODO: put this in the parser instead
-        // if ( content[0] == '@' && content.length > 1 ) {
-        //     node.variable.content = content.substring( 1 )
-        //     programBuilder.addBytecode( makeVariable( node.variable ) );
-        //     programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOCRET ), node );
-        // } else {
-        //     programBuilder.addBytecode( makeVariable( node.variable ) );
-        //     programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOASGN ), node );
-        // }
         programBuilder.addBytecode( makeVariable( node.variable ) );
         programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOASGN ), node );
         return programBuilder.toProgram();
@@ -587,7 +577,7 @@ function traverseAST( node: ASTNode ): PlProgramWithDebug {
         let value = null;
         if ( node.value ) {
             value = new ASTVariable( [], MATCH_VALUE );
-            const assignment = new ASTAssign( [], undefined, value, node.value );
+            const assignment = new ASTCreate( [], undefined, value, node.value );
             programBuilder
                 .addBytecode( NewBytecode( PlBytecodeType.STKENT ) )
                 .addPWD( traverseAST( assignment ) )

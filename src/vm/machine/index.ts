@@ -490,8 +490,7 @@ export class PlStackMachine implements StackMachine {
                     case PlBytecodeType.DONEGT: {
                         const value = this.popStack();
                         if ( value.type == PlStuffType.Num ) {
-                            value.value = -value.value;
-                            this.pushStack( value );
+                            this.pushStack(NewPlStuff(PlStuffType.Num, -value.value)); // gotta make a new object
                             break;
                         }
                         this.newProblem( "RE0005", this.pointer, debug, PlStuffGetType( value ) );

@@ -10,7 +10,7 @@ import { ExportJs, ExportNative } from "./types";
 
 export function equals(l: PlStuff, r: PlStuff) {
     if (l.type != r.type) {
-        return PlStuffFalse;
+        return false;
     }
 
     // assume that l and r are the same type
