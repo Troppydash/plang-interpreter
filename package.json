@@ -19,7 +19,7 @@
       "node12-linux-x64"
     ],
     "outputPath": "dist",
-    "assets": "node_modules/blessed/**/*"
+    "assets": ["node_modules/blessed/**/*", "node_modules/deasync/**/*"]
   },
   "bin": "./out/index.js",
   "keywords": [],
@@ -33,6 +33,8 @@
   },
   "dependencies": {
     "blessed": "^0.1.81",
+    "deasync": "^0.1.21",
+    "node-fetch": "^2.6.1",
     "prompt-sync": "^4.2.0",
     "prompt-sync-history": "^1.0.1"
   }

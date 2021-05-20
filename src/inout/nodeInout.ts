@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as ps from 'prompt-sync';
 import * as psh from 'prompt-sync-history';
 import {PlConverter} from "../vm/machine/native/converter";
+import { MaskedEval } from "./proxy";
 
 function complete( commands ) {
     return function ( str ) {
@@ -60,17 +61,8 @@ export function readFile( filePath: string, type: PathType ) {
     }
 }
 
-
-function maskedEval( src, ctx = {} ) {
-    ctx = new Proxy( ctx, {
-        has: () => true
-    } )
-    let func = (new Function( "with(this) { " + src + "}" ));
-    func.call( ctx );
-}
-
 export function execute(code: string, vars: Record<string, any>): void {
-    maskedEval(code, {
+    MaskedEval(code, {
         console,
         Math,
         Date,
@@ -89,6 +81,7 @@ export function execute(code: string, vars: Record<string, any>): void {
         JSON,
         Promise,
         require,
+        global,
         ...vars,
     });
 }

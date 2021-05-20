@@ -1,5 +1,6 @@
 import { PathType } from "./path";
 import { PlBuffer } from "./buffer";
+import { MaskedEval } from "./proxy";
 
 
 const buffer = new PlBuffer();
@@ -33,4 +34,29 @@ export function setRootPath(rootFile: string) {
 
 export function readFile(filePath: string, type: PathType) {
     return null;
+}
+
+export function execute(code: string, vars: Record<string, any>): void {
+    MaskedEval(code, {
+        console,
+        Math,
+        Date,
+        Object,
+        Number,
+        Array,
+        String,
+        Function,
+        Boolean,
+        Symbol,
+        Error,
+        BigInt,
+        RegExp,
+        Map,
+        Set,
+        JSON,
+        Promise,
+        document,
+        window,
+        ...vars,
+    });
 }
