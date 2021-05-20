@@ -19,7 +19,10 @@
       "node12-linux-x64"
     ],
     "outputPath": "dist",
-    "assets": ["node_modules/blessed/**/*", "node_modules/deasync/**/*"]
+    "assets": [
+      "node_modules/blessed/**/*",
+      "node_modules/deasync/**/*"
+    ]
   },
   "bin": "./out/index.js",
   "keywords": [],
