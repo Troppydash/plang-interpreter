@@ -60,8 +60,8 @@ interface Parser {
     getProblems(): PlProblem[];
 }
 
-// class PlParser implements Parser {}
 
+// TODO: make this more generic so we don't need an emitter
 // this parser is only an ast parser, the bytecode emitting parser will not make an ast tree
 export class PlAstParser implements Parser {
     readonly lexer: Lexer;
@@ -850,9 +850,9 @@ export class PlAstParser implements Parser {
             }
             if (variable.content.startsWith(CREATE_MAGIC)) {
                 variable.content = variable.content.slice(1);
-                return new ASTAssign( [ peekToken ], pre, variable, value );
+                return new ASTCreate( [ peekToken ], pre, variable, value );
             }
-            return new ASTCreate( [ peekToken ], pre, variable, value );
+            return new ASTAssign( [ peekToken ], pre, variable, value );
         }
 
         return left;
