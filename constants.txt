@@ -1,17 +1,31 @@
 inout/buffer
 MAXBUFFER: maximum buffer size, used for printing buffering
+inout/color
+COLORS: possible printing text colors
+inout/index
+isNode: is the script running in nodejs
 
 problem/printer
 NLINESUP, NLINESDOWN: number of error lines printing that is displayed before the error line and after the error line
 TRACE_MAX: maximum number of callframes to display
+CHARWRAP: maximum length for displaying error messages
+problem/interactive
+TRACE_MAX: maximum number of traces to display at once in interactive mode
 
 compiler/parsing/visualizer:
 PPINDENT: number of spaces when pretty printing an AST
+compiler/parsing/index:
+CREATE_MAGIC: the leading symbol for creating a variable instead of assigning
 
-vm/emitter/index:
+
+vm/emitter/index
 METHOD_SEP: method name scrabbling for impl functions
-ARITY_SEP: function call overloading for all functions
 LOOP_INDEX: name of inaccessible variable for 'loop' and 'each' statements
 EACH_ITER: name of inaccessible variable for 'each' statements
 MATCH_VALUE: name of inaccessible variable for 'match' statements with a value
 
+vm/machine/index
+CTOR_NAME: name of the constructor function
+
+cli/options
+CLI_FLAGS: available cli flags
