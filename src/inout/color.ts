@@ -12,12 +12,9 @@ if (isNode) {
         return obj as { [K in typeof colors[any] | 'grey']: (str: string) => string };
     })(COLORS);
 } else {
-    const nothing = str => str;
-    colors = {
-        'grey': nothing
-    };
-    for (const color of COLORS) {
-        colors[color] = nothing;
+    colors = {};
+    for (const color of [...COLORS, 'grey']) {
+        colors[color] = (str) => `<span\\style='color:${color}'>${str}</span>`;
     }
 }
 

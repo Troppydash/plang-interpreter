@@ -10,7 +10,7 @@ import { CliArguments } from "./cli";
 import { CliHandleMagicFlags } from "./cli/magic";
 import { LogCliError } from "./cli/error";
 import { PrettyPrintAST } from "./compiler/parsing/visualizer";
-import { PrettyPrintProgram } from "./vm/emitter/pprinter";
+import { PrettyPrintProgram } from "./vm/emitter/printer";
 
 // Parse arguments
 const striped = process.argv.slice(2);

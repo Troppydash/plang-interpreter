@@ -1,4 +1,4 @@
-import {escapeString} from "../../extension";
+import {dddString, escapeString} from "../../extension";
 
 export enum PlBytecodeType {
 
@@ -59,6 +59,6 @@ export function NewBytecode(type: PlBytecodeType, value: string | null = null): 
 }
 
 export function BytecodeToString(bc: PlBytecode) {
-    return `${allEnumKeys[bc.type]}` + (bc.value == null ? '' : ` |${escapeString(bc.value)}|`);
+    return `${allEnumKeys[bc.type]}` + (bc.value == null ? '' : ` |${dddString(escapeString(bc.value), 7)}|`);
 }
 

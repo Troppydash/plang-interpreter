@@ -73,6 +73,36 @@ export function RunOnce(vm: PlStackMachine, file: PlFile) {
     return vm.popStack();
 }
 
+export function RunFile(file: PlFile, vm: PlStackMachine) {
+    const lexer = new PlLexer(file);
+    const parser = new PlAstParser(lexer);
+    const ast = parser.parseAll();
+    if (ast == null) {
+        const problems = parser.getProblems();
+        ReportProblems(file.content, problems);
+        return null;
+    }
+
+    const program = EmitProgram(ast);
+    for (const debug of program.debug) {
+        debug.endLine += vm.program.program.length;
+    }
+
+    vm.addProgram(program);
+    const out = vm.runProgram();
+    if (out == null) {
+        const trace = vm.getTrace();
+        const problems = vm.getProblems();
+        ReportProblems(file.content, problems, trace);
+        return 1;
+    }
+    inout.flush();
+
+    if (typeof out.value == "number")
+        return out.value;
+    return 0;
+}
+
 export async function RunVM(file: PlFile, args: string[]): Promise<number> {
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);

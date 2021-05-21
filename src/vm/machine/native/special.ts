@@ -139,6 +139,15 @@ export const special = {
         }
         return PlStuffNull;
     },
+    "log": function( this: StackMachine, ...message: PlStuff[]) {
+        if ( message.length == 0 ) {
+            console.log( '\n' );
+        } else {
+            const combined = message.map( mess => PlToString( mess, this ) ).join( ' ' );
+            console.log( combined );
+        }
+        return PlStuffNull;
+    }
 };
 
 interface FetchOptions {

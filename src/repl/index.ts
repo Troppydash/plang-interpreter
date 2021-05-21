@@ -10,7 +10,7 @@ import PlLexer from "../compiler/lexing";
 import {PlAstParser} from "../compiler/parsing";
 import {EmitProgram} from "../vm/emitter";
 import {PrettyPrintAST} from "../compiler/parsing/visualizer";
-import { PrettyPrintProgram } from "../vm/emitter/pprinter";
+import { PrettyPrintProgram } from "../vm/emitter/printer";
 
 export function GetLine(filename: string): string | null {
     let content = "";
