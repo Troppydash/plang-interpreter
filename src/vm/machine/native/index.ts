@@ -32,5 +32,5 @@ export const natives: ExportNative = {
 export const jsModules: Record<string, any> = {
     ...maths,
     ...time,
-    ...random,
+    ...random
 };

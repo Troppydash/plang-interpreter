@@ -150,18 +150,17 @@ export const special = {
     }
 };
 
+// FETCH STUFF
 interface FetchOptions {
     method: string;
     headers: Record<string, string>;
     body: string;
 }
-
 interface FetchOutput {
     text: string;
     ok: boolean;
     status: number;
 }
-
 function sanitizeOptions(options: object): FetchOptions {
     const method = 'method' in options ? options["method"] : 'GET';
     const headers = 'headers' in options ? options["headers"] : {};
@@ -172,7 +171,6 @@ function sanitizeOptions(options: object): FetchOptions {
         body
     };
 }
-
 function callbackFetch( fetch ) {
     return function ( url, options, callback ) {
         let d;
@@ -197,8 +195,16 @@ function callbackFetch( fetch ) {
             } );
     }
 }
+
+// SELECTOR AND RUNNER STUFF
+interface ExecOutput {
+    ok: boolean;
+    text: string;
+}
+
 if ( isNode ) {
     const deasync = require( 'deasync' );
+
     const fetch = require( 'node-fetch' );
     const syncFetch = deasync( callbackFetch( fetch ) );
 
@@ -206,6 +212,26 @@ if ( isNode ) {
         const opt = sanitizeOptions(options);
         return syncFetch( url, opt );
     } );
+
+
+    // TODO: Add rel path parameter
+    const cp = require('child_process');
+    jsSpecial['$'] = GenerateJsGuardedFunction("$", ["string"], function(command) {
+        try {
+            const out = cp.execSync(command, {
+                stdio: [0, 'pipe', 'pipe']
+            }).toString();
+            return {
+                text: out,
+                ok: true,
+            }
+        } catch ( e ) {
+            return {
+                text: e.toString(),
+                ok: false
+            };
+        }
+    })
 } else {
     jsSpecial['fetch'] = GenerateJsGuardedFunction( 'fetch', [ "string", "object" ], function ( this, url, options: FetchOptions ) {
         const opt = sanitizeOptions(options);

@@ -599,7 +599,7 @@ class PlLexer implements Lexer {
         }
 
         // variables
-        if (isalpha(c) || c === '_' || c === '@') {
+        if (isalpha(c) || c === '_' || c === '@' || c === '$') {
             let content = '';
             const oldCol = this.currentCol;
             do {
