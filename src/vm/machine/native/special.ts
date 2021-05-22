@@ -304,18 +304,13 @@ if (isNode) {
             html() {
                 return result.map(node => node.innerHTML);
             },
-            listen: function(event, callback) {
-                callback();
-                return;
-                console.log("Hi");
+            listen: GenerateJsGuardedFunction("listen", ["string", "function"], function(event, callback) {
                 for (const node of result) {
-                    console.log(node);
                     node.addEventListener(event, (event) => {
-                        console.log(event);
                         callback(event);
                     });
                 }
-            }
+            })
         } as SelectorResult;
     })
 }

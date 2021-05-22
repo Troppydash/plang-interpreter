@@ -90,7 +90,7 @@ export namespace PlConverter {
                 return out;
             }
             case PlStuffType.NFunc: {
-                return function(...args) {
+                return (...args) => {
                     return PlToJs(object.value.native(...args.map(a => JsToPl(a, sm))), sm);
                 };
             }
@@ -120,8 +120,8 @@ export namespace PlConverter {
             }
             case "function": {
                 return NewPlStuff(PlStuffType.NFunc, {
-                    native: function (...args) {
-                        return JsToPl(object.bind(this)(...args.map(a => PlToJs(a, sm))), sm);
+                    native: (...args) => {
+                        return JsToPl(object.bind(sm)(...args.map(a => PlToJs(a, sm))), sm);
                     },
                     name: "native"
                 });

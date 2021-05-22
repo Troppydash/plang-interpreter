@@ -202,7 +202,7 @@ export class PlStackMachine implements StackMachine {
 
     seedFrame( args: string[] ) {
         for ( const [ key, entry ] of Object.entries( jsNatives ) ) {
-            const pl = PlConverter.JsToPl( entry, this.runFunction.bind( this ) );
+            const pl = PlConverter.JsToPl( entry, this );
             pl.value.name = UnscrambleFunction( key )[1];
             this.stackFrame.createValue(
                 key,
@@ -214,7 +214,7 @@ export class PlStackMachine implements StackMachine {
             this.stackFrame.createValue(
                 key,
                 NewPlStuff( PlStuffType.NFunc, {
-                    native: entry,
+                    native: entry.bind(this),
                     name: UnscrambleFunction( key )[1],
                 } as PlNativeFunction )
             );
@@ -223,7 +223,7 @@ export class PlStackMachine implements StackMachine {
         for ( const [ key, entry ] of Object.entries( jsModules ) ) {
             this.stackFrame.createValue(
                 key,
-                PlConverter.JsToPl( entry, this.runFunction.bind( this ) )
+                PlConverter.JsToPl( entry, this )
             );
         }
 
@@ -231,7 +231,7 @@ export class PlStackMachine implements StackMachine {
             "plang",
             PlConverter.JsToPl({
                 arguments: args
-            }, null)
+            }, this)
         )
 
         // types
@@ -650,7 +650,7 @@ export class PlStackMachine implements StackMachine {
                                 const value = func.value as PlNativeFunction;
                                 const stackFrame = this.stackFrame;
                                 try {
-                                    this.pushStack( value.native.bind( this )( ...args ) );
+                                    this.pushStack( value.native( ...args ) );
                                 } catch ( e ) {
                                     // insert stackFrame
                                     if ( stackFrame == this.stackFrame ) {
