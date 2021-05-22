@@ -7,16 +7,20 @@
 <body>
 
 <h1>Look at the prompts</h1>
-
-
-<script type="application/plang">
-    say "Testing"
-</script>
+<div id="test">
+    <p>Hello</p>
+</div>
 
 <script type="application/plang">
-    each i of 12 {
+    say time.measure(func() {
+        say "Hi"
+    })
 
-    }
+    node = $("div#test")
+    node.listen("click", func(event) {
+        say "Hi"
+    })
+
 </script>
 
 

@@ -9,7 +9,7 @@ import {
     PlStuffTypeFromString,
     PlStuffTypeToString
 } from "../stuff";
-import { PlInstance, PlType } from "../memory";
+import { PlInstance } from "../memory";
 import { StackMachine } from "../index";
 
 export namespace PlConverter {

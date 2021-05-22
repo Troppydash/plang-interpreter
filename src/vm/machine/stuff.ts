@@ -37,7 +37,7 @@ export function PlStuffTypeFromJsString(string: TypeofTypes) {
     switch (string) {
         case "boolean":
             return PlStuffType.Bool;
-        case  "function":
+        case "function":
             return PlStuffType.Func;
         case "number":
             return PlStuffType.Num;
