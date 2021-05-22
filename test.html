@@ -6,19 +6,71 @@
 </head>
 <body>
 
-<h1>Look at the prompts</h1>
-<div id="test">
-    <p>Hello</p>
+<div>
+    <h1>Echoing</h1>
+    <p id="output"></p>
+    <form>
+        <input id="input" type="text"/><button type="submit" id="input-button">Add</button>
+    </form>
 </div>
 
-<script type="application/plang">
-    node = $("div#test")
-    node.listen("click", func(event) {
-        say "Hi"
-    })
 
+<!--INTERACTION SOURCE CODE-->
+
+<script type="application/plang">
+    input = $("#input")
+    inputButton = $("#input-button")
+    output = $("#output")
+
+
+    # word typing game
+    height = 50 # height limit
+
+    # state
+    board = list()
+    each _ of range height {
+        board.add ""
+    }
+    stopped = false
+
+    func displayGame() {
+        output.setText board.join("\n")
+    }
+
+    words = list("hello", "world")
+
+    func refresh() {
+        if stopped {
+            return
+        }
+        if board.get height /= "" {
+            stopped = true
+            return
+        }
+
+        newBoard = list("")
+        each word of range board {
+            newBoard.add word
+        }
+        newBoard.pop()
+
+        newBoard.1 = words.get(random.number(words.size()))
+        board = newBoard
+        displayGame()
+    }
+
+    displayGame()
+    # TODO: fix this or something
+    javascript """
+        const refresh = pl.import("refresh");
+        window.setInterval(() => {
+            refresh()
+        }, 1000);
+    """
 </script>
 
+
+<!--THESE ARE ALL FOR LOADING THE PROGRAMMING LANGUAGE-->
 
 <div id="pl-model" style="display:none;top:0;left:0;height: 100vh;width: 100vw;position: absolute;z-index: 99;align-items: center;justify-content: center;background-color: rgba(0, 0, 0, 0.8)"
      onclick="closeModel()">

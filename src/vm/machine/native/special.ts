@@ -294,23 +294,73 @@ if (isNode) {
         html: () => string[];
     }
 
-    jsSpecial["$"] = GenerateJsGuardedFunction("$", ["string"], function(this, selector) {
-        const result: HTMLElement[] = Array.from(document.querySelectorAll(selector)); // this closure might impact performance, but too bad
-        return {
-            _native() { return result; },
-            text() {
-                return result.map(node => node.innerText ? node.innerText : node.innerHTML);
+    interface ListenCallbackEvent {
+        preventDefault: () => void;
+    }
+
+    jsSpecial["$"] = GenerateJsGuardedFunction("$", ["string"], function (this, selector) {
+        let result: HTMLElement[] = Array.from(document.querySelectorAll(selector)); // this closure might impact performance, but too bad
+        const obj = {
+            _native() {
+                return result;
             },
+            limit: GenerateJsGuardedFunction("limit", ["number"], function (amount) {
+                if (amount >= result.length) {
+                    return obj; // we dont have this as it is the stack machine
+                }
+                result = result.slice(amount);
+                return obj;
+            }),
+            text() {
+                return result.map(node => node.innerText);
+            },
+            setText: GenerateJsGuardedFunction("setText", ["string"], function (text) {
+                result.forEach(node => {
+                    node.innerText = text;
+                })
+                return obj;
+            }),
             html() {
                 return result.map(node => node.innerHTML);
             },
-            listen: GenerateJsGuardedFunction("listen", ["string", "function"], function(event, callback) {
+            setHTML: GenerateJsGuardedFunction("setHTML", ["string"], function (text) {
+                result.forEach(node => {
+                    node.innerHTML = text;
+                })
+                return obj;
+            }),
+            attr: GenerateJsGuardedFunction("attr", ["string"], function(attr) {
+                return result.map(node => node[attr]);
+            }),
+            setAttr: GenerateJsGuardedFunction("attr", ["string", "*"], function(attr, value) {
+                result.forEach(node => node[attr] = value);
+                return obj;
+            }),
+            listen: GenerateJsGuardedFunction("listen", ["string", "function"], function (this: StackMachine, event, callback) {
+                const callPointer = this.pointer; // TODO: this cache of call site pointer is very bad, should fix this at some point
                 for (const node of result) {
-                    node.addEventListener(event, (event) => {
-                        callback(event);
+                    node.addEventListener(event, (event: Event) => {
+                        const oldPointer = this.pointer;
+                        this.pointer = callPointer;
+
+                        const saved = this.saveState();
+                        try {
+                            const e = {
+                                preventDefault: event.preventDefault.bind(event),
+                            } as ListenCallbackEvent;
+                            callback(e);
+                        } catch (e) {
+                            this.restoreState(saved);
+                            const problem = this.problems.pop();
+                            const {row, filename, col, length} = problem.info;
+                            inout.print(`$.listen callback error at '${filename} ${row}:${col-length}': [${problem.code}] ${problem.message}`);
+                            inout.flush();
+                        }
+                        this.pointer = oldPointer;
                     });
                 }
             })
         } as SelectorResult;
+        return obj;
     })
 }

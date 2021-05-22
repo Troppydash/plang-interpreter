@@ -45,6 +45,7 @@ export interface StackMachine {
     problems: PlProblem[];
     readonly inout: PlInout;
     readonly stackFrame: PlStackFrame;
+    pointer : number;
 }
 
 interface StackMachineState {

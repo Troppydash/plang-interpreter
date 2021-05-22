@@ -10,8 +10,12 @@
     "run": "node out/index.js",
     "run-build": "npm run clean && npm run build && npm run run",
     "watch-build": "tsc --watch",
-    "clean": "tsc --build --clean"
+    "clean": "tsc --build --clean",
+    "browser-publish": "npm run build-browser && npm publish"
   },
+  "files": [
+    "out/index.js"
+  ],
   "pkg": {
     "scripts": "out/**/*.js",
     "targets": [

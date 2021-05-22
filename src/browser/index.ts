@@ -25,8 +25,10 @@ const vm = new PlStackMachine({
 for (let i = 0; i < sources.length; i++) {
     const source = sources[i];
     const fn = `${filename}${i+1}`;
+
     const code = RunFile(NewPlFile(fn, source), vm);
-    console.log(`[${fn}] return code: ${code}`);
+    console.debug(`[${fn}] sync return code: ${code}`);
+
     if (code !== 0) {
         break;
     }
