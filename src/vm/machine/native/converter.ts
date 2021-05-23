@@ -11,6 +11,23 @@ import {
 } from "../stuff";
 import { PlInstance } from "../memory";
 import { StackMachine } from "../index";
+import inout from "../../../inout";
+
+function protectPlangCall(callback: Function, sm: StackMachine) {
+    return (...args) => {
+        const saved = sm.saveState();
+        try {
+            return callback(...args);
+        } catch (e) {
+            sm.restoreState(saved);
+            const problem = sm.problems.pop();
+            const {row, filename, col, length} = problem.info;
+            inout.print(`Callback error at '${filename}@${row}:${col-length}'\n[${problem.code}] ${problem.message}`);
+            inout.flush();
+            return null;
+        }
+    }
+}
 
 export namespace PlConverter {
     const VERSION = 1;
@@ -95,9 +112,10 @@ export namespace PlConverter {
                 };
             }
             case PlStuffType.Func: {
-                return (...args) => {
-                    return PlToJs(sm.runFunction(object, args.map(arg => JsToPl(arg, sm))), sm);
-                };
+                const callPointer = sm.pointer;
+                return protectPlangCall((...args) => {
+                    return PlToJs(sm.runFunction(object, args.map(arg => JsToPl(arg, sm)), callPointer), sm);
+                }, sm);
             }
         }
         throw new Error(`PlConvert.PlToJs failed to match object of type ${PlStuffTypeToString(object.type)}`);
@@ -120,7 +138,7 @@ export namespace PlConverter {
             }
             case "function": {
                 return NewPlStuff(PlStuffType.NFunc, {
-                    native: (...args) => {
+                    native:(...args) => {
                         return JsToPl(object.bind(sm)(...args.map(a => PlToJs(a, sm))), sm);
                     },
                     name: "native"

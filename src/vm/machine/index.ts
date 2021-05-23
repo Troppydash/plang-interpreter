@@ -29,13 +29,10 @@ export const CTOR_NAME = "new";
 
 export interface StackMachine {
     findValue( key: string );
-
     createValue( key: string, value: PlStuff );
-
     setValue( key: string, value: PlStuff );
 
-    runFunction( func: PlStuff, args: PlStuff[] ): PlStuff | null;
-
+    runFunction( func: PlStuff, args: PlStuff[], callPointer?: number ): PlStuff | null;
     findFunction(name: string, target?: PlStuff): PlStuff | null;
 
     saveState(): StackMachineState;
@@ -161,9 +158,16 @@ export class PlStackMachine implements StackMachine {
         this.pointer = value.index;
     }
 
-    runFunction( func: PlStuff, args: PlStuff[] ): PlStuff | null {
+    runFunction( func: PlStuff, args: PlStuff[], callPointer?: number ): PlStuff | null {
+        const oldPointer = this.pointer;
+        if (callPointer) {
+            this.pointer = callPointer;
+        }
+
         if (func.type == PlStuffType.NFunc) {
-            return func.value.native(...args);
+            const out = func.value.native(...args);
+            this.pointer = oldPointer;
+            return out;
         }
 
         const { debug } = this.program;
@@ -171,7 +175,8 @@ export class PlStackMachine implements StackMachine {
 
         const parameters = value.parameters;
         if ( parameters.length != args.length ) {
-            this.newProblem( "RE0006", this.pointer, debug, '' + parameters.length, '' + args.length );
+            this.newProblem( "RE0006", this.pointer, debug, '' + parameters.length, '' + args.length );            this.pointer = oldPointer;
+            this.pointer = oldPointer;
             throw null;
         }
 
@@ -190,13 +195,12 @@ export class PlStackMachine implements StackMachine {
         this.createValue( value.closure.trace.name, func ); // so we can never actually modify the function
 
         this.pushStack( null ); // return address
-        const old = this.pointer;
         const out = this.runProgram( value.index + 1 );
-        if ( out == null ) {
-            throw null; // error
-        }
+        this.pointer = oldPointer;
 
-        this.pointer = old;
+        if ( out == null ) {
+            throw null;
+        }
 
         return out;
     }

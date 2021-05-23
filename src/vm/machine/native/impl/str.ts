@@ -1,10 +1,12 @@
 import {ScrambleType} from "../../scrambler";
-import {PlStuffType} from "../../stuff";
+import {NewPlStuff, PlStuff, PlStuffType} from "../../stuff";
 import {
+    GenerateGuardedTypeFunction,
     GenerateJsGuardedTypeFunction
 } from "../helpers";
 import {ExportJs, ExportNative} from "../types";
 import {MakeOutOfRangeMessage} from "../messeger";
+import {StackMachine} from "../../index";
 
 export const jsStr: ExportJs = {
     [ScrambleType("size", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("size", [], function (self) {
@@ -57,4 +59,9 @@ export const jsStr: ExportJs = {
     }),
 };
 
-export const str: ExportNative = {}
+export const str: ExportNative = {
+    [ScrambleType("split", PlStuffType.Str)]: GenerateGuardedTypeFunction("split", [PlStuffType.Str], function ( this: StackMachine, self: PlStuff, sep: PlStuff ) {
+        const list = self.value.split(sep.value).map(value => NewPlStuff(PlStuffType.Str, value));
+        return NewPlStuff(PlStuffType.List, list);
+    }),
+}

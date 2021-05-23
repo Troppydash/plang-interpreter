@@ -18,6 +18,9 @@
 <!--INTERACTION SOURCE CODE-->
 
 <script type="application/plang">
+    words = fetch("https://raw.githubusercontent.com/dwyl/english-words/master/words.txt", dict())
+    words = words.text.split("\n")
+
     input = $("#input")
     inputButton = $("#input-button")
     output = $("#output")
@@ -37,36 +40,59 @@
         output.setText board.join("\n")
     }
 
-    words = list("hello", "world")
+    func last(board) {
+        @idx = -1
+        each word, index of board {
+            if word /= "" {
+                idx = index
+            }
+        }
+        return idx
+    }
+
+    # words = list("hello", "world", "typing", "game")
 
     func refresh() {
         if stopped {
             return
         }
-        if board.get height /= "" {
+        if board.get(height) /= "" {
             stopped = true
             return
         }
 
         newBoard = list("")
-        each word of range board {
+        each word of board {
             newBoard.add word
         }
         newBoard.pop()
 
-        newBoard.1 = words.get(random.number(words.size()))
+        newBoard.1 = words.random()
         board = newBoard
         displayGame()
     }
 
+    refresh()
     displayGame()
-    # TODO: fix this or something
     javascript """
         const refresh = pl.import("refresh");
         window.setInterval(() => {
             refresh()
-        }, 1000);
+        }, 2000);
     """
+
+    inputButton.listen("click", func(event) {
+        event.preventDefault()
+        @text = input.attr("value")
+        @lst = last(board)
+        if lst /= -1 {
+            if board.get(lst) == text.1 {
+                board.set(lst, "")
+                input.setAttr("value", "")
+                displayGame()
+            }
+        }
+    })
 </script>
 
 

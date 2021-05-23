@@ -1,10 +1,10 @@
-import { ScrambleType } from "../../scrambler";
-import { NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType } from "../../stuff";
-import { AssertType, GenerateGuardedTypeFunction, GenerateJsGuardedTypeFunction } from "../helpers";
-import { equals } from "../operators";
-import { MakeNoTypeFunctionMessage, MakeOutOfRangeMessage } from "../messeger";
-import { StackMachine } from "../../index";
-import { PlConverter } from "../converter";
+import {ScrambleType} from "../../scrambler";
+import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../../stuff";
+import {AssertType, GenerateGuardedTypeFunction, GenerateJsGuardedTypeFunction} from "../helpers";
+import {equals} from "../operators";
+import {MakeNoTypeFunctionMessage, MakeOutOfRangeMessage} from "../messeger";
+import {StackMachine} from "../../index";
+import {PlConverter} from "../converter";
 import PlToString = PlConverter.PlToString;
 
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -123,6 +123,16 @@ export const list = {
             return PlToString(item, this);
         });
         return NewPlStuff(PlStuffType.Str, strs.join(sep.value));
+    }),
+    [ScrambleType("random", PlStuffType.List)]: GenerateGuardedTypeFunction("random", [], function(self: PlStuff) {
+        const lower = 0;
+        const upper = self.value.length;
+        return self.value[Math.floor(Math.random() * (upper - lower) + lower)];
+    }),
+    [ScrambleType("reverse", PlStuffType.List)]: GenerateGuardedTypeFunction("reverse", [], function(self: PlStuff) {
+        const items: PlStuff[] = [...self.value];
+        items.reverse();
+        return NewPlStuff(PlStuffType.List, items);
     }),
     [ScrambleType("sort", PlStuffType.List)]: GenerateGuardedTypeFunction("sort", [], function(this: StackMachine, self: PlStuff) {
         self.value.sort((l, r) => {

@@ -102,10 +102,10 @@ export const special = {
             if (value == null) {
                 return null;
             }
-            return PlConverter.PlToJs(this.findValue(key), this.runFunction.bind(this));
+            return PlConverter.PlToJs(value, this);
         }).bind(this);
         const _export = (function (key, value) {
-            this.createValue(key, PlConverter.JsToPl(value, this.runFunction.bind(this)));
+            this.createValue(key, PlConverter.JsToPl(value, this));
             return null;
         }).bind(this);
 
@@ -337,26 +337,12 @@ if (isNode) {
                 return obj;
             }),
             listen: GenerateJsGuardedFunction("listen", ["string", "function"], function (this: StackMachine, event, callback) {
-                const callPointer = this.pointer; // TODO: this cache of call site pointer is very bad, should fix this at some point
                 for (const node of result) {
                     node.addEventListener(event, (event: Event) => {
-                        const oldPointer = this.pointer;
-                        this.pointer = callPointer;
-
-                        const saved = this.saveState();
-                        try {
-                            const e = {
-                                preventDefault: event.preventDefault.bind(event),
-                            } as ListenCallbackEvent;
-                            callback(e);
-                        } catch (e) {
-                            this.restoreState(saved);
-                            const problem = this.problems.pop();
-                            const {row, filename, col, length} = problem.info;
-                            inout.print(`$.listen callback error at '${filename} ${row}:${col-length}': [${problem.code}] ${problem.message}`);
-                            inout.flush();
-                        }
-                        this.pointer = oldPointer;
+                        const e = {
+                            preventDefault: event.preventDefault.bind(event),
+                        } as ListenCallbackEvent;
+                        callback(e);
                     });
                 }
             })
