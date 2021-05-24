@@ -4,8 +4,9 @@
   "description": "A Plang Language Interpreter",
   "repository": "https://github.com/Troppydash/plang-interpreter/",
   "scripts": {
-    "build-browser": "node ./scripts/timestamp.js && tsc --module AMD --outFile \"./out/index.js\"",
-    "build-cli": "node ./scripts/timestamp.js && npm run build && pkg .",
+    "update-timestamp": "node ./scripts/timestamp.js",
+    "build-browser": "npm run update-timestamp && tsc --module AMD --outFile \"./out/index.js\"",
+    "build-cli": "npm run update-timestamp && npm run build && pkg .",
     "build": "tsc",
     "run": "node out/index.js",
     "run-build": "npm run clean && npm run build && npm run run",

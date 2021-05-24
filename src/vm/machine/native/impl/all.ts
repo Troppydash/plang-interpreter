@@ -4,6 +4,7 @@ import { NewPlStuff, PlStuff, PlStuffFalse, PlStuffGetType, PlStuffTrue, PlStuff
 import { StackMachine } from "../../index";
 import { ScrambleType } from "../../scrambler";
 import { MakeNoTypeFunctionMessage } from "../messeger";
+import {PlType} from "../../memory";
 
 
 export const all = {
@@ -33,9 +34,22 @@ export const all = {
     })),
     ...GenerateForAll("type", GenerateGuardedTypeFunction("type", [], (object: PlStuff) => {
         if (object.type == PlStuffType.NFunc) {
-            return NewPlStuff(PlStuffType.Type, PlStuffType.Func);
+            return NewPlStuff(PlStuffType.Type, {
+                type: "Func",
+                format: null,
+            } as PlType);
+        } else if (object.type == PlStuffType.Inst) {
+            const format = Object.keys(object.value);
+            return NewPlStuff(PlStuffType.Type, {
+                type: PlStuffGetType(object),
+                format,
+            } as PlType);
         }
-        return NewPlStuff(PlStuffType.Type, object.type);
+
+        return NewPlStuff(PlStuffType.Type, {
+            type: PlStuffGetType(object),
+            format: null
+        } as PlType);
     })),
     ...GenerateForAll("in", GenerateGuardedTypeFunction("in", ["*"], function (this: StackMachine, self: PlStuff, other: PlStuff) {
         const value = this.findValue(ScrambleType("have", other.type));

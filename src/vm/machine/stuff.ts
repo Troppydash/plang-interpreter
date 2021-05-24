@@ -79,8 +79,8 @@ export function PlStuffGetType(stuff: PlStuff): string {
     switch (stuff.type) {
         case PlStuffType.Inst:
             return stuff.value.type;
-        case PlStuffType.Type:
-            return (stuff.value as PlType).type;
+        // case PlStuffType.Type:
+        //     return (stuff.value as PlType).type;
     }
     return PlStuffTypeToString(stuff.type);
 }

@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Test</title>
+    <title>Testing Area</title>
 </head>
 <body>
 
 <div>
-    <h1>Echoing</h1>
+    <h1>Typing Practice</h1>
+    <h4>Type the bottom word with the correct spelling</h4>
     <p id="output"></p>
     <form>
-        <input id="input" type="text"/><button type="submit" id="input-button">Add</button>
+        <input id="input" type="text" autofocus/><button type="submit" id="input-button">Enter</button>
     </form>
 </div>
 
@@ -18,83 +19,99 @@
 <!--INTERACTION SOURCE CODE-->
 
 <script type="application/plang">
-    words = fetch("https://raw.githubusercontent.com/dwyl/english-words/master/words.txt", dict())
-    words = words.text.split("\n")
+    # words
+    networkResult = fetch("https://raw.githubusercontent.com/dwyl/english-words/master/words.txt", dict())
+    if not networkResult.ok {
+        panic("Failed to get a list of words")
+    }
+    wordList = networkResult.text.split("\n")
 
-    input = $("#input")
+    inputBox = $("#input")
     inputButton = $("#input-button")
-    output = $("#output")
+    outputBox = $("#output")
 
+    height = 25 # height limit
+    delay = 2000 # new word delay
 
-    # word typing game
-    height = 50 # height limit
-
-    # state
-    board = list()
+    # words state
+    words = list()
     each _ of range height {
-        board.add ""
-    }
-    stopped = false
-
-    func displayGame() {
-        output.setText board.join("\n")
+        words.add(null) # TODO: Fix this and types
     }
 
-    func last(board) {
-        @idx = -1
-        each word, index of board {
-            if word /= "" {
-                idx = index
+    # functions
+    func renderWords() {
+        text = ""
+        each word of words {
+            if word /= null {
+                text = text + word
             }
+            text = text + "\n"
         }
-        return idx
+        outputBox.setText text
     }
 
-    # words = list("hello", "world", "typing", "game")
+    func lastWordIndex() {
+        lastIndex = 0
+        each item, index of words {
+            if item == null {
+                break
+            }
+            lastIndex = index
+        }
+        return lastIndex
+    }
 
+    running = true
     func refresh() {
-        if stopped {
-            return
-        }
-        if board.get(height) /= "" {
-            stopped = true
+        if not running {
             return
         }
 
-        newBoard = list("")
-        each word of board {
-            newBoard.add word
+        # game over if the words reach the bottom
+        if words.get(height) /= null { # gotta fix this
+            running = false
+            javascript """window.alert("Game Over");"""
+            return
         }
-        newBoard.pop()
 
-        newBoard.1 = words.random()
-        board = newBoard
-        displayGame()
+        # shift all words down
+        newWords = list(null)
+        each word of words {
+            newWords.add word
+        }
+        newWords.pop()
+
+        newWords.1 = wordList.random() # set the top word to be a random word
+        words = newWords
+        renderWords()
     }
 
     refresh()
-    displayGame()
+    renderWords()
+    # hook into javascript event loop
     javascript """
-        const refresh = pl.import("refresh");
-        window.setInterval(() => {
-            refresh()
-        }, 2000);
+    const refresh = pl.import("refresh");
+    const delay = pl.import("delay");
+    window.setInterval(() => {
+        refresh()
+    }, delay);
     """
 
+
+    # inputs
     inputButton.listen("click", func(event) {
         event.preventDefault()
-        @text = input.attr("value")
-        @lst = last(board)
-        if lst /= -1 {
-            if board.get(lst) == text.1 {
-                board.set(lst, "")
-                input.setAttr("value", "")
-                displayGame()
-            }
+        inputText = inputBox.attr("value").1
+        lastWord = lastWordIndex()
+        if lastWord /= 0 and words.get(lastWord) == inputText {
+            words.set lastWord, ""
+            inputBox.setAttr "value", ""
+            renderWords()
         }
     })
-</script>
 
+</script>
 
 <!--THESE ARE ALL FOR LOADING THE PROGRAMMING LANGUAGE-->
 
@@ -150,6 +167,7 @@
         }
     }
 </script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
 <script src="out/index.js"></script>
 <script>require(['inout/otherInout', 'browser/index']);</script>

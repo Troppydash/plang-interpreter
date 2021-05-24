@@ -18,13 +18,16 @@ export function equals(l: PlStuff, r: PlStuff) {
     switch (l.type) {
         case PlStuffType.Num:
         case PlStuffType.Bool:
-        case PlStuffType.Type:
         case PlStuffType.Str:
             out = l.value === r.value;
+            break;
+        case PlStuffType.Type:
+            out = l.value.type == r.value.type;
             break;
 
         case PlStuffType.Null:
             out = true;
+            break;
 
         case PlStuffType.List:
         case PlStuffType.Dict:
