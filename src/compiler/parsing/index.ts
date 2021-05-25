@@ -1,5 +1,5 @@
-import { NewPlProblem, NewPlProblemAt, PlHereType, PlProblem } from "../../problem/problem";
-import { Lexer } from "../lexing";
+import {NewPlProblem, NewPlProblemAt, PlHereType, PlProblem} from "../../problem/problem";
+import {Lexer} from "../lexing";
 import {
     ASTAssign,
     ASTBinary,
@@ -36,8 +36,8 @@ import {
     ASTWhile,
     CreateSpanToken
 } from "./ast";
-import PlToken, { NAME_BLACKLIST, PlTokenToPlVariable, PlTokenType, TOKEN_OPERATORS } from "../lexing/token";
-import { PlProblemCode } from "../../problem/codes";
+import PlToken, {NAME_BLACKLIST, PlTokenToPlVariable, PlTokenType, TOKEN_OPERATORS} from "../lexing/token";
+import {PlProblemCode} from "../../problem/codes";
 
 class ErrTokenException {
 
@@ -1240,7 +1240,7 @@ export class PlAstParser implements Parser {
         let expressions = [];
         let tokens = [];
         while ( true ) {
-            if (!this.peekMatch([PlTokenType.VARIABLE, PlTokenType.STR, PlTokenType.BOOLEAN, PlTokenType.NUMBER, PlTokenType.TYPE, PlTokenType.FUNC ])) {
+            if (!this.peekMatch([PlTokenType.VARIABLE, PlTokenType.STR, PlTokenType.BOOLEAN, PlTokenType.NUMBER, PlTokenType.TYPE, PlTokenType.FUNC, PlTokenType.NOT, PlTokenType.NULL ])) {
                 break;
             }
 

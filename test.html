@@ -36,7 +36,7 @@
     # words state
     words = list()
     each _ of range height {
-        words.add(null) # TODO: Fix this and types
+        words.add(null)
     }
 
     # functions
@@ -105,7 +105,7 @@
         inputText = inputBox.attr("value").1
         lastWord = lastWordIndex()
         if lastWord /= 0 and words.get(lastWord) == inputText {
-            words.set lastWord, ""
+            words.set(lastWord, null)
             inputBox.setAttr "value", ""
             renderWords()
         }
