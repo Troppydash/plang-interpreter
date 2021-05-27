@@ -1,7 +1,7 @@
 {
   "name": "plang-interpreter",
   "version": "0.0.1",
-  "description": "A Plang Language Interpreter",
+  "description": "A Deviation Language Interpreter",
   "repository": "https://github.com/Troppydash/plang-interpreter/",
   "scripts": {
     "update-timestamp": "node ./scripts/timestamp.js",

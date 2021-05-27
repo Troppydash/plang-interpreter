@@ -1,8 +1,8 @@
-## The Plang Interpreter
-The **Plang** stands for **P**rogramming **Lang**uage.
+## The Deviation Interpreter
+or Devia for shorten.
 
 ### Description
-This repository houses the source code of the plang interpreter written entirely in Typescript.
+This repository houses the source code of the deviation interpreter written entirely in Typescript.
 
 The source code are all in the `src/` folder. `compiler/` contains the lexer and parser; `inout/` contains the input and output functions; `linking/` contains the linker; `problem/` contains the error printer; `repl/` contains the REPL; `vm/` contains the virtual machine emitter and stack machine; `extensions/` are code that I've copied from stackoverflow.
 
@@ -91,11 +91,11 @@ say(v1.get()) # prints list(2, 3)
 ```
 
 ```
-# using javascript inside of plang
+# using javascript inside of devia
 values = list(1, 10, 20, 30)
 
 javascript """
-    const values = pl.import("values"); // import the variable "values" from plang
+    const values = pl.import("values"); // import the variable "values" from devia
     function factorial(n) {
         if (n < 2) {
             return 1;
@@ -106,7 +106,7 @@ javascript """
     for (const value of values) {
         out.push(factorial(value));
     }
-    pl.export("out", out); // export the variable as "out" to plang
+    pl.export("out", out); // export the variable as "out" to devia
 """
 
 each item, index of out {
@@ -115,15 +115,15 @@ each item, index of out {
 ```
 
 ### How do I use it
-If you have the executable, `plang.exe <file>`
-will run the file. You can also start the REPL by running `plang.exe` directly with no arguments.
+If you have the executable, `devia.exe <file>`
+will run the file. You can also start the REPL by running `devia.exe` directly with no arguments.
 
 If there is no executable, see the section below to build it yourself.
 
 ### How do I build it
 Node 12 or higher is used to build the interpreter, but feel free to try it with a lower node version. The command `node -v` will tell you if node is installed on your machine.
 
-Run `npm install` first to install all the dependencies, and run `npm run build-cli` to make an executable in the `dist/` folder.
+Run `npm install` first to install all the dependencies, and run `npm run build-cli` to make an executable in the `dist/` folder. Rename the executable for your platform to `devia.exe`. 
 
 Other commands located in package.json are as follows
 ```

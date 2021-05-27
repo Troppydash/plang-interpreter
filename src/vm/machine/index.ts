@@ -156,6 +156,7 @@ export class PlStackMachine implements StackMachine {
 
         this.pushStack( NewPlStuff( PlStuffType.Num, this.pointer ) ); // return address
         this.pointer = value.index;
+        return 0;
     }
 
     runFunction( func: PlStuff, args: PlStuff[], callPointer?: number ): PlStuff | null {
@@ -571,6 +572,9 @@ export class PlStackMachine implements StackMachine {
 
                         // get arguments
                         const arity = this.popStack();
+                        // const parameters = arity.value + (func.value.self) ? 1 : 0;
+                        // if (parameters != func.value)
+
                         let args: PlStuff[] = [];
                         for ( let i = 0; i < +arity.value; ++i ) {
                             args.push( PlActions.PlCopy( this.popStack() ) );
@@ -578,6 +582,8 @@ export class PlStackMachine implements StackMachine {
                         if ( func.value.self ) {
                             args = [ PlActions.PlCopy( func.value.self ), ...args ];
                         }
+                        // check arity
+
 
                         // get debug
                         let callDebug: PlDebug;
@@ -676,7 +682,8 @@ export class PlStackMachine implements StackMachine {
                                 break;
                             }
                             case PlStuffType.Func: {
-                                this.jumpFunction(func, callDebug, args);
+                                if (this.jumpFunction(func, callDebug, args) == null)
+                                    return null;
                                 break;
                             }
                         }

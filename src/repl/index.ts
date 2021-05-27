@@ -64,7 +64,7 @@ export function GetLine(filename: string): string | null {
 }
 
 export function StartREPL( filename: string ): number {
-    inout.print( `Welcome to the Plang interactive console (version ${timestamp})` );
+    inout.print( `Welcome to the Deviation interactive console (version ${timestamp})` );
     if ( isNode ) {
         const os = require( 'os' );
         inout.print( `Running on ${os.platform()}-${os.arch()}. Hello ${os.hostname()}!` );
@@ -107,7 +107,7 @@ export function StartREPL( filename: string ): number {
 }
 
 export function StartDemo(filename: string): number {
-    inout.print( `Running Plang in demo mode (version ${timestamp})` );
+    inout.print( `Running Deviation in demo mode (version ${timestamp})` );
     if (isNode) {
         inout.print("Press ctrl-c to quit");
     }
