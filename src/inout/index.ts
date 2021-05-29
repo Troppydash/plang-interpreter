@@ -5,6 +5,8 @@ export const isNode =
     process.versions != null &&
     process.versions.node != null;
 
+export type OPTIONS = "mode";
+
 export interface PlInout {
     print: (message: string) => void;
     input: (message: string) => string | null;
@@ -15,6 +17,8 @@ export interface PlInout {
     readFile: (filePath: string, type: PathType) => string | null;
 
     execute: (code: string, vars: Record<string, any>) => void;
+
+    options: Record<OPTIONS, string>;
 }
 
 let inout: PlInout;

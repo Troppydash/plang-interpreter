@@ -85,3 +85,7 @@ export function execute(code: string, vars: Record<string, any>): void {
         ...vars,
     });
 }
+
+export let options = {
+    mode: "debug",
+};

@@ -130,7 +130,7 @@ export async function RunVM(file: PlFile, args: string[]): Promise<number> {
         const ok = ReportProblems(file.content, problems, trace);
 
         // fancy
-        if (ok && trace.length > 1) {
+        if (inout.options["mode"] == "debug" && ok && trace.length > 1) {
             await StartInteractive(file.content, problems, trace);
         }
 

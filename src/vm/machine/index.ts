@@ -1,5 +1,5 @@
 import {PlBytecodeType} from "../emitter/bytecode";
-import {PlDebug} from "../emitter/debug";
+import {NewPlDebug, PlDebug} from "../emitter/debug";
 import {NewPlProblem, PlProblem} from "../../problem/problem";
 import {
     NewPlStuff, PlFunction, PlInstance, PlNativeFunction,
@@ -564,6 +564,7 @@ export class PlStackMachine implements StackMachine {
                         return this.newProblem({
                             "ASTVariable": "RE0003",
                             "ASTBinary": "RE0004",
+                            "*": "RE0003",
                         }, this.pointer, name, left ? PlStuffGetType(left) : undefined);
                     }
                     // define lists
@@ -782,14 +783,15 @@ export class PlStackMachine implements StackMachine {
                                     this.pushStack(value.native(...args));
                                 } catch (e) {
                                     // insert stackFrame
+                                    const info = callDebug == null ? null : callDebug.span.info;
                                     if (stackFrame == this.stackFrame) {
-                                        this.stackFrame = new PlStackFrame(this.stackFrame, NewPlTraceFrame(value.name, callDebug.span.info));
+                                        this.stackFrame = new PlStackFrame(this.stackFrame, NewPlTraceFrame(value.name, info));
                                     } else {
                                         let sf = this.stackFrame;
                                         while (sf.outer != stackFrame) {
                                             sf = sf.outer;
                                         }
-                                        sf.outer = new PlStackFrame(stackFrame, NewPlTraceFrame(value.name, callDebug.span.info))
+                                        sf.outer = new PlStackFrame(stackFrame, NewPlTraceFrame(value.name, info))
                                     }
 
                                     if (e != null) {

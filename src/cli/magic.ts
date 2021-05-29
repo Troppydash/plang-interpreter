@@ -28,6 +28,12 @@ run-emitter     ~ Run [file] with the emitter only`);
         return false;
     }
 
+    if (args.is("mode-release")) {
+        // bad way, but it is a singleton so whatever
+        inout.options["mode"] = "release";
+        return true;
+    }
+
 
 
     return true;

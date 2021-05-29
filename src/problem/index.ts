@@ -14,7 +14,7 @@ export function ReportProblem(problem: PlProblem, content: string) {
 export function ReportProblems(content: string, problems: PlProblem[], trace?: PlTrace): boolean {
     inout.print(colors.red("Problem(s) Occurred"));
     if (trace && trace.length > 0) {
-        inout.print(colors.red('\nCallframes (Most Recent Last)'));
+        inout.print(colors.red('Callframes (Most Recent Last)'));
         inout.print(LogTrace(trace));
         inout.print('');
     }

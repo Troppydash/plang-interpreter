@@ -2,7 +2,7 @@ import { CliError, NewCliError } from "./error";
 import { CLI_FLAGS, MatchFlag, MatchPrefix } from "./options";
 
 type CliRaw = string;
-type CliFlag = typeof CLI_FLAGS[number];
+export type CliFlag = typeof CLI_FLAGS[number];
 type CliOption = {
     key: string;
     value: string;

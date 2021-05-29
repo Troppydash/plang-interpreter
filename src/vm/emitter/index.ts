@@ -36,6 +36,7 @@ import {
 } from "../../compiler/parsing/ast";
 import {NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram} from "./debug";
 import { NewFakePlToken, PlTokenType } from "../../compiler/lexing/token";
+import inout from "../../inout";
 
 export const METHOD_SEP = '@';
 export const LOOP_INDEX = 'i@';
@@ -79,12 +80,14 @@ class ProgramBuilder {
 
     addPWD( program: PlProgram, debug?: PlDebug ) {
         this.code.push( ...program.program );
-        program.debug.forEach( d => {
-            d.endLine += this.line;
-        } )
-        this.debugs.push( ...program.debug );
+        if (this.emitDebug) {
+            program.debug.forEach( d => {
+                d.endLine += this.line;
+            } )
+            this.debugs.push( ...program.debug );
+        }
         this.line += program.program.length;
-        if ( debug ) {
+        if ( this.emitDebug && debug ) {
             debug.endLine += this.line;
             this.debugs.push( debug );
         }
@@ -98,7 +101,7 @@ class ProgramBuilder {
     addBytecode( bc: PlBytecode, debug?: PlDebug ) {
         this.code.push( bc );
         this.line += 1;
-        if ( debug ) {
+        if ( this.emitDebug && debug ) {
             debug.endLine += this.line;
             this.debugs.push( debug );
         }
@@ -119,6 +122,7 @@ class ProgramBuilder {
     }
 
     addStretch( node: ASTNode, length: number | null = null ) {
+        if (!this.emitDebug) return this;
         let debug = NewPlDebugStretch( node, length == null ? this.code.length : length );
         debug.endLine += this.line;
         this.debugs.push( debug );
@@ -126,12 +130,17 @@ class ProgramBuilder {
     }
 
     popDebug() {
+        if (!this.emitDebug) return this;
         this.debugs.pop();
         return this;
     }
 
     toProgram(): PlProgram {
         return { program: this.code, debug: this.debugs };
+    }
+
+    get emitDebug() {
+        return inout.options['mode'] == 'debug';
     }
 }
 

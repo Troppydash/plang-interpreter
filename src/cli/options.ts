@@ -9,6 +9,8 @@ export const CLI_FLAGS = [
     "run-compiler",
     "run-emitter",
     "help",
+    "mode-release",
+    "mode-debug",
 ] as const;
 
 export function MatchPrefix(raw: string): string | null {

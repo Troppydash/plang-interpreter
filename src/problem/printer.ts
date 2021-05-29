@@ -54,7 +54,7 @@ function getLines(lines: string[], targetRow: number): [Line[], Line, Line[]] {
 export function CreateProblemTitle(code: string, info: PlFileInfo) {
     const buffer = [];
     if (info == null) {
-        buffer.push(`[${code}] There is no debug information`);
+        buffer.push(`[${code}] At unknown location`);
     } else {
         buffer.push(`[${code}] In "${info.filename}" on line ${info.row + 1}`);
     }
