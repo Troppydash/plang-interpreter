@@ -1,5 +1,5 @@
 import {
-    NewPlStuff,
+    NewPlStuff, PlInstance,
     PlStuff,
     PlStuffFalse,
     PlStuffGetType,
@@ -7,31 +7,50 @@ import {
     PlStuffTrue,
     PlStuffType,
     PlStuffTypeFromString,
-    PlStuffTypeToString
+    PlStuffTypeToString, PlType
 } from "../stuff";
-import { PlInstance } from "../memory";
 import { StackMachine } from "../index";
-import inout from "../../../inout";
+import {ReportCallbackProblems} from "../../../problem";
 
+/**
+ * Protects a plang like function call
+ * @param callback The function call
+ * @param sm The stack machine
+ */
 function protectPlangCall(callback: Function, sm: StackMachine) {
     return (...args) => {
-        const saved = sm.saveState();
-        try {
-            return callback(...args);
-        } catch (e) {
-            sm.restoreState(saved);
-            const problem = sm.problems.pop();
-            const {row, filename, col, length} = problem.info;
-            inout.print(`Callback error at '${filename}@${row}:${col-length}'\n[${problem.code}] ${problem.message}`);
-            inout.flush();
-            return null;
+        // if the caller is a js callback
+        const caller = (new Error()).stack.split("\n")[2].trim().split(" ")[1];
+        // This is very hacky, but js had forced myhand
+        if (!caller.includes("PlStackMachine")) {
+            const saved = sm.saveState();
+            try {
+                return callback(...args);
+            } catch (e) {
+                sm.restoreState(saved);
+                const problem = sm.problems.pop();
+                const trace = sm.getTrace();
+                ReportCallbackProblems(problem, trace);
+                return null;
+            }
         }
+
+        return callback(...args);
     }
 }
 
+/**
+ * Houses the conversion between devia and js types
+ */
 export namespace PlConverter {
-    const VERSION = 1;
+    const VERSION = 1; // Converter version
 
+    /**
+     * Convert an devia instance to js
+     * @param instance The devia instance
+     * @param sm The stack machine
+     * @private
+     */
     function instanceToJs(instance: PlInstance, sm: StackMachine) {
         const out = {};
         Object.entries(instance.value).forEach(([key, value]) => {
@@ -46,6 +65,11 @@ export namespace PlConverter {
         };
     }
 
+    /**
+     * Check if an js object is a valid devia instance
+     * @param js The js object
+     * @private
+     */
     function jsIsInstance(js: object): boolean {
         if ("_version" in js) {
             switch (js["_version"]) {
@@ -63,6 +87,12 @@ export namespace PlConverter {
         return false;
     }
 
+    /**
+     * Converts an js object to a devia instance
+     * @param js The js object
+     * @param sm The stack machine
+     * @private
+     */
     function jsToInstance(js: object, sm: StackMachine): PlStuff {
         const out = {};
         for (const [key, value] of Object.entries(js["value"])) {
@@ -74,7 +104,12 @@ export namespace PlConverter {
         } as PlInstance);
     }
 
-    // plang type to js type
+    /**
+     * Converts a devia object to js
+     * @param object The devia object
+     * @param sm The stack machine
+     * @constructor
+     */
     export function PlToJs(object: PlStuff, sm: StackMachine): any {
         switch (object.type) {
             case PlStuffType.Str: {
@@ -121,7 +156,12 @@ export namespace PlConverter {
         throw new Error(`PlConvert.PlToJs failed to match object of type ${PlStuffTypeToString(object.type)}`);
     }
 
-    // js type to plang type
+    /**
+     * Converts a js object to devia
+     * @param object The js object
+     * @param sm The stack machine
+     * @constructor
+     */
     export function JsToPl(object: any, sm: StackMachine): PlStuff {
         switch (typeof object) {
             case "number": {
@@ -169,15 +209,28 @@ export namespace PlConverter {
         throw new Error(`PlConvert.JsToPl failed to match object of type ${typeof object}`);
     }
 
-    // Plang Type To Plang Type
-    export function PlToPl(source: PlStuff, target: string, sm: StackMachine): PlStuff {
+    /**
+     * Converts a devia type to another devia type
+     * @param source The source devia object
+     * @param target The target devia
+     * @param sm
+     * @constructor
+     */
+    export function PlToPl(source: PlStuff, target: PlType, sm: StackMachine): PlStuff {
+        // Cannot convert anything to an INST type
+        if (target.format != null) {
+            return PlStuffNull;
+        }
+
+        // Checks if the source type is the target type, return the source directly if so
         const sourceStr = PlStuffGetType(source);
-        const targetStr = target;
+        const targetStr = target.type;
         if (sourceStr == targetStr) {
             return source;
         }
 
-        const targetType: PlStuffType = PlStuffTypeFromString(target);
+        // Turn the target type to an enum type
+        const targetType: PlStuffType = PlStuffTypeFromString(targetStr);
         switch (targetType) {
             case PlStuffType.Dict:
             case PlStuffType.Inst:
@@ -185,11 +238,9 @@ export namespace PlConverter {
             case PlStuffType.NFunc:
             case PlStuffType.List:
             case PlStuffType.Null:
-                return PlStuffNull;
-
             case PlStuffType.Type:
-                // TODO: Write this
-                return PlStuffNull;
+                return PlStuffNull; // These cannot be converted
+
             case PlStuffType.Bool: {
                 let out;
                 switch (source.type) {
@@ -215,7 +266,7 @@ export namespace PlConverter {
                         break;
                 }
                 return out == true ? PlStuffTrue : PlStuffFalse;
-            }
+            } // IsTruthy kinda
             case PlStuffType.Num: {
                 let num = null;
                 switch (source.type) {
@@ -242,16 +293,22 @@ export namespace PlConverter {
                         return PlStuffNull;
                 }
                 return NewPlStuff(PlStuffType.Num, num);
-            }
+            } // To int
             case PlStuffType.Str: {
                 return NewPlStuff(PlStuffType.Str, PlToString(source, sm));
-            }
+            } // calls the to string
         }
 
-        return PlStuffNull;
+        return PlStuffNull; // Default to returning null
     }
 
-    // to string
+    /**
+     * Converts a devia object to a js string
+     * @param object The devia object
+     * @param sm The stack machine
+     * @param quote Whether to quote the strings if the object is a string, this is used for nesting strings
+     * @constructor
+     */
     export function PlToString(object: PlStuff, sm: StackMachine, quote: boolean = false): string {
         switch (object.type) {
             case PlStuffType.Bool:
@@ -273,7 +330,7 @@ export namespace PlConverter {
                 }
                 return object.value;
             case PlStuffType.Type:
-                return PlStuffGetType(object);
+                return object.value.type;
             case PlStuffType.Inst: {
                 let fn;
                 if ((fn = sm.findFunction("str", object))) {
@@ -288,10 +345,17 @@ export namespace PlConverter {
     }
 }
 
+/**
+ * These are the common actions that can be done on devia stuffs
+ */
 export namespace PlActions {
 
-
-    // shallow copying
+    /**
+     * This shallow copies the devia object,
+     * the default used in function calling
+     * @param object The devia object to be copied
+     * @constructor
+     */
     export function PlCopy(object: PlStuff): PlStuff {
         const {type, value} = object;
         switch (type) {
@@ -312,7 +376,11 @@ export namespace PlActions {
         throw new Error(`PlActions.PlCopy failed to match type ${PlStuffTypeToString(object.type)}`);
     }
 
-    // deep cloning
+    /**
+     * This deep clones the devia object
+     * @param object The object to be cloned
+     * @constructor
+     */
     export function PlClone(object: PlStuff): PlStuff {
         const {type, value} = object;
         switch (type) {
@@ -329,7 +397,10 @@ export namespace PlActions {
                 Object.entries(value.value).forEach(([k, v]) => {
                     newObj[k] = PlClone(v as PlStuff);
                 });
-                return NewPlStuff(type, newObj);
+                return NewPlStuff(type, {
+                    type: value.type,
+                    value: newObj
+                } as PlInstance);
             }
             case PlStuffType.Dict: {
                 const newObj = {};
@@ -345,9 +416,5 @@ export namespace PlActions {
                 return object;
         }
         throw new Error(`PlActions.PlClone failed to match type ${PlStuffTypeToString(object.type)}`);
-    }
-
-    export function PlDefault(type: PlStuffType): PlStuff {
-        return null;
     }
 }

@@ -1,5 +1,5 @@
 import { PlProblem } from "./problem";
-import { LogProblem, LogTrace } from "./printer";
+import {LogCallbackProblem, LogProblem, LogTrace} from "./printer";
 import inout from "../inout";
 import { colors } from "../inout/color";
 import { PlTrace } from "./trace";
@@ -29,6 +29,28 @@ export function ReportProblems(content: string, problems: PlProblem[], trace?: P
         return false;
     }
 
+    inout.flush();
+    return true;
+}
+
+export function ReportCallbackProblems(problem: PlProblem, trace: PlTrace): boolean {
+    inout.print(colors.red("Callback Problem(s) Occurred"));
+    if (trace.length == 0) {
+        inout.print(colors.red('No Callframes'))
+    } else {
+        inout.print(colors.red('Callframes:'));
+        inout.print(LogTrace(trace));
+    }
+    inout.print('');
+
+    try {
+        inout.print(LogCallbackProblem(problem));
+    } catch (e) {
+        inout.print(`Exception in reporting the problems: ${e}`);
+        inout.print("This is a developer error, please report this to him");
+        inout.flush();
+        return false;
+    }
     inout.flush();
     return true;
 }

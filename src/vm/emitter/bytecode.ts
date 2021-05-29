@@ -1,7 +1,10 @@
 import {dddString, escapeString} from "../../extension";
+import {tsEnumKeys} from "../../extension/tstypes";
 
+/**
+ * Types of bytecodes
+ */
 export enum PlBytecodeType {
-
     DEFNUM,
     DEFVAR,
     DEFFUN,
@@ -34,22 +37,14 @@ export enum PlBytecodeType {
     STKPOP,
     STKENT,
     STKEXT
-
 }
+const allEnumKeys = tsEnumKeys(PlBytecodeType); // List of all bytecode types as an array
 
-// https://stackoverflow.com/questions/18111657/how-to-get-names-of-enum-entries
-const allEnumKeys = [];
-for (const mem in PlBytecodeType) {
-    if (parseInt(mem, 10) >= 0) {
-        allEnumKeys.push(PlBytecodeType[mem]);
-    }
-}
 
 export interface PlBytecode {
     type: PlBytecodeType;
     value: string | null;
 }
-export type PlProgram = PlBytecode[];
 
 export function NewBytecode(type: PlBytecodeType, value: string | null = null): PlBytecode {
     return {

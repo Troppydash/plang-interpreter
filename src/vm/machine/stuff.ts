@@ -1,6 +1,9 @@
 import {TypeofTypes} from "../../extension";
-import { PlInstance, PlType } from "./memory";
+import {PlStackFrame} from "./memory";
 
+/**
+ * All possible devia stuff types
+ */
 export enum PlStuffType {
     Num,
     Str,
@@ -14,12 +17,19 @@ export enum PlStuffType {
     Inst,
 }
 
-export const PlStuffTypes = ["Num", "Str", "Bool", "Null", "Type", "Func", "List", "Dict", "Inst"];
+// The plstufftypes in string form
+export const PlStuffTypes = ["Num", "Str", "Bool", "Null", "Type", "Func", "List", "Dict", "Inst"] as const;
+// The union type of the plstufftypes
+export type PlStuffTypeStrings = typeof PlStuffTypes[number];
+// the union type of the values of a devia object
+type PlStuffValue = PlFunction | PlNativeFunction | PlInstance | PlType | any;
 
-
+/**
+ * The values for a devia object
+ */
 export interface PlStuff {
-    type: PlStuffType;
-    value: any;
+    type: PlStuffType; // The type of the object
+    value: PlStuffValue; // The value of the object
 }
 
 export function NewPlStuff(type: PlStuffType, value: any): PlStuff {
@@ -29,11 +39,50 @@ export function NewPlStuff(type: PlStuffType, value: any): PlStuff {
     };
 }
 
-export function PlStuffTypeFromString(string: string) {
-    return PlStuffType[string];
+
+/// These are possible types for the plstuff.value field ///
+export interface PlFunction {
+    index: number; // index of bytecode
+    closure: PlStackFrame; // closure stack frame
+    parameters: string[]; // parameter names
+    self?: PlStuff; // self for overloading
 }
 
-export function PlStuffTypeFromJsString(string: TypeofTypes) {
+export interface PlNativeFunction {
+    native: Function;
+    name: string;
+    self?: PlStuff;
+}
+
+export interface PlInstance {
+    type: string; // true instance type
+    value: Record<string, PlStuff>; // instance value
+}
+
+export interface PlType {
+    type: string;
+    format: any;
+}
+
+
+/**
+ * Converts a js string to a plstufftype enum
+ * @param string The js string
+ * @constructor
+ */
+export function PlStuffTypeFromString(string: string): PlStuffType {
+    if (string in PlStuffType) {
+        return PlStuffType[string];
+    }
+    throw new Error(`PlStuffTypeFromString failed to match with value ${string}`);
+}
+
+/**
+ * Converts a js typeof result string to a plstufftype enum
+ * @param string The js typeof result
+ * @constructor
+ */
+export function PlStuffTypeFromJsString(string: TypeofTypes): PlStuffType {
     switch (string) {
         case "boolean":
             return PlStuffType.Bool;
@@ -51,7 +100,13 @@ export function PlStuffTypeFromJsString(string: TypeofTypes) {
     throw new Error(`PlStuffTypeFromJsString failed to match with value ${string}`);
 
 }
-export function PlStuffTypeToString(stuffType: PlStuffType): string {
+
+/**
+ * Converts a plstufftype enum to string
+ * @param stuffType The plstufftype enum
+ * @constructor
+ */
+export function PlStuffTypeToString(stuffType: PlStuffType): PlStuffTypeStrings {
     switch (stuffType) {
         case PlStuffType.Num:
             return "Num";
@@ -75,17 +130,22 @@ export function PlStuffTypeToString(stuffType: PlStuffType): string {
     }
     throw new Error(`PlStuffTypeToString failed to match with value ${stuffType}`);
 }
-export function PlStuffGetType(stuff: PlStuff): string {
+
+/**
+ * Returns the real type of a devia object, can be a non expected string that is not a plstufftype string
+ * @param stuff
+ * @constructor
+ */
+export function PlStuffGetType(stuff: PlStuff): PlStuffTypeStrings | string {
     switch (stuff.type) {
         case PlStuffType.Inst:
             return stuff.value.type;
-        // case PlStuffType.Type:
-        //     return (stuff.value as PlType).type;
     }
     return PlStuffTypeToString(stuff.type);
 }
 
-// optimization
+/// There can be only one of these, so we don't make them up but rather use these ///
+// TODO: make them frozen
 export const PlStuffTrue = NewPlStuff(PlStuffType.Bool, true);
 export const PlStuffFalse = NewPlStuff(PlStuffType.Bool, false);
 export const PlStuffNull = NewPlStuff(PlStuffType.Null, null);

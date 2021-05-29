@@ -1,4 +1,4 @@
-import { NewBytecode, PlBytecode, PlBytecodeType, PlProgram } from "./bytecode";
+import { NewBytecode, PlBytecode, PlBytecodeType } from "./bytecode";
 import {
     ASTAssign,
     ASTAttributes,
@@ -34,7 +34,7 @@ import {
     ASTVariable,
     ASTWhile
 } from "../../compiler/parsing/ast";
-import { NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram } from "./debug";
+import {NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram} from "./debug";
 import { NewFakePlToken, PlTokenType } from "../../compiler/lexing/token";
 
 export const METHOD_SEP = '@';
@@ -42,9 +42,9 @@ export const LOOP_INDEX = 'i@';
 export const EACH_ITER = 'iter@';
 export const MATCH_VALUE = 'value@';
 
-export type PlProgramWithDebug = { program: PlProgram, debug: PlDebugProgram };
+export type PlProgram = { program: PlBytecode[], debug: PlDebugProgram };
 
-export function EmitProgram( ast: ASTProgram ): PlProgramWithDebug {
+export function EmitProgram( ast: ASTProgram ): PlProgram {
     let programBuilder = new ProgramBuilder();
     for ( const statement of ast ) {
         programBuilder.addPWD( EmitStatement( statement ) );
@@ -52,7 +52,7 @@ export function EmitProgram( ast: ASTProgram ): PlProgramWithDebug {
     return programBuilder.toProgram();
 }
 
-export function EmitStatement( statement: ASTStatement ): PlProgramWithDebug {
+export function EmitStatement( statement: ASTStatement ): PlProgram {
     return (new ProgramBuilder())
         .addPWD( traverseAST( statement ) )
         .addBytecode( NewBytecode( PlBytecodeType.STKPOP ) )
@@ -71,13 +71,13 @@ class ProgramBuilder {
         this.line = 0;
     }
 
-    addPWDNoDebug( program: PlProgramWithDebug ) {
+    addPWDNoDebug( program: PlProgram ) {
         this.code.push( ...program.program );
         this.line += program.program.length;
         return this;
     }
 
-    addPWD( program: PlProgramWithDebug, debug?: PlDebug ) {
+    addPWD( program: PlProgram, debug?: PlDebug ) {
         this.code.push( ...program.program );
         program.debug.forEach( d => {
             d.endLine += this.line;
@@ -91,7 +91,7 @@ class ProgramBuilder {
         return this;
     }
 
-    addPWDStretch( program: PlProgramWithDebug, node: ASTNode, length: number | null = null ) {
+    addPWDStretch( program: PlProgram, node: ASTNode, length: number | null = null ) {
         return this.addPWD( program, NewPlDebugStretch( node, length == null ? this.code.length + program.program.length : length ) );
     }
 
@@ -130,12 +130,12 @@ class ProgramBuilder {
         return this;
     }
 
-    toProgram(): PlProgramWithDebug {
+    toProgram(): PlProgram {
         return { program: this.code, debug: this.debugs };
     }
 }
 
-function traverseAST( node: ASTNode ): PlProgramWithDebug {
+function traverseAST( node: ASTNode ): PlProgram {
     let programBuilder = new ProgramBuilder();
     if ( node instanceof ASTNumber ) {
         return programBuilder.addBytecode( makeNumber( node ) ).toProgram();
@@ -720,7 +720,7 @@ function makeString( node: ASTString ) {
     return NewBytecode( PlBytecodeType.DEFSTR, `${node.content}` );
 }
 
-function makeEvalBlock( node: ASTBlock ): PlProgramWithDebug {
+function makeEvalBlock( node: ASTBlock ): PlProgram {
     return (new ProgramBuilder())
         .addBytecode( NewBytecode( PlBytecodeType.STKENT ) )
         .addPWD( EmitProgram( node.statements, ) )
@@ -728,7 +728,7 @@ function makeEvalBlock( node: ASTBlock ): PlProgramWithDebug {
         .toProgram();
 }
 
-function makePureBlock( node: ASTBlock ): PlProgramWithDebug {
+function makePureBlock( node: ASTBlock ): PlProgram {
     return (new ProgramBuilder())
         .addPWD( EmitProgram( node.statements ) )
         .toProgram();

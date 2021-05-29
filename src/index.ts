@@ -9,8 +9,8 @@ import { ReadFile, RunEmitter, RunParser, RunVM } from "./linking";
 import { CliArguments } from "./cli";
 import { CliHandleMagicFlags } from "./cli/magic";
 import { LogCliError } from "./cli/error";
-import { PrettyPrintAST } from "./compiler/parsing/visualizer";
-import { PrettyPrintProgram } from "./vm/emitter/printer";
+import { ASTProgramToString } from "./compiler/parsing/visualizer";
+import { PlProgramToString } from "./vm/emitter/printer";
 
 // Parse arguments
 const striped = process.argv.slice(2);
@@ -44,14 +44,14 @@ if (!isNode || args.getArgSize() == 0 || args.is("run-repl")) { // If running in
     if (args.is("run-compiler")) {
         const out = RunParser(file);
         if (out != null) {
-            inout.print(PrettyPrintAST(RunParser(file)));
+            inout.print(ASTProgramToString(RunParser(file)));
         }
         process.exit(0);
     }
     if (args.is("run-emitter")) {
         const out = RunEmitter(file);
         if (out != null) {
-            inout.print(PrettyPrintProgram(out));
+            inout.print(PlProgramToString(out));
             inout.print(`Emitted ${out.program.length} instructions, with ${out.debug.length} debug messages`);
         }
         process.exit(0);

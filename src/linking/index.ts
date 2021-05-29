@@ -6,7 +6,7 @@ import inout from "../inout";
 import {ASTProgram} from "../compiler/parsing/ast";
 import {PlAstParser} from "../compiler/parsing";
 import {PlProblem} from "../problem/problem";
-import { EmitProgram, PlProgramWithDebug } from "../vm/emitter/";
+import { EmitProgram, PlProgram } from "../vm/emitter/";
 import {PlStackMachine} from "../vm/machine";
 import {StartInteractive} from "../problem/interactive";
 
@@ -25,7 +25,7 @@ export function RunParser(file: PlFile): ASTProgram | null {
     return result;
 }
 
-export function RunEmitter(file: PlFile): PlProgramWithDebug | null {
+export function RunEmitter(file: PlFile): PlProgram | null {
     const ast = RunParser(file);
     if (ast == null) {
         return null;

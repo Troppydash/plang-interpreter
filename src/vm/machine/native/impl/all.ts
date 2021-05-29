@@ -1,10 +1,9 @@
 import { GenerateForAll, GenerateForSome, GenerateGuardedTypeFunction } from "../helpers";
 import { PlActions, PlConverter } from "../converter";
-import { NewPlStuff, PlStuff, PlStuffFalse, PlStuffGetType, PlStuffTrue, PlStuffType } from "../../stuff";
+import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffGetType, PlStuffTrue, PlStuffType, PlType} from "../../stuff";
 import { StackMachine } from "../../index";
 import { ScrambleType } from "../../scrambler";
 import { MakeNoTypeFunctionMessage } from "../messeger";
-import {PlType} from "../../memory";
 
 
 export const all = {
@@ -22,15 +21,18 @@ export const all = {
         let otypestr = PlStuffGetType(object);
         return otypestr == type.value.type ? PlStuffTrue : PlStuffFalse;
     })),
+    ...GenerateForAll("to", GenerateGuardedTypeFunction("to", [PlStuffType.Type], function(self, type) {
+        return PlConverter.PlToPl(self, type.value, this);
+    })),
     /// TYPES
     ...GenerateForAll("bool", GenerateGuardedTypeFunction("bool", [], function(self) {
-        return PlConverter.PlToPl(self, "Bool", this)
+        return PlConverter.PlToPl(self, {format: null, type: "Bool"}, this)
     })),
     ...GenerateForAll("str", GenerateGuardedTypeFunction("str", [], function(self) {
-        return PlConverter.PlToPl(self, "Str", this)
+        return PlConverter.PlToPl(self, {format: null, type: "Str"}, this)
     })),
     ...GenerateForSome("num", [PlStuffType.Bool, PlStuffType.Str, PlStuffType.Null, PlStuffType.Num], GenerateGuardedTypeFunction("num", [], function(self) {
-        return PlConverter.PlToPl(self, "Num", this);
+        return PlConverter.PlToPl(self, {format: null, type: "Num"}, this);
     })),
     ...GenerateForAll("type", GenerateGuardedTypeFunction("type", [], (object: PlStuff) => {
         if (object.type == PlStuffType.NFunc) {

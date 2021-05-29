@@ -1,7 +1,6 @@
 import { ASTNode } from "../../compiler/parsing/ast";
 import PlToken from "../../compiler/lexing/token";
 
-export type PlDebugProgram = PlDebug[];
 
 export interface PlDebug {
     span: PlToken;
@@ -9,6 +8,7 @@ export interface PlDebug {
     endLine: number;
     length: number;
 }
+export type PlDebugProgram = PlDebug[];
 
 export function NewPlDebug( node: ASTNode, endLine: number, length: number ): PlDebug {
     const name = node.attribute == null ? (node as any).constructor.name : node.attribute;

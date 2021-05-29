@@ -1,9 +1,14 @@
-import {BytecodeToString, PlProgram} from "./bytecode";
+import {BytecodeToString} from "./bytecode";
 import {PlDebugToString} from "./debug";
-import { PlProgramWithDebug } from "./index";
+import {PlProgram} from "./index";
 
-export function PrettyPrintProgram( program: PlProgramWithDebug): string {
-    let bytecodes = ProgramToString(program.program).split('\n');
+/**
+ * Pretty prints the plprogram
+ * @param program The program to be printed
+ * @constructor
+ */
+export function PlProgramToString(program: PlProgram): string {
+    let bytecodes = program.program.map(b => BytecodeToString(b));
 
     // pad bytecode
     let max = Number.MIN_VALUE;
@@ -11,7 +16,7 @@ export function PrettyPrintProgram( program: PlProgramWithDebug): string {
         let length = bc.length;
         if (length > max)
             max = length;
-    })
+    });
     bytecodes = bytecodes.map(bc => {
         return bc + ' '.repeat(max - bc.length) + ' #';
     });
@@ -41,12 +46,4 @@ export function PrettyPrintProgram( program: PlProgramWithDebug): string {
         }
     }
     return bytecodes.join('\n');
-}
-
-export function ProgramToString(program: PlProgram): string {
-    const out = [];
-    for (const bc of program) {
-        out.push(BytecodeToString(bc));
-    }
-    return out.join('\n');
 }

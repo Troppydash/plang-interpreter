@@ -23,7 +23,7 @@ let c = {
     nu: colors.cyan,
 };
 
-export function PrettyPrintAST( program: ASTProgram ): string {
+export function ASTProgramToString(program: ASTProgram ): string {
     return program.map( statement => ats( statement ) ).join( "\n\n" );
 }
 

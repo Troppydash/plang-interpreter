@@ -1,4 +1,6 @@
 /*
+NOTE: A lot of this are out dated
+
 
 Here is the planning of the virtual machine
 

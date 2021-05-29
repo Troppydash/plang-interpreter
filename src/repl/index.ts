@@ -9,8 +9,8 @@ import { timestamp } from "../timestamp";
 import PlLexer from "../compiler/lexing";
 import {PlAstParser} from "../compiler/parsing";
 import {EmitProgram} from "../vm/emitter";
-import {PrettyPrintAST} from "../compiler/parsing/visualizer";
-import { PrettyPrintProgram } from "../vm/emitter/printer";
+import {ASTProgramToString} from "../compiler/parsing/visualizer";
+import {PlProgramToString} from "../vm/emitter/printer";
 
 export function GetLine(filename: string): string | null {
     let content = "";
@@ -137,13 +137,13 @@ export function StartDemo(filename: string): number {
             continue;
         }
         inout.print("[Display] Printing Parser output");
-        inout.print(PrettyPrintAST(ast));
+        inout.print(ASTProgramToString(ast));
         inout.print('');
 
         inout.print("[Running] Emitting bytecodes...");
         const program = EmitProgram(ast);
         inout.print("[Display] Printing bytecodes");
-        inout.print(PrettyPrintProgram(program));
+        inout.print(PlProgramToString(program));
         inout.print('');
 
         inout.print("[Running] Executing Virtual Machine");

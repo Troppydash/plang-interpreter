@@ -116,6 +116,15 @@ export function LogProblem(problem: PlProblem, content: string): string {
     return buffer.join('\n');
 }
 
+export function LogCallbackProblem(problem: PlProblem): string {
+    let buffer = [];
+    const {code, info, message, here} = problem;
+    buffer.push(...CreateProblemTitle(code, info));
+    buffer.push('');
+    buffer.push(...CreateProblemMessage(code, message));
+    return buffer.join('\n');
+}
+
 export function LogProblemShort(problem: PlProblem) {
     return `${colors.cyan(PCFullName(problem.code))}: ${problem.message}`;
 }
