@@ -1,6 +1,6 @@
 import {PlFileInfo} from "../compiler/lexing/info";
 import templates, {PlProblemCode} from "./codes";
-import {escapeString} from "../extension";
+import {escapeString} from "../extension/text";
 
 export type PlHereType = keyof typeof hereMessage;
 const hereMessage = {

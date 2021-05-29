@@ -1,5 +1,5 @@
-import {dddString, escapeString} from "../../extension";
 import {tsEnumKeys} from "../../extension/tstypes";
+import {dddString, escapeString} from "../../extension/text";
 
 /**
  * Types of bytecodes

@@ -1,4 +1,4 @@
-import { replaceForAll } from "../extension";
+import {replaceForAll} from "../extension/text";
 
 export interface PlFile {
     filename: string;

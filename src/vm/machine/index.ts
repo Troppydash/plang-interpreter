@@ -384,7 +384,7 @@ export class PlStackMachine implements StackMachine {
             if (line < (d.endLine) && line >= (d.endLine - d.length)) {
                 if (surrounding == null) {
                     surrounding = d;
-                } else if (debug.length < surrounding.length) {
+                } else if (d.length < surrounding.length) {
                     surrounding = d;
                 }
             }
@@ -619,8 +619,8 @@ export class PlStackMachine implements StackMachine {
                             break;
                         }
                         this.newProblem({
-                            "*": "RE0011",
-                            "ASTCondition": "RE0015",
+                            "*": "RE0015",
+                            "ASTCondition": "RE0011",
                         }, this.pointer, PlStuffGetType(value));
                         return null;
                     }

@@ -1,32 +1,37 @@
 import {HTMessage, PlHereType, PlProblem} from "./problem";
 import {PCFullName, PCHint, PlProblemCode} from "./codes";
-import inout from "../inout";
 import {colors} from "../inout/color";
-import {chunkString} from "../extension";
-import {PlTrace, PlTraceFrame} from "./trace";
+import {PlTrace} from "./trace";
 import {PlFileInfo} from "../compiler/lexing/info";
+import { dddString, lineWrap, replaceForAll} from "../extension/text";
 
-const NLINESUP = 1;
-const NLINESDOWN = 2;
-const CHARWRAP = 80;
-export const TRACE_MAX = 3;
+const NLINESUP = 1; // Lines above
+const NLINESDOWN = 2; // Lines below
 
+const CHARWRAP = 60; // Max line width
+const TRACE_MAX = 3; // Max number of traces
+const NEWLINE_SYMBOL = " "; // <- symbol
 
-function wrapLine(line: string, header: string) {
-    return line.split('\n').map(l => chunkString(l, CHARWRAP).join('\n' + header)).join('\n' + header); // TODO: make this prettier
+type Line = string;
+
+/**
+ * Create a multiline text from a single long line, where each new line is of **prefix**,
+ * and with the consideration of an offset
+ * @param line The source line
+ * @param prefix The prefix for newline
+ * @param offset The line offset
+ */
+function multiLine(line: string, prefix: string, offset: number) {
+    return replaceForAll(lineWrap(line, CHARWRAP-offset), '\n', '\n'+prefix);
 }
-
-type Line = string[];
 
 function getLine(lines: string[], targetRow: number): Line | null {
     if (targetRow >= 0 && targetRow < lines.length) {
-        const line = lines[targetRow];
-        return chunkString(line, CHARWRAP);
+        return dddString(lines[targetRow], CHARWRAP);
     }
     return null;
 }
 
-// find one line up, two lines down
 function getLines(lines: string[], targetRow: number): [Line[], Line, Line[]] {
     let linesUp = [];
     let linesDown = [];
@@ -65,25 +70,22 @@ export function CreateProblemBody(here: PlHereType, info: PlFileInfo, content: s
     const contentLines = content.split('\n');
     const [linesUp, targetLine, linesDown] = getLines(contentLines, info.row);
 
-    const gap = ' '.repeat(largestLineNumberLength) + '| ';
     let startLine = info.row - NLINESUP + 1;
     // add all the lines above
     for (const line of linesUp) {
         if (line !== null) {
-            const output = line.join('\n' + ' '.repeat(largestLineNumberLength - 1) + '\u21B3| ');
-            buffer.push(grey(startLine.toString().padStart(largestLineNumberLength) + '| ' + output));
+            buffer.push(grey(startLine.toString().padStart(largestLineNumberLength) + '| ' + line));
         }
         ++startLine;
     }
     // add current line and ^^ pointers
-    buffer.push(startLine.toString().padStart(largestLineNumberLength) + '| ' + targetLine[0]);
+    buffer.push(startLine.toString().padStart(largestLineNumberLength) + '| ' + targetLine);
     ++startLine;
     buffer.push(' '.repeat(largestLineNumberLength) + grey('| ') + ' '.repeat(actualCol) + colors.red('^'.repeat(info.length) + ' ' + HTMessage(here)));
     // add all the lines below
     for (const line of linesDown) {
         if (line !== null) {
-            const output = line.join(' ↵\n' + gap);
-            buffer.push(grey(startLine.toString().padStart(largestLineNumberLength) + '| ' + output));
+            buffer.push(grey(startLine.toString().padStart(largestLineNumberLength) + '| ' + line));
         }
         ++startLine;
     }
@@ -94,10 +96,10 @@ export function CreateProblemMessage(code: PlProblemCode, message: string) {
     const buffer = [];
     // hints
     const hint = PCHint(code);
-    buffer.push(`${colors.yellow("Hint")}: ${wrapLine(hint, "    ↳ ")}`);
+    buffer.push(`${colors.yellow("Hint")}: ${multiLine(hint, `    ${NEWLINE_SYMBOL} `, 6)}`);
     // error
     const fullname = PCFullName(code);
-    buffer.push(`${colors.cyan(PCFullName(code))}: ${wrapLine(message, ' '.repeat(fullname.length) + '↳ ')}`);
+    buffer.push(`${colors.cyan(fullname)}: ${multiLine(message, ' '.repeat(fullname.length) + `${NEWLINE_SYMBOL} `, fullname.length+2)}`);
     return buffer;
 }
 

@@ -1,5 +1,5 @@
 import { NewEmptyFileInfo, NewFileInfo, PlFileInfo } from "./info";
-import { escapeString } from "../../extension";
+import {escapeString} from "../../extension/text";
 
 export enum PlTokenType {
     // keywords

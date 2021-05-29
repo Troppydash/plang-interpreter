@@ -521,7 +521,7 @@ class PlLexer implements Lexer {
                             // emit ("a" + str(b) + "c")
 
                             // emit "a" + str(
-                            this.addBuffer(NewPlToken(PlTokenType.STR, content.substring(0, content.length), this.currentFileInfo(this.currentCol - oldCol)) );
+                            this.addBuffer(NewPlToken(PlTokenType.STR, content.substring(0, content.length), this.currentFileInfo(this.currentCol - oldCol + 1)) );
                             content = '';
 
                             this.addBuffer(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(1)))
@@ -529,7 +529,7 @@ class PlLexer implements Lexer {
                             this.addBuffer(NewPlToken(PlTokenType.LPAREN, '(', this.currentFileInfo(1)));
 
                             this.advancePointer();
-
+                            const lparen = this.currentFileInfo(2); // lparen token info
                             // used for counting parenthesis
                             let lparens = 0;
                             while (true) {
@@ -539,7 +539,7 @@ class PlLexer implements Lexer {
                                     return token;
                                 }
                                 if (token.type === PlTokenType.EOF || token.type == PlTokenType.LF) {
-                                    return this.newErrorToken("LE0004", token.info);
+                                    return this.newErrorToken("LE0004", lparen);
                                 }
 
                                 // if multiple tokens emitted in buffer, this puts the popped into place
@@ -583,7 +583,7 @@ class PlLexer implements Lexer {
 
             // add the final/first string segment
             this.addBuffer(
-                NewPlToken(PlTokenType.STR, content.substring(0, content.length - 1), this.currentFileInfo(this.currentCol - lastCol))
+                NewPlToken(PlTokenType.STR, content.substring(0, content.length - 1), this.currentFileInfo(this.currentCol - lastCol + 1))
             );
 
             // if there is more than one emitted

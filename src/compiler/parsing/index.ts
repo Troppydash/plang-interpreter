@@ -797,7 +797,7 @@ export class PlAstParser implements Parser {
                     if ( nextToken.type == PlTokenType.LF || nextToken.type == PlTokenType.EOF ) {
                         this.newProblem( lbrace, "CE0007" );
                     } else {
-                        this.newProblem( nextToken, "ET0042", nextToken.content );
+                        this.newProblem( nextToken, "ET0042" );
                     }
                     return null;
                 }
