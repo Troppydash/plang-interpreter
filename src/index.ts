@@ -5,7 +5,7 @@
 // Starting repl
 import { StartREPL } from "./repl";
 import inout, { isNode } from "./inout";
-import { ReadFile, RunEmitter, RunParser, RunVM } from "./linking";
+import {ReadFile, RunEmitter, RunParser, RunVM, RunVmRelease} from "./linking";
 import { CliArguments } from "./cli";
 import { CliHandleMagicFlags } from "./cli/magic";
 import { LogCliError } from "./cli/error";
@@ -58,6 +58,11 @@ if (!isNode || args.getArgSize() == 0 || args.is("run-repl")) { // If running in
     }
 
     // Default run vm
+    if (args.is("mode-release")) {
+        const code = RunVmRelease(file, args.getArgRest());
+        process.exit(code);
+    }
+
     (async () => {
         const result = await RunVM(file, args.getArgRest());
         process.exit(result);

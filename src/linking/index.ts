@@ -6,7 +6,7 @@ import inout from "../inout";
 import {ASTProgram} from "../compiler/parsing/ast";
 import {PlAstParser} from "../compiler/parsing";
 import {PlProblem} from "../problem/problem";
-import { EmitProgram, PlProgram } from "../vm/emitter/";
+import {EmitProgram, EmitStatement, PlProgram} from "../vm/emitter/";
 import {PlStackMachine} from "../vm/machine";
 import {StartInteractive} from "../problem/interactive";
 
@@ -103,6 +103,47 @@ export function RunFile(file: PlFile, vm: PlStackMachine) {
     return 0;
 }
 
+export function RunVmRelease(file: PlFile, args: string[]): number {
+    const lexer = new PlLexer(file);
+    const parser = new PlAstParser(lexer);
+
+    const vm = new PlStackMachine({
+        ...inout,
+        print: message => {
+            inout.print(message);
+            inout.flush();
+        }
+    }, args);
+
+    let out = null;
+    try {
+        while (!parser.isEOF()) {
+            const statement = parser.parseOnce();
+            if (statement == null) {
+                throw new Error();
+            }
+
+            vm.addProgram(EmitStatement(statement));
+            out = vm.runProgram();
+            if (out == null) {
+                const trace = vm.getTrace();
+                const problems = vm.getProblems();
+                ReportProblems(file.content, problems, trace);
+
+                return 1;
+            }
+        }
+    } catch (e) {
+        const problems = parser.getProblems();
+        ReportProblems(file.content, problems);
+        return 1;
+    }
+
+    if (out != null && typeof out.value == "number")
+        return out.value;
+    return 0;
+}
+
 export async function RunVM(file: PlFile, args: string[]): Promise<number> {
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
@@ -110,7 +151,7 @@ export async function RunVM(file: PlFile, args: string[]): Promise<number> {
     if (ast == null) {
         const problems = parser.getProblems();
         ReportProblems(file.content, problems);
-        return null;
+        return 1;
     }
 
     const program = EmitProgram(ast);
@@ -134,7 +175,7 @@ export async function RunVM(file: PlFile, args: string[]): Promise<number> {
             await StartInteractive(file.content, problems, trace);
         }
 
-        return null;
+        return 1;
     }
     inout.flush();
 

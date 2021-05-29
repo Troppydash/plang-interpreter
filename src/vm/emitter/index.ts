@@ -66,7 +66,10 @@ class ProgramBuilder {
     debugs: PlDebug[];
     line: number;
 
+    emitDebug: boolean;
+
     constructor() {
+        this.emitDebug = inout.options['mode'] == 'debug';
         this.code = [];
         this.debugs = [];
         this.line = 0;
@@ -137,10 +140,6 @@ class ProgramBuilder {
 
     toProgram(): PlProgram {
         return { program: this.code, debug: this.debugs };
-    }
-
-    get emitDebug() {
-        return inout.options['mode'] == 'debug';
     }
 }
 
@@ -628,7 +627,7 @@ function traverseAST( node: ASTNode ): PlProgram {
             .addBytecode( NewBytecode( PlBytecodeType.STKENT ) );
 
         // iter@ = target.iter()
-        // while (@i = iter@.next()).get(2) {
+        // while (i@ = iter@.next()).get(2) {
         //  KEY = i@.get(1).get(1)
         //  VALUE = i@.get(1).get(2)
         //  BLOCK
@@ -649,22 +648,21 @@ function traverseAST( node: ASTNode ): PlProgram {
             .addPWD( traverseAST( assignment ) )
             .addBytecode( NewBytecode( PlBytecodeType.STKPOP ) );
 
-        const get = new ASTVariable( [], 'get' );
-        const one = new ASTNumber( [], '1' );
-        const two = new ASTNumber( [], '2' );
+        const one = new ASTVariable( [], '1' );
+        const two = new ASTVariable( [], '2' );
 
-        const condition = new ASTCall( [], new ASTDot( [], new ASTCreate( [], undefined,
+        const condition = new ASTDot( [], new ASTCreate( [], undefined,
             index,
             new ASTCall( [ target ], new ASTDot( [], iter, new ASTVariable( [], "next" ) ), [] )
-        ), get ), [ two ] );
+        ), two );
 
         let inBlock = [];
         const valueAssign = new ASTCreate( [], undefined, node.value,
-            new ASTCall( [], new ASTDot( [], new ASTCall( [ target ], new ASTDot( [], index, get ), [ one ] ), get ), [ one ] ) );
+            new ASTDot( [], new ASTDot([], index, one), one) );
         inBlock.push( valueAssign );
         if ( node.key ) {
             const keyAssign = new ASTCreate( [], undefined, node.key,
-                new ASTCall( [], new ASTDot( [], new ASTCall( [ target ], new ASTDot( [], index, get ), [ one ] ), get ), [ two ] ) );
+                new ASTDot( [], new ASTDot([], index, one), two) );
             inBlock.push( keyAssign );
         }
 

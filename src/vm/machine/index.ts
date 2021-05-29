@@ -140,8 +140,8 @@ export class PlStackMachine implements StackMachine {
 
     // Adds a program into the stack machine
     addProgram(program: PlProgram) {
-        this.program.program = [...this.program.program, ...program.program];
-        this.program.debug = [...this.program.debug, ...program.debug];
+        this.program.program.push(...program.program);
+        this.program.debug.push(...program.debug);
     }
 
     // Resets the stack machine state
@@ -483,7 +483,7 @@ export class PlStackMachine implements StackMachine {
      */
     runProgram(position: number = this.pointer): PlStuff | null {
         /// WE ASSUME THAT THE PROGRAM IS VALID ///
-        const {program, debug} = this.program;
+        const {program} = this.program;
         this.pointer = position;
 
         try {

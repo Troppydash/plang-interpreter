@@ -71,7 +71,7 @@ export function chunkString(str, n) {
  * @param limit The maximum length with the ...
  */
 export function dddString(source: string, limit: number = 20) {
-    if (source.length <= 20) {
+    if (source.length <= limit) {
         return source;
     }
     return source.substring(0, limit - 3) + '...';

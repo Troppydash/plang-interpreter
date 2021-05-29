@@ -6,20 +6,23 @@ import {colors} from "../inout/color";
 export function CliHandleMagicFlags(args: CliArguments): boolean {
 
     if (args.is("help")) {
-        const exe = process.platform == "win32" ? "plang.exe" : "./plang";
+        const exe = process.platform == "win32" ? "devia.exe" : "./devia";
         inout.print(`Usage: ${exe} ...flags [file] ...program_arguments
 
 ${colors.cyan('Examples')}
-${exe} code.plang               ~ Run the file called [code.plang]
+${exe} code.de                  ~ Run the file called [code.plang]
 ${exe}                          ~ Start the repl
-${exe} --run-emitter code.plang ~ Run the file called [code.plang] with the emitter only 
+${exe} --run-emitter code.de    ~ Run the file called [code.plang] with the emitter only 
 
 ${colors.cyan('Flags')} (all flags begin with --)
 help            ~ Show this message
 run-repl        ~ Start the repl (default method if no [file] is supplied
 run-demo        ~ Start the repl in demo mode
 run-compiler    ~ Run [file] with the compiler only
-run-emitter     ~ Run [file] with the emitter only`);
+run-emitter     ~ Run [file] with the emitter only
+mode-debug      ~ Run [file] in debug mode, will show more detailed errors
+mode-release    ~ Run [file] in release mode, have no detailed errors
+`);
         return false;
     }
 
