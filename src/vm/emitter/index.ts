@@ -488,7 +488,7 @@ function traverseAST( node: ASTNode ): PlProgram {
 
         // TODO: There might be some optimization here to ignore some instructions - skip the condition if it is empty
         programBuilder
-            .addBytecode( NewBytecode( PlBytecodeType.JMPREL, '-' + (block.program.length + afterLength + condLength - 1) ) );
+            .addBytecode( NewBytecode( PlBytecodeType.JMPREL, '-' + (block.program.length + afterLength + condLength + 1) ) );
 
         // initial
         // condition
@@ -524,7 +524,7 @@ function traverseAST( node: ASTNode ): PlProgram {
             .addBytecode( NewBytecode( PlBytecodeType.JMPICF, '' + (block.program.length + 1) ) )
             .addStretch( node.condition, cond.program.length + 1 )
             .addPWD( block )
-            .addBytecode( NewBytecode( PlBytecodeType.JMPREL, '-' + (cond.program.length + block.program.length) ) );
+            .addBytecode( NewBytecode( PlBytecodeType.JMPREL, '-' + (cond.program.length + block.program.length + 2) ) );
 
         return programBuilder.addBytecode( NewBytecode( PlBytecodeType.STKEXT ) )
             .addEmpty()
@@ -574,7 +574,7 @@ function traverseAST( node: ASTNode ): PlProgram {
         }
 
         programBuilder.addPWD( block )
-            .addBytecode( NewBytecode( PlBytecodeType.JMPREL, '-' + (bodySize - 1) ) );
+            .addBytecode( NewBytecode( PlBytecodeType.JMPREL, '-' + (bodySize + 1) ) );
 
         return programBuilder
             .addBytecode( NewBytecode( PlBytecodeType.STKEXT ) )
@@ -685,7 +685,7 @@ function traverseAST( node: ASTNode ): PlProgram {
             .addBytecode( NewBytecode( PlBytecodeType.JMPICF, '' + (block.program.length + kvBlock.program.length + 1) ) )
             .addPWD( kvBlock )
             .addPWD( block )
-            .addBytecode( NewBytecode( PlBytecodeType.JMPREL, '-' + (cond.program.length + block.program.length + kvBlock.program.length) ) )
+            .addBytecode( NewBytecode( PlBytecodeType.JMPREL, '-' + (cond.program.length + block.program.length + kvBlock.program.length + 2) ) )
             .addBytecode( NewBytecode( PlBytecodeType.STKEXT ) )
             .addEmpty()
             .addStretch( node )

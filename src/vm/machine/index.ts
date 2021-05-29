@@ -440,18 +440,6 @@ export class PlStackMachine implements StackMachine {
         return trace;
     }
 
-    /**
-     * Changes the stack machine pointer by **amount** amount
-     * @param amount The amount of change
-     */
-    jump(amount: number) {
-        if (amount < 0) {
-            this.pointer += amount - 2; // this because i am stupid at emitting bytecode jumps
-            return;
-        }
-        this.pointer += amount;
-    }
-
     findValue(key: string) {
         let value = this.stackFrame.findValue(key);
         if (value != null) {
@@ -904,7 +892,7 @@ export class PlStackMachine implements StackMachine {
 
                     /// do jumps ///
                     case PlBytecodeType.JMPREL: {
-                        this.jump(+byte.value);
+                        this.pointer += +byte.value;
                         break;
                     }
 
@@ -912,7 +900,7 @@ export class PlStackMachine implements StackMachine {
                         const peek = this.peekStack();
                         if (peek.type == PlStuffType.Bool) {
                             if (peek.value == true) {
-                                this.jump(+byte.value);
+                                this.pointer += +byte.value;
                             }
                             break;
                         }
@@ -923,7 +911,7 @@ export class PlStackMachine implements StackMachine {
                         const peek = this.peekStack();
                         if (peek.type == PlStuffType.Bool) {
                             if (peek.value == false) {
-                                this.jump(+byte.value);
+                                this.pointer += +byte.value;
                             }
                             break;
                         }
@@ -934,7 +922,7 @@ export class PlStackMachine implements StackMachine {
                         const peek = this.popStack();
                         if (peek.type == PlStuffType.Bool) {
                             if (peek.value == true) {
-                                this.jump(+byte.value);
+                                this.pointer += +byte.value;
                             }
                             break;
                         }
@@ -945,7 +933,7 @@ export class PlStackMachine implements StackMachine {
                         const peek = this.popStack();
                         if (peek.type == PlStuffType.Bool) {
                             if (peek.value == false) {
-                                this.jump(+byte.value);
+                                this.pointer += +byte.value;
                             }
                             break;
                         }
