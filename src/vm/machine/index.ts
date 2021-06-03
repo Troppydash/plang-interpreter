@@ -831,27 +831,30 @@ export class PlStackMachine implements StackMachine {
 
                         const name = bKey.value;
                         if (bTarget.type == PlStuffType.Dict) {
-                            if (name in bTarget.value) {
-                                this.pushStack(bTarget.value[name]);
+                            const value = bTarget.value[name];
+                            if (value) {
+                                this.pushStack(value);
                                 break;
                             }
                         } else if (bTarget.type == PlStuffType.List) {
                             let parsed = Number.parseFloat('' + name);
                             if (!Number.isNaN(parsed)) {
                                 parsed--;
-                                if (parsed in bTarget.value) {
-                                    this.pushStack(bTarget.value[parsed]);
+                                const value = bTarget.value[parsed];
+                                if (value) {
+                                    this.pushStack(value);
                                     break;
                                 }
                             }
                         } else if (bTarget.type == PlStuffType.Inst) {
                             const instance = bTarget.value as PlInstance;
-                            if (name in instance.value) {
-                                this.pushStack(instance.value[name]);
+                            let value = instance.value[name];
+                            if (value) {
+                                this.pushStack(value);
                                 break;
                             }
                             // instance impl functions are different
-                            const value = this.findValue(ScrambleType(name, bTarget.type));
+                            value = this.findValue(ScrambleType(name, bTarget.type));
                             if (value != null) {
                                 value.value.self = bTarget;
                                 this.pushStack(value);

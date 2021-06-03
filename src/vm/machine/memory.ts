@@ -58,9 +58,8 @@ export class PlStackFrame {
     findValue(key: string): PlStuff | null {
         let outer: PlStackFrame = this;
         do {
-            if (key in outer.values) {
-                return outer.values[key];
-            }
+            const value = outer.values[key];
+            if (value) return value;
             if (!outer.isShallow) {
                 return null;
             }
@@ -76,9 +75,8 @@ export class PlStackFrame {
     findValueDeep(key: string): PlStuff | null {
         let outer: PlStackFrame = this;
         do {
-            if (key in outer.values) {
-                return outer.values[key];
-            }
+            const value = outer.values[key];
+            if (value) return value;
             outer = outer.outer;
         } while (outer != null);
 
