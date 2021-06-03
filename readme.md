@@ -27,7 +27,10 @@ say(fib(12))
 # program that asks for your name forever
 loop {
     name = ask("What is your name? ")
-    say("Your name is:", name)
+    if name == null {
+        break
+    }
+    say("Hello", name)
 }
 ```
 

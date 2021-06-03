@@ -1,15 +1,19 @@
-import {PlBytecodeType} from "../emitter/bytecode";
-import {NewPlDebug, PlDebug} from "../emitter/debug";
+import {BytecodeTypeToString, PlBytecodeType} from "../emitter/bytecode";
+import {PlDebug} from "../emitter/debug";
 import {NewPlProblem, PlProblem} from "../../problem/problem";
 import {
-    NewPlStuff, PlFunction, PlInstance, PlNativeFunction,
+    NewPlStuff,
+    PlFunction,
+    PlInstance,
+    PlNativeFunction,
     PlStuff,
     PlStuffFalse,
     PlStuffGetType,
     PlStuffNull,
     PlStuffTrue,
     PlStuffType,
-    PlStuffTypes, PlType,
+    PlStuffTypes,
+    PlType,
 } from "./stuff";
 import {jsModules, jsNatives, natives} from "./native";
 import {ScrambleImpl, ScrambleType, UnscrambleFunction} from "./scrambler";
@@ -186,38 +190,6 @@ export class PlStackMachine implements StackMachine {
         return null;
     }
 
-    /**
-     * Jumps to the function to call the function, faster than runFunction but needs to be synced
-     * @param func The devia function object
-     * @param callDebug The debug node
-     * @param args Function arguments
-     */
-    jumpFunction(func: PlStuff, callDebug: PlDebug | null, args: PlStuff[]) {
-        const value = func.value as PlFunction;
-
-        const parameters = value.parameters;
-        if (parameters.length != args.length) {
-            this.newProblem("RE0006", this.pointer, '' + parameters.length, '' + args.length);
-            return null;
-        }
-
-        this.closureFrames.push(value.closure);
-        this.stackFrame = new PlStackFrame(this.stackFrame, value.closure.trace);
-        if (callDebug) {
-            this.stackFrame.setTraceInfo(callDebug.span.info);
-        }
-
-        // assign variables
-        for (let i = 0; i < args.length; ++i) {
-            this.createValue(parameters[i], args[i]);
-        }
-        this.createValue(value.closure.trace.name, func); // so we can never actually modify the function
-
-        this.pushStack(NewPlStuff(PlStuffType.Num, this.pointer)); // return address
-        this.pointer = value.index;
-        return 0;
-    }
-
     runFunction(func: PlStuff, args: PlStuff[], callPointer?: number): PlStuff | null {
         const oldPointer = this.pointer;
         if (callPointer) {
@@ -267,17 +239,155 @@ export class PlStackMachine implements StackMachine {
     }
 
     /**
+     * Jumps to the function to call the function, faster than runFunction but needs to be synced
+     * @param func The devia function object
+     * @param callDebug The debug node
+     * @param args Function arguments
+     */
+    jumpFunction(func: PlStuff, args: PlStuff[], callDebug: PlDebug | null): boolean {
+        const value = func.value as PlFunction;
+
+        const parameters = value.parameters;
+        if (parameters.length != args.length) {
+            this.newProblem("RE0006", this.pointer, '' + parameters.length, '' + args.length);
+            return false;
+        }
+
+        this.closureFrames.push(value.closure);
+        this.stackFrame = new PlStackFrame(this.stackFrame, value.closure.trace);
+        if (callDebug) {
+            this.stackFrame.setTraceInfo(callDebug.span.info);
+        }
+
+        // assign variables
+        for (let i = 0; i < args.length; ++i) {
+            this.createValue(parameters[i], args[i]);
+        }
+        this.createValue(value.closure.trace.name, func); // so we can never actually modify the function
+
+        this.pushStack(NewPlStuff(PlStuffType.Num, this.pointer)); // return address
+        this.pointer = value.index;
+        return true;
+    }
+
+    /**
+     * Takes the func and tries to call it with the arguments, returns true if successful
+     * @param func
+     * @param args
+     * @param callDebug
+     */
+    callSomething(func: PlStuff, args: PlStuff[], callDebug: PlDebug | null): boolean {
+        switch (func.type) {
+            case PlStuffType.Type: {
+                const value = func.value as PlType;
+                // conversion then
+                if (value.format == null) {
+                    if (args.length != 1) {
+                        this.newProblem("RE0006", this.pointer, '1', '' + args.length);
+                        return false;
+                    }
+                    const got = args[0];
+
+                    // Tries to find .type functions first
+                    const fn = this.findFunction(value.type.toLowerCase(), got);
+                    if (fn != null) {
+                        if (fn.type == PlStuffType.NFunc) {
+                            this.pushStack(this.runFunction(fn, [got]));
+                            break;
+                        }
+                        this.jumpFunction(fn, [got], callDebug);
+                        break;
+                    }
+
+                    // convert to type by default
+                    this.pushStack(PlConverter.PlToPl(got, value, this));
+                    break;
+                }
+
+                // create new instance
+                const obj = {};
+                for (const member of value.format) {
+                    obj[member] = PlStuffNull;
+                }
+
+                const instance = NewPlStuff(PlStuffType.Inst, {
+                    type: value.type,
+                    value: obj
+                } as PlInstance);
+
+                // get new method if exists
+                const ctor = this.findFunction(CTOR_NAME, instance);
+                if (ctor == null) {
+                    if (args.length == 0) { // default value type
+                        this.pushStack(instance);
+                        break;
+                    }
+                    if (args.length == value.format.length) {
+                        for (let i = 0; i < value.format.length; i++) {
+                            instance.value.value[value.format[i]] = args[i];
+                        }
+                        this.pushStack(instance);
+                        break;
+                    }
+                    this.newProblem("RE0006", this.pointer, `0 or ${value.format.length}`, '' + args.length);
+                    return false;
+                }
+                // call constructor // TODO: make this a jump sometime
+                try {
+                    this.runFunction(ctor, [instance, ...args]); // need run function, so we can pop and push
+                } catch (e) {
+                    return false;
+                }
+                this.pushStack(instance);
+                break;
+            }
+            case PlStuffType.NFunc: {
+                const value = func.value as PlNativeFunction;
+                const stackFrame = this.stackFrame;
+                try {
+                    this.pushStack(value.native(...args));
+                } catch (e) {
+                    // insert stackFrame
+                    const info = callDebug == null ? null : callDebug.span.info;
+                    if (stackFrame == this.stackFrame) {
+                        this.stackFrame = new PlStackFrame(this.stackFrame, NewPlTraceFrame(value.name, info));
+                    } else {
+                        let sf = this.stackFrame;
+                        while (sf.outer != stackFrame) {
+                            sf = sf.outer;
+                        }
+                        sf.outer = new PlStackFrame(stackFrame, NewPlTraceFrame(value.name, info))
+                    }
+
+                    if (e != null) {
+                        this.newProblem("RE0007", this.pointer, e.message);
+                    }
+                    return false;
+                }
+                break;
+            }
+            case PlStuffType.Func: {
+                if (!this.jumpFunction(func, args, callDebug))
+                    return false;
+                break;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns the call debug for the bytecode located at **pointer**
      * @param pointer Where the call bytecode is
      */
     getCallDebug(pointer: number): PlDebug | null {
         const {debug} = this.program;
         if (debug) {
-            const callDebug = debug.filter(d => d.endLine == pointer + 1);
-            if (callDebug.length != 1) {
-                return null;
+            for (const d of debug) {
+                if (d.endLine == pointer+1) {
+                    return d;
+                }
             }
-            return callDebug[0];
+            return null;
         }
         return null;
     }
@@ -290,7 +400,7 @@ export class PlStackMachine implements StackMachine {
         // Javascript Natives
         for (const [key, entry] of Object.entries(jsNatives)) {
             const pl = PlConverter.JsToPl(entry, this);
-            pl.value.name = UnscrambleFunction(key)[1];
+            (pl.value as PlNativeFunction).name = UnscrambleFunction(key)[1];
             this.stackFrame.createValue(
                 key,
                 pl
@@ -374,9 +484,6 @@ export class PlStackMachine implements StackMachine {
             this.problems.push(NewPlProblem(typeof code == "string" ? code : code["*"], null, ...args));
             return null;
         }
-
-        // clean up arguments
-        args = args.filter(a => a != undefined);
 
         // get all pldebug that contains this line and the smallest one to do so
         let surrounding: PlDebug = null;
@@ -539,21 +646,7 @@ export class PlStackMachine implements StackMachine {
                             break;
                         }
 
-                        // try to find it by impl
-                        const left = this.peekStack(1);
-                        if (left != null) {
-                            let value = this.findValue(ScrambleImpl(name, left))
-                            if (value != null) {
-                                this.pushStack(value);
-                                break;
-                            }
-                        }
-
-                        return this.newProblem({
-                            "ASTVariable": "RE0003",
-                            "ASTBinary": "RE0004",
-                            "*": "RE0003",
-                        }, this.pointer, name, left ? PlStuffGetType(left) : undefined);
+                        return this.newProblem("RE0003", this.pointer, name);
                     }
                     // define lists
                     case PlBytecodeType.DEFLST: {
@@ -596,22 +689,26 @@ export class PlStackMachine implements StackMachine {
                         break;
                     }
                     // inc and dec
-                    case PlBytecodeType.DOOINC:
-                    case PlBytecodeType.DOODEC: {
+                    case PlBytecodeType.DOOINC: {
                         const value = this.popStack();
                         if (value.type == PlStuffType.Num) {
-                            if (byte.type == PlBytecodeType.DOOINC)
-                                value.value++;
-                            else
-                                value.value--;
+                            value.value++;
                             this.pushStack(value);
                             break;
                         }
-                        this.newProblem({
+                        return this.newProblem("RE0015", this.pointer, PlStuffGetType(value));
+                    }
+                    case PlBytecodeType.DOODEC: {
+                        const value = this.popStack();
+                        if (value.type == PlStuffType.Num) {
+                            value.value--;
+                            this.pushStack(value);
+                            break;
+                        }
+                        return this.newProblem({
                             "*": "RE0015",
                             "ASTCondition": "RE0011",
                         }, this.pointer, PlStuffGetType(value));
-                        return null;
                     }
                     // negate
                     case PlBytecodeType.DONEGT: {
@@ -681,6 +778,28 @@ export class PlStackMachine implements StackMachine {
                         return this.newProblem("RE0013", this.pointer, PlStuffGetType(target));
                     }
 
+                    case PlBytecodeType.DOFDCL: {
+                        const name = byte.value;
+                        const arity = this.popStack();
+                        const target = this.popStack();
+                        const fn = this.findFunction(name, target);
+                        if (fn == null) {
+                            return this.newProblem("RE0004", this.pointer, name, PlStuffGetType(target));
+                        }
+
+                        const args = [target];
+                        const remain = (+arity.value)-1;
+                        for (let i = 0; i < remain; ++i) {
+                            args.push(PlActions.PlCopy(this.popStack()));
+                        }
+
+                        const ok = this.callSomething(fn, args, this.getCallDebug(this.pointer));
+                        if (!ok) {
+                            return null;
+                        }
+                        break;
+                    }
+
                     // do function call
                     case PlBytecodeType.DOCALL: {
                         const func = this.popStack();
@@ -692,108 +811,15 @@ export class PlStackMachine implements StackMachine {
                         const arity = this.popStack();
                         const args: PlStuff[] = [];
                         if (func.value.self) {
-                            args.push(PlActions.PlCopy(func.value.self));
+                            args.push(func.value.self);
                         }
                         for (let i = 0; i < +arity.value; ++i) {
                             args.push(PlActions.PlCopy(this.popStack()));
                         }
 
-                        const callDebug = this.getCallDebug(this.pointer);
-
-                        // call function
-                        switch (func.type) {
-                            case PlStuffType.Type: {
-                                const value = func.value as PlType;
-                                // conversion then
-                                if (value.format == null) {
-                                    if (args.length != 1) {
-                                        this.newProblem("RE0006", this.pointer, '1', '' + args.length);
-                                        return null;
-                                    }
-                                    const got = args[0];
-
-                                    // Tries to find .type functions first
-                                    const fn = this.findFunction(value.type.toLowerCase(), got);
-                                    if (fn != null) {
-                                        if (fn.type == PlStuffType.NFunc) {
-                                            this.pushStack(this.runFunction(fn, [got]));
-                                            break;
-                                        }
-                                        this.jumpFunction(fn, callDebug, [got]);
-                                        break;
-                                    }
-
-                                    // convert to type by default
-                                    this.pushStack(PlConverter.PlToPl(got, value, this));
-                                    break;
-                                }
-
-                                // create new instance
-                                const obj = {};
-                                for (const member of value.format) {
-                                    obj[member] = PlStuffNull;
-                                }
-
-                                const instance = NewPlStuff(PlStuffType.Inst, {
-                                    type: value.type,
-                                    value: obj
-                                } as PlInstance);
-
-                                // get new method if exists
-                                const ctor = this.findFunction(CTOR_NAME, instance);
-                                if (ctor == null) {
-                                    if (args.length == 0) { // default value type
-                                        this.pushStack(instance);
-                                        break;
-                                    }
-                                    if (args.length == value.format.length) {
-                                        for (let i = 0; i < value.format.length; i++) {
-                                            instance.value.value[value.format[i]] = args[i];
-                                        }
-                                        this.pushStack(instance);
-                                        break;
-                                    }
-                                    return this.newProblem("RE0006", this.pointer, `0 or ${value.format.length}`, '' + args.length);
-                                }
-                                // call constructor // TODO: make this a jump sometime
-                                try {
-                                    this.runFunction(ctor, [instance, ...args]); // need run function, so we can pop and push
-                                } catch (e) {
-                                    return null;
-                                }
-                                this.pushStack(instance);
-                                break;
-                            }
-                            case PlStuffType.NFunc: {
-                                const value = func.value as PlNativeFunction;
-                                const stackFrame = this.stackFrame;
-                                try {
-                                    this.pushStack(value.native(...args));
-                                } catch (e) {
-                                    // insert stackFrame
-                                    const info = callDebug == null ? null : callDebug.span.info;
-                                    if (stackFrame == this.stackFrame) {
-                                        this.stackFrame = new PlStackFrame(this.stackFrame, NewPlTraceFrame(value.name, info));
-                                    } else {
-                                        let sf = this.stackFrame;
-                                        while (sf.outer != stackFrame) {
-                                            sf = sf.outer;
-                                        }
-                                        sf.outer = new PlStackFrame(stackFrame, NewPlTraceFrame(value.name, info))
-                                    }
-
-                                    if (e != null) {
-                                        this.newProblem("RE0007", this.pointer, e.message);
-                                    }
-                                    return null;
-                                }
-                                break;
-                            }
-                            case PlStuffType.Func: {
-                                if (this.jumpFunction(func, callDebug, args) == null)
-                                    return null;
-                                break;
-                            }
+                        const ok = this.callSomething(func, args, this.getCallDebug(this.pointer));
+                        if (!ok) {
+                            return null;
                         }
                         break;
                     }
@@ -941,7 +967,7 @@ export class PlStackMachine implements StackMachine {
                     }
 
                     default: {
-                        return this.newProblem("RE0001", this.pointer, byte.type);
+                        return this.newProblem("RE0001", this.pointer, BytecodeTypeToString(byte.type));
                     }
                 }
                 ++this.pointer;

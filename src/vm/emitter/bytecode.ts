@@ -22,6 +22,7 @@ export enum PlBytecodeType {
     JMPICF,
     JMPREL,
 
+    DOFDCL,
     DOCALL,
     DORETN,
     DOASGN,
@@ -51,6 +52,10 @@ export function NewBytecode(type: PlBytecodeType, value: string | null = null): 
         type,
         value
     };
+}
+
+export function BytecodeTypeToString(bct: PlBytecodeType): string {
+    return allEnumKeys[bct];
 }
 
 export function BytecodeToString(bc: PlBytecode) {

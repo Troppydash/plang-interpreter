@@ -255,8 +255,7 @@ function traverseAST( node: ASTNode ): PlProgram {
             .addPWD( traverseAST( node.right ) )
             .addPWD( traverseAST( node.left ) )
             .addBytecode( NewBytecode( PlBytecodeType.DEFNUM, '2' ) )
-            .addBytecode( NewBytecode( PlBytecodeType.DEFVAR, node.operator.content ) )
-            .addBytecodeStretch( NewBytecode( PlBytecodeType.DOCALL ), node )
+            .addBytecodeStretch( NewBytecode( PlBytecodeType.DOFDCL, node.operator.content ), node )
             .toProgram();
     } else if ( node instanceof ASTUnary ) {
         programBuilder.addPWD( traverseAST( node.value ) );
@@ -437,7 +436,7 @@ function traverseAST( node: ASTNode ): PlProgram {
 
         let cond;
         let after;
-        let condLength = 2;
+        let condLength = 0;
         let afterLength = 0;
 
         if ( node.condition ) {
@@ -468,10 +467,6 @@ function traverseAST( node: ASTNode ): PlProgram {
                 .addBytecode( NewBytecode( PlBytecodeType.JMPICF, '' + (block.program.length + afterLength + 1) ) )
                 .addStretch( node.condition, cond.program.length + 1 );
 
-        } else {
-            programBuilder
-                .addBytecode( NewBytecode( PlBytecodeType.DEFBOL, '1' ) )
-                .addBytecode( NewBytecode( PlBytecodeType.JMPICF, '' + (block.program.length + afterLength + 1) ) );
         }
 
         // emit block
@@ -486,16 +481,8 @@ function traverseAST( node: ASTNode ): PlProgram {
 
         }
 
-        // TODO: There might be some optimization here to ignore some instructions - skip the condition if it is empty
         programBuilder
             .addBytecode( NewBytecode( PlBytecodeType.JMPREL, '-' + (block.program.length + afterLength + condLength + 1) ) );
-
-        // initial
-        // condition
-        // jmpicf
-        // block
-        // after
-        // jmprel -
 
         return programBuilder
             .addBytecode( NewBytecode( PlBytecodeType.STKEXT ) )
@@ -561,7 +548,7 @@ function traverseAST( node: ASTNode ): PlProgram {
                 .addPWDNoDebug( out )
                 .addStretch( node.amount, out.program.length )
                 .addBytecode( NewBytecode( PlBytecodeType.JMPICF, '' + (bodySize + 1) ) );
-            bodySize += 7;
+            bodySize += out.program.length + 1;
         }
 
         for ( let i = 0; i < block.program.length; ++i ) {

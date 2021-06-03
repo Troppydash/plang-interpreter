@@ -1,7 +1,7 @@
 import { PlFile } from "../../inout/file";
 import PlToken, { NewPlToken, PlTokenType } from "./token";
 import { NewFileInfo, PlFileInfo } from "./info";
-import { isalpha, isblank, isnum, isvariablerest } from "../../extension/types";
+import {isalpha, isblank, isnum, isvariablefirst, isvariablerest} from "../../extension/types";
 import { NewPlProblem, PlProblem } from "../../problem/problem";
 import { PlProblemCode } from "../../problem/codes";
 
@@ -178,7 +178,7 @@ class PlLexer implements Lexer {
 
         let c = this.currentChar();
         // is number
-        if (isnum(c)) { // TODO: make exponents
+        if (isnum(c)) {
             let content = '';
             const oldCol = this.currentCol;
             do {
@@ -187,8 +187,22 @@ class PlLexer implements Lexer {
                 c = this.currentChar();
             } while (isnum(c) && !this.isEOF());
 
+            // parse dot
             if (!this.isEOF() && !this.isNextEOF() && c === '.' && isnum(this.nextChar())) {
-                // parse dot
+                do {
+                    content += c;
+                    this.advancePointer();
+                    c = this.currentChar();
+                } while (isnum(c) && !this.isEOF());
+            }
+
+            // parses exponents
+            if (!this.isEOF() && !this.isNextEOF() && (c == 'e' || c == 'E') && (isnum(this.nextChar()) || this.nextChar() == '-')) {
+                if (this.nextChar() == '-') {
+                    content += c;
+                    this.advancePointer();
+                    c = this.currentChar();
+                }
                 do {
                     content += c;
                     this.advancePointer();
@@ -525,7 +539,7 @@ class PlLexer implements Lexer {
                             content = '';
 
                             this.addBuffer(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(1)))
-                            this.addBuffer(NewPlToken(PlTokenType.VARIABLE, 'str', this.currentFileInfo(1)));
+                            this.addBuffer(NewPlToken(PlTokenType.VARIABLE, 'Str', this.currentFileInfo(1)));
                             this.addBuffer(NewPlToken(PlTokenType.LPAREN, '(', this.currentFileInfo(1)));
 
                             this.advancePointer();
@@ -599,7 +613,7 @@ class PlLexer implements Lexer {
         }
 
         // variables
-        if (isalpha(c) || c === '_' || c === '@' || c === '$') {
+        if (isvariablefirst(c)) {
             let content = '';
             const oldCol = this.currentCol;
             do {

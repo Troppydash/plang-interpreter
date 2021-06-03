@@ -19,6 +19,7 @@ jmprel - Force jump
 
 
 Actions:
+dofdcl - Find and call function
 docall - Call functions
 doasgn - Assignment
 docret - Assignment but creation only
