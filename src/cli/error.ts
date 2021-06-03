@@ -17,11 +17,11 @@ export function NewCliError(index: number, reason: string) {
 export function LogCliError(args: string[], error: CliError) {
     const {index, reason} = error;
 
-    inout.print(colors.red(`Cannot Understand the CLI Arguments:`));
-    inout.print(`> plang ${args.join(' ')}`);
+    inout.print(colors.red(`CLI Problems:`));
+    inout.print(`> devia ${args.join(' ')}`);
 
     // count offsets
-    let offset = 8; // for '> plang '
+    let offset = 8; // for '> devia '
     for (let i = 0; i < index; i++) {
         offset += args[i].length + 1;
     }
@@ -29,7 +29,7 @@ export function LogCliError(args: string[], error: CliError) {
     inout.print(' '.repeat(offset) + colors.red('^'.repeat(args[index].length)));
 
     inout.print('');
-    const exe = process.platform == "win32" ? "plang.exe" : "./plang";
+    const exe = process.platform == "win32" ? "devia.exe" : "./devia";
     inout.print(`${colors.yellow('Tip')}: run '${exe} --help' to see the correct usages`);
     inout.print(`${colors.cyan('Reason')}: ${reason}`);
 }

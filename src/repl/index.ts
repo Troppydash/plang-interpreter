@@ -60,7 +60,7 @@ export function GetLine(filename: string): string | null {
             }
             break;
         }
-    return content;
+    return content.slice(0, content.length-1); // strip \n
 }
 
 export function StartREPL( filename: string ): number {

@@ -1,6 +1,5 @@
-import PlToken from "../compiler/lexing/token";
 import PlLexer from "../compiler/lexing";
-import {ReportProblem, ReportProblems} from "../problem";
+import {ReportProblems} from "../problem";
 import { NewPlFile, PlFile } from "../inout/file";
 import inout from "../inout";
 import {ASTProgram} from "../compiler/parsing/ast";
@@ -171,7 +170,7 @@ export async function RunVM(file: PlFile, args: string[]): Promise<number> {
         const ok = ReportProblems(file.content, problems, trace);
 
         // fancy
-        if (inout.options["mode"] == "debug" && ok && trace.length > 1) {
+        if (inout.options["mode"] == "debug" && ok && trace.length > 2) {
             await StartInteractive(file.content, problems, trace);
         }
 

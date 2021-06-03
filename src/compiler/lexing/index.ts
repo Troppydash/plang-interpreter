@@ -178,7 +178,7 @@ class PlLexer implements Lexer {
 
         let c = this.currentChar();
         // is number
-        if (isnum(c)) {
+        if (isnum(c)) { // TODO: make exponents
             let content = '';
             const oldCol = this.currentCol;
             do {

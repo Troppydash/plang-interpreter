@@ -10,9 +10,9 @@ export function CliHandleMagicFlags(args: CliArguments): boolean {
         inout.print(`Usage: ${exe} ...flags [file] ...program_arguments
 
 ${colors.cyan('Examples')}
-${exe} code.de                  ~ Run the file called [code.plang]
+${exe} code.de                  ~ Run the file called [code.de]
 ${exe}                          ~ Start the repl
-${exe} --run-emitter code.de    ~ Run the file called [code.plang] with the emitter only 
+${exe} --run-emitter code.de    ~ Run the file called [code.de] with the emitter only 
 
 ${colors.cyan('Flags')} (all flags begin with --)
 help            ~ Show this message
