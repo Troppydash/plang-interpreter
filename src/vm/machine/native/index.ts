@@ -10,6 +10,7 @@ import {jsNum} from "./impl/num";
 import {time} from "./modules/time";
 import {random} from "./modules/random";
 import {debug} from "./modules/debug";
+import {func} from "./impl/func";
 
 
 export const jsNatives: ExportJs = {
@@ -26,6 +27,7 @@ export const natives: ExportNative = {
     ...str,
     ...list,
     ...dict,
+    ...func,
     ...all,
     ...special,
 };

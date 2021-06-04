@@ -40,6 +40,24 @@ export function NewPlStuff(type: PlStuffType, value: any): PlStuff {
 }
 
 
+export interface PlStuffFunction extends PlStuff {
+    value: PlFunction;
+}
+
+export interface PlStuffNativeFunction extends PlStuff {
+    value: PlNativeFunction;
+}
+
+export interface PlStuffInstance extends PlStuff {
+    value: PlInstance;
+}
+
+export interface PlStuffT extends PlStuff {
+    value: PlType;
+}
+
+
+
 /// These are possible types for the plstuff.value field ///
 export interface PlFunction {
     index: number; // index of bytecode

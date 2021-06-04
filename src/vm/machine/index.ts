@@ -16,7 +16,7 @@ import {
     PlType,
 } from "./stuff";
 import {jsModules, jsNatives, natives} from "./native";
-import {ScrambleImpl, ScrambleType, UnscrambleFunction} from "./scrambler";
+import {ScrambleImpl, ScrambleName, ScrambleType, UnscrambleFunction} from "./scrambler";
 import {PlProblemCode} from "../../problem/codes";
 import {PlActions, PlConverter} from "./native/converter";
 import {PlProgram} from "../emitter";
@@ -70,6 +70,7 @@ export interface StackMachine {
      */
     findFunction(name: string, target?: PlStuff): PlStuff | null;
 
+    callSomething(func: PlStuff, args: PlStuff[], callDebug: PlDebug | null): boolean;
     /**
      * Save the stack machine state for try catch calls
      */
@@ -270,6 +271,24 @@ export class PlStackMachine implements StackMachine {
         return true;
     }
 
+
+    convertBasicTypes(value: PlType, args: PlStuff[]): PlStuff | null {
+        if (args.length != 1) {
+            this.newProblem("RE0006", this.pointer, '1', '' + args.length);
+            return null;
+        }
+        const got = args[0];
+
+        // Tries to find .type functions first
+        const fn = this.findFunction(value.type.toLowerCase(), got);
+        if (fn != null) {
+            return this.runFunction(fn, [got]);
+        }
+
+        // convert to type by default
+        return PlConverter.PlToPl(got, value, this);
+    }
+
     /**
      * Takes the func and tries to call it with the arguments, returns true if successful
      * @param func
@@ -282,25 +301,11 @@ export class PlStackMachine implements StackMachine {
                 const value = func.value as PlType;
                 // conversion then
                 if (value.format == null) {
-                    if (args.length != 1) {
-                        this.newProblem("RE0006", this.pointer, '1', '' + args.length);
+                    const out = this.convertBasicTypes(value, args);
+                    if (out == null) {
                         return false;
                     }
-                    const got = args[0];
-
-                    // Tries to find .type functions first
-                    const fn = this.findFunction(value.type.toLowerCase(), got);
-                    if (fn != null) {
-                        if (fn.type == PlStuffType.NFunc) {
-                            this.pushStack(this.runFunction(fn, [got]));
-                            break;
-                        }
-                        this.jumpFunction(fn, [got], callDebug);
-                        break;
-                    }
-
-                    // convert to type by default
-                    this.pushStack(PlConverter.PlToPl(got, value, this));
+                    this.pushStack(out);
                     break;
                 }
 
@@ -442,13 +447,25 @@ export class PlStackMachine implements StackMachine {
 
         // Basic types
         for (const key of PlStuffTypes) {
+            const value = NewPlStuff(PlStuffType.Type, {
+                type: key,
+                format: null
+            } as PlType);
             this.stackFrame.createValue(
                 key,
-                NewPlStuff(PlStuffType.Type, {
-                    type: key,
-                    format: null
-                } as PlType)
-            )
+                value
+            );
+            this.stackFrame.createValue(
+                ScrambleName("new", key),
+                NewPlStuff(PlStuffType.NFunc, {
+                    native: (...args) => {
+                        const out =  this.convertBasicTypes(value.value, args);
+                        if (out == null) throw null;
+                        return out;
+                    },
+                    name: "new"
+                } as PlNativeFunction)
+            );
         }
     }
 
@@ -553,7 +570,7 @@ export class PlStackMachine implements StackMachine {
         return trace;
     }
 
-    findValue(key: string) {
+    findValue(key: string): PlStuff | null {
         let value = this.stackFrame.findValue(key);
         if (value != null) {
             return value;
@@ -866,6 +883,14 @@ export class PlStackMachine implements StackMachine {
                                 this.pushStack(value);
                                 break;
                             }
+                        } else if (bTarget.type == PlStuffType.Type) {
+                            // try to find static functions
+                            const value = this.findValue(ScrambleName(name, bTarget.value.type));
+                            if (value != null) {
+                                value.value.self = null;
+                                this.pushStack(value);
+                                break;
+                            }
                         }
 
                         // try finding impl
@@ -875,6 +900,8 @@ export class PlStackMachine implements StackMachine {
                             this.pushStack(value);
                             break;
                         }
+
+
 
                         return this.newProblem({
                             "*": "RE0012",
