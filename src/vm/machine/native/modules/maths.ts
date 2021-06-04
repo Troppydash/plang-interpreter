@@ -1,7 +1,9 @@
+import {GenerateJsGuardedFunction} from "../helpers";
+
 function generateBindings(target: any, converter: Record<string, string>): object {
     const out = {};
     for (const [key, entry] of Object.entries(converter)) {
-        out[key] = target[entry];
+        out[key] = GenerateJsGuardedFunction(key, ["number"], target[entry]);
     }
     return out;
 }

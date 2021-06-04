@@ -430,7 +430,13 @@ export class PlStackMachine implements StackMachine {
         this.stackFrame.createValue(
             "process",
             PlConverter.JsToPl({
-                arguments: args
+                arguments: args,
+                exit: code => {
+                    if (process) {
+                        process.exit(code);
+                    }
+                    this.pointer = this.program.program.length;
+                }
             }, this)
         )
 

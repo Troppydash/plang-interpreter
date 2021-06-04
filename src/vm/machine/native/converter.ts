@@ -1,5 +1,6 @@
 import {
-    NewPlStuff, PlInstance,
+    NewPlStuff,
+    PlInstance,
     PlStuff,
     PlStuffFalse,
     PlStuffGetType,
@@ -7,9 +8,10 @@ import {
     PlStuffTrue,
     PlStuffType,
     PlStuffTypeFromString,
-    PlStuffTypeToString, PlType
+    PlStuffTypeToString,
+    PlType
 } from "../stuff";
-import { StackMachine } from "../index";
+import {StackMachine} from "../index";
 import {ReportCallbackProblems} from "../../../problem";
 
 /**
@@ -45,13 +47,19 @@ function protectPlangCall(callback: Function, sm: StackMachine) {
 export namespace PlConverter {
     const VERSION = 1; // Converter version
 
+    interface CustomValue {
+        _version: number;
+        type: "Instance" | "Type";
+        value: any
+    }
+
     /**
      * Convert an devia instance to js
      * @param instance The devia instance
      * @param sm The stack machine
      * @private
      */
-    function instanceToJs(instance: PlInstance, sm: StackMachine) {
+    function instanceToJs(instance: PlInstance, sm: StackMachine): CustomValue {
         const out = {};
         Object.entries(instance.value).forEach(([key, value]) => {
             out[key] = PlToJs(value as PlStuff, sm);
@@ -60,17 +68,20 @@ export namespace PlConverter {
         // custom js instance format
         return {
             _version: VERSION,
-            type: instance.type,
-            value: out
+            type: "Instance",
+            value: {
+                type: instance.type,
+                value: instance.value
+            }
         };
     }
 
     /**
-     * Check if an js object is a valid devia instance
+     * Check if an js object is a valid devia custom stuff
      * @param js The js object
      * @private
      */
-    function jsIsInstance(js: object): boolean {
+    function jsIsCustom(js: CustomValue): boolean {
         if ("_version" in js) {
             switch (js["_version"]) {
                 case 1:
@@ -93,16 +104,35 @@ export namespace PlConverter {
      * @param sm The stack machine
      * @private
      */
-    function jsToInstance(js: object, sm: StackMachine): PlStuff {
+    function jsToInstance(js: CustomValue, sm: StackMachine): PlStuff {
         const out = {};
-        for (const [key, value] of Object.entries(js["value"])) {
+        for (const [key, value] of Object.entries(js.value.value)) {
             out[key] = JsToPl(value, sm);
         }
         return NewPlStuff(PlStuffType.Inst, {
-            type: js["type"],
+            type: js.value.type,
             value: out
         } as PlInstance);
     }
+
+    function typeToJs(type: PlStuff): CustomValue {
+        return {
+            _version: VERSION,
+            type: "Type",
+            value: {
+                type: type.value.type,
+                format: type.value.format
+            }
+        };
+    }
+
+    function jsToType(js: CustomValue): PlStuff {
+        return NewPlStuff(PlStuffType.Type, {
+            type: js.value.type,
+            format: js.value.value
+        } as PlType);
+    }
+
 
     /**
      * Converts a devia object to js
@@ -119,7 +149,7 @@ export namespace PlConverter {
                 return +object.value;
             }
             case PlStuffType.Type: {
-                return object.value.type; // a string
+                return typeToJs(object);
             }
             case PlStuffType.Bool: {
                 return object.value;
@@ -195,8 +225,13 @@ export namespace PlConverter {
                     return NewPlStuff(PlStuffType.List, object.map(i => JsToPl(i, sm)));
                 }
 
-                if (jsIsInstance(object)) {
-                    return jsToInstance(object, sm);
+                if (jsIsCustom(object)) {
+                    switch ((object as CustomValue).type) {
+                        case "Instance":
+                            return jsToInstance(object, sm);
+                        case "Type":
+                            return jsToType(object);
+                    }
                 }
 
                 const obj = {};

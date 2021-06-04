@@ -41,6 +41,18 @@ export const jsList = {
                 return [[self[index++], index], true];
             }
         }
+    }),
+    [ScrambleType("map", PlStuffType.List)]: GenerateJsGuardedTypeFunction("map", ["function"], function (self, func) {
+        const newList = [];
+        for (let i = 0; i < self.length; i++) {
+            try {
+                const value = func(self[i], i+1);
+                newList.push(value);
+            } catch (e) {
+                throw null;
+            }
+        }
+        return newList;
     })
 };
 
@@ -170,5 +182,5 @@ export const list = {
             return -1;
         })
         return self;
-    })
+    }),
 }

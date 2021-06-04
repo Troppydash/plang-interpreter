@@ -126,10 +126,6 @@ export const special = {
     "panic": function (...message: PlStuff[]) {
         throw new Error(message.map(m => PlToString(m, this)).join(' '));
     },
-    "locals": GenerateGuardedFunction("locals", [], function (this: StackMachine) {
-        const obj = this.stackFrame.values;
-        return NewPlStuff(PlStuffType.Dict, obj);
-    }),
     "say": function (this: StackMachine, ...message: PlStuff[]) {
         if (message.length == 0) {
             this.inout.print('\n');
@@ -265,6 +261,27 @@ if (isNode) {
                 ok: false
             } as ExecOutput;
         }
+    });
+
+    jsSpecial["require"] = GenerateJsGuardedFunction("require", ["string"], function (p: string) {
+        try {
+            if (/^\w+$/.test(p)) {
+                return {
+                    ok: true,
+                    data: require(p),
+                };
+            }
+            return {
+                ok: true,
+                data: require(path.join(inout.paths.rootPath, p)),
+            };
+        } catch (e) {
+            return {
+                ok: false,
+                data: `cannot import js file '${p}'`
+            };
+        }
+
     })
 } else {
     jsSpecial['fetch'] = GenerateJsGuardedFunction('fetch', ["string", "object"], function (this, url, options: FetchOptions) {

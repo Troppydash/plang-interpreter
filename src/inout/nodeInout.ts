@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as ps from 'prompt-sync';
 import * as psh from 'prompt-sync-history';
-import {PlConverter} from "../vm/machine/native/converter";
 import { MaskedEval } from "./proxy";
 
 function complete( commands ) {
@@ -80,7 +79,9 @@ export function execute(code: string, vars: Record<string, any>): void {
         Set,
         JSON,
         Promise,
-        require,
+        require: p => {
+            return require(path.join(paths.rootPath, p));
+        },
         global,
         ...vars,
     });

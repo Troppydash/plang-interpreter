@@ -1,14 +1,15 @@
-import { jsOperators, operators } from "./operators";
-import { jsList, list } from "./impl/list";
-import { all } from "./impl/all";
-import { jsStr, str } from "./impl/str";
+import {jsOperators, operators} from "./operators";
+import {jsList, list} from "./impl/list";
+import {all} from "./impl/all";
+import {jsStr, str} from "./impl/str";
 import {dict, jsDict} from "./impl/dict";
 import {jsSpecial, special} from "./special";
-import { ExportJs, ExportNative } from "./types";
+import {ExportJs, ExportNative} from "./types";
 import {maths} from "./modules/maths";
 import {jsNum} from "./impl/num";
-import { time } from "./modules/time";
+import {time} from "./modules/time";
 import {random} from "./modules/random";
+import {debug} from "./modules/debug";
 
 
 export const jsNatives: ExportJs = {
@@ -32,5 +33,6 @@ export const natives: ExportNative = {
 export const jsModules: Record<string, any> = {
     ...maths,
     ...time,
-    ...random
+    ...random,
+    ...debug,
 };
