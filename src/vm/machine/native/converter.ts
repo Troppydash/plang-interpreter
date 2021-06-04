@@ -352,7 +352,7 @@ export namespace PlConverter {
                 return `dict(${Object.entries(object.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToString(value, sm,true)}`).join(', ')})`;
             case PlStuffType.NFunc:
             case PlStuffType.Func:
-                return "[function]";
+                return `[function '${object.value.name}']`;
             case PlStuffType.List:
                 return `list(${object.value.map(v => PlToString(v, sm, true)).join(', ')})`;
             case PlStuffType.Null:

@@ -61,7 +61,7 @@ export interface StackMachine {
      * @param args The arguments for the function
      * @param callPointer The location where the function is called, so that debug messages generate nicely if this is used as an callback
      */
-    runFunction(func: PlStuff, args: PlStuff[], callPointer?: number): PlStuff | null;
+    runFunction(func: PlStuff, args: PlStuff[], callPointer?: number): PlStuff;
 
     /**
      * Find a function or an impl function at the current state
@@ -191,7 +191,7 @@ export class PlStackMachine implements StackMachine {
         return null;
     }
 
-    runFunction(func: PlStuff, args: PlStuff[], callPointer?: number): PlStuff | null {
+    runFunction(func: PlStuff, args: PlStuff[], callPointer?: number): PlStuff {
         const oldPointer = this.pointer;
         if (callPointer) {
             this.pointer = callPointer;
@@ -876,13 +876,13 @@ export class PlStackMachine implements StackMachine {
                                 this.pushStack(value);
                                 break;
                             }
-                            // instance impl functions are different
-                            value = this.findValue(ScrambleType(name, bTarget.type));
-                            if (value != null) {
-                                value.value.self = bTarget;
-                                this.pushStack(value);
-                                break;
-                            }
+                            // // instance impl functions are different
+                            // value = this.findValue(ScrambleType(name, bTarget.type));
+                            // if (value != null) {
+                            //     value.value.self = bTarget;
+                            //     this.pushStack(value);
+                            //     break;
+                            // }
                         } else if (bTarget.type == PlStuffType.Type) {
                             // try to find static functions
                             const value = this.findValue(ScrambleName(name, bTarget.value.type));

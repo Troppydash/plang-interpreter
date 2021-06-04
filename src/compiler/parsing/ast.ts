@@ -322,9 +322,11 @@ export class ASTCall extends ASTExpression {
         return this.target.getSpanToken();
     }
 
-
-
     lastToken(): PlToken {
+        const last = this.tokens[this.tokens.length - 1];
+        if ( last && last.info.row == this.target.getSpanToken().info.row) {
+            return last;
+        }
         return this.target.getSpanToken();
     }
 }
