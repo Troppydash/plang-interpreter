@@ -16,10 +16,12 @@ ${exe} --run-emitter code.de    ~ Run the file called [code.de] with the emitter
 
 ${colors.cyan('Flags')} (all flags begin with --)
 help            ~ Show this message
+
 run-repl        ~ Start the repl (default method if no [file] is supplied
 run-demo        ~ Start the repl in demo mode
 run-compiler    ~ Run [file] with the compiler only
 run-emitter     ~ Run [file] with the emitter only
+
 mode-debug      ~ Run [file] in debug mode, will show more detailed errors
 mode-release    ~ Run [file] in release mode, have no detailed errors
 `);

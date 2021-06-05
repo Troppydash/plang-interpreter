@@ -1,6 +1,6 @@
 import PlLexer from "../compiler/lexing";
 import {ReportProblems} from "../problem";
-import { NewPlFile, PlFile } from "../inout/file";
+import {NewPlFile, PlFile} from "../inout/file";
 import inout from "../inout";
 import {ASTProgram} from "../compiler/parsing/ast";
 import {PlAstParser} from "../compiler/parsing";
@@ -102,7 +102,7 @@ export function RunFile(file: PlFile, vm: PlStackMachine) {
     return 0;
 }
 
-export function RunVmRelease(file: PlFile, args: string[]): number {
+export function RunVmFast(file: PlFile, args: string[]): number {
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
 
@@ -115,29 +115,24 @@ export function RunVmRelease(file: PlFile, args: string[]): number {
     }, args);
 
     let out = null;
-    try {
-        while (!parser.isEOF()) {
-            const statement = parser.parseOnce();
-            if (statement == null) {
-                throw new Error();
-            }
-
-            vm.addProgram(EmitStatement(statement));
-            out = vm.runProgram();
-            if (out == null) {
-                const trace = vm.getTrace();
-                const problems = vm.getProblems();
-                ReportProblems(file.content, problems, trace);
-
-                return 1;
-            }
+    while (!parser.isEOF()) {
+        const statement = parser.parseOnce();
+        if (statement == null) {
+            const problems = parser.getProblems();
+            ReportProblems(file.content, problems);
+            return 1;
         }
-    } catch (e) {
-        const problems = parser.getProblems();
-        ReportProblems(file.content, problems);
-        return 1;
-    }
 
+        vm.addProgram(EmitStatement(statement));
+        out = vm.runProgram();
+        if (out == null) {
+            const trace = vm.getTrace();
+            const problems = vm.getProblems();
+            ReportProblems(file.content, problems, trace);
+
+            return 1;
+        }
+    }
     if (out != null && typeof out.value == "number")
         return out.value;
     return 0;

@@ -93,11 +93,14 @@ export interface StackMachine {
     getProblems(): PlProblem[];
 
 
+
     readonly stack: PlStuff[];
     readonly problems: PlProblem[];
     readonly inout: PlInout;
     readonly stackFrame: PlStackFrame;
+    readonly closureFrame: PlStackFrame;
     readonly pointer: number;
+    readonly program: PlProgram;
 }
 
 /**
@@ -123,7 +126,7 @@ export class PlStackMachine implements StackMachine {
 
     problems: PlProblem[]; // Errors of the stack machine
 
-    program: PlProgram | null; // The bytecode program
+    program: PlProgram; // The bytecode program
     pointer: number; // The machine pointer
 
     constructor(inout: PlInout, args: string[] = []) {

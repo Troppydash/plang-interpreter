@@ -9,7 +9,7 @@ import {maths} from "./modules/maths";
 import {jsNum} from "./impl/num";
 import {time} from "./modules/time";
 import {random} from "./modules/random";
-import {debug} from "./modules/debug";
+import {jsdebug} from "./modules/debug";
 import {func} from "./impl/func";
 
 
@@ -36,5 +36,5 @@ export const jsModules: Record<string, any> = {
     ...maths,
     ...time,
     ...random,
-    ...debug,
+    ...jsdebug,
 };
