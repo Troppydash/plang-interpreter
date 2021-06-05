@@ -2,6 +2,8 @@ import {GenerateJsGuardedFunction} from "../helpers";
 import {StackMachine} from "../../index";
 import {PlConverter} from "../converter";
 import {PlProgramToString} from "../../../emitter/printer";
+import {IACTSync} from "../../../../problem/interactive/index";
+import {IACTDebugger} from "../../../../problem/interactive/debugger";
 
 const debug = {
         stack: GenerateJsGuardedFunction("stack", [], function (this: StackMachine) {
@@ -40,7 +42,8 @@ const debug = {
             return this.pointer;
         }),
         debugger: GenerateJsGuardedFunction("debugger", [], function (this: StackMachine) {
-
+            IACTSync(IACTDebugger(this));
+            return null;
         })
 };
 

@@ -10,7 +10,7 @@
     "build": "tsc",
     "run": "node out/index.js",
     "run-build": "npm run clean && npm run build && npm run run",
-    "watch-build": "tsc --watch",
+    "watch-build": "npm run clean && tsc --watch",
     "clean": "tsc --build --clean",
     "browser-publish": "npm run build-browser && npm publish"
   },

@@ -1,28 +1,24 @@
-import {PlTrace} from "./trace";
-import {NewPlProblem, PlProblem} from "./problem";
-import {colors} from "../inout/color";
-import {
-    CreateFrame,
-    CreateProblemBody,
-    CreateProblemMessage,
-    CreateProblemTitle,
-} from "./printer";
+import {PlProblem} from "../problem";
+import {CreateFrame, CreateProblemBody, CreateProblemMessage, CreateProblemTitle} from "../printer";
+import {colors} from "../../inout/color";
+import {PlTrace} from "../trace";
 
 const TRACE_MAX = 8;
 
-export function StartInteractive(content: string, problems: PlProblem[], trace: PlTrace) {
+export async function IACTTrace(content: string, problems: PlProblem[], trace: PlTrace): Promise<number> {
     const blessed = require('blessed');
 
     return new Promise((resolve) => {
         const screen = blessed.screen({
-            smartCSR: true
+            smartCSR: true,
+            title: "Interactive Frame Viewer"
         });
 
         const maxIndex = trace.length - 1;
         const minIndex = 0;
         let traceIndex = 0;
         const renderText = (index) => {
-            const buffer = ['{bold}Interactive Frame Viewer{/bold}', "Press 'enter' to exit", ''];
+            const buffer = ['{bold}Interactive Frame Viewer{/bold}', "Press 'enter' to exit", "Press 'w' or 's' to navigate through the callframes", ''];
             buffer.push(colors.red('\nCallframes (Most Recent Last)'));
 
             let line = maxIndex-index;
@@ -74,18 +70,22 @@ export function StartInteractive(content: string, problems: PlProblem[], trace: 
         }
 
         const box = blessed.box({
-            top: 'center',
-            left: 'center',
-            width: '100%',
-            height: '100%',
             content: renderText(traceIndex),
             tags: true,
+            scrollable: true,
+            alwaysScroll: true,
+            scrollbar: {
+                style: {
+                    bg: 'yellow'
+                }
+            },
+            keys: true,
         });
 
         screen.append(box);
 
-        screen.key(['up', 'down'], function (ch, key) {
-            if (key.name == 'up')
+        box.key(['w', 's'], function (ch, key) {
+            if (key.name == 'w')
                 traceIndex += 1;
             else
                 traceIndex -= 1;
@@ -97,10 +97,12 @@ export function StartInteractive(content: string, problems: PlProblem[], trace: 
 
             box.setContent(renderText(traceIndex));
             screen.render();
-        })
+        });
 
-        screen.key(['escape', 'q', 'C-c', 'enter'], function (ch, key) {
-            resolve(true);
+
+
+        screen.key(['C-c', 'enter'], function (ch, key) {
+            resolve(0);
         });
 
         box.focus();

@@ -63,10 +63,8 @@ if (!isNode || args.getArgSize() == 0 || args.is("run-repl")) { // If running in
         process.exit(code);
     }
 
-    (async () => {
-        const result = await RunVM(file, args.getArgRest());
-        process.exit(result);
-    })();
+    const result = RunVM(file, args.getArgRest());
+    process.exit(result);
 }
 
 

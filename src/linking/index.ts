@@ -7,7 +7,8 @@ import {PlAstParser} from "../compiler/parsing";
 import {PlProblem} from "../problem/problem";
 import {EmitProgram, EmitStatement, PlProgram} from "../vm/emitter/";
 import {PlStackMachine} from "../vm/machine";
-import {StartInteractive} from "../problem/interactive";
+import {IACTPrepare, IACTSync} from "../problem/interactive/index";
+import {IACTTrace} from "../problem/interactive/trace";
 
 
 export function RunParser(file: PlFile): ASTProgram | null {
@@ -102,6 +103,12 @@ export function RunFile(file: PlFile, vm: PlStackMachine) {
     return 0;
 }
 
+/**
+ * This function does not have error handling
+ * @param file
+ * @param args
+ * @constructor
+ */
 export function RunVmFast(file: PlFile, args: string[]): number {
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
@@ -112,7 +119,7 @@ export function RunVmFast(file: PlFile, args: string[]): number {
             inout.print(message);
             inout.flush();
         }
-    }, args);
+    }, file, args);
 
     let out = null;
     while (!parser.isEOF()) {
@@ -138,7 +145,7 @@ export function RunVmFast(file: PlFile, args: string[]): number {
     return 0;
 }
 
-export async function RunVM(file: PlFile, args: string[]): Promise<number> {
+export function RunVM(file: PlFile, args: string[]): number {
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
     const ast = parser.parseAll();
@@ -155,7 +162,7 @@ export async function RunVM(file: PlFile, args: string[]): Promise<number> {
             inout.print(message);
             inout.flush();
         }
-    }, args);
+    }, file, args);
 
     vm.addProgram(program);
     const out = vm.runProgram();
@@ -165,8 +172,8 @@ export async function RunVM(file: PlFile, args: string[]): Promise<number> {
         const ok = ReportProblems(file.content, problems, trace);
 
         // fancy
-        if (inout.options["mode"] == "debug" && ok && trace.length > 2) {
-            await StartInteractive(file.content, problems, trace);
+        if (ok && inout.options["mode"] == "debug" && ok && trace.length > 2 && IACTPrepare()) {
+            IACTSync(IACTTrace(file.content, problems, trace));
         }
 
         return 1;

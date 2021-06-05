@@ -23,6 +23,7 @@ import {PlProgram} from "../emitter";
 import {NewPlTraceFrame, PlTrace} from "../../problem/trace";
 import {PlInout} from "../../inout";
 import {PlStackFrame} from "./memory";
+import {PlFile} from "../../inout/file";
 
 // These are the jump errors
 const JUMP_ERRORS: Record<string, PlProblemCode> = {
@@ -101,6 +102,8 @@ export interface StackMachine {
     readonly closureFrame: PlStackFrame;
     readonly pointer: number;
     readonly program: PlProgram;
+    readonly file: PlFile;
+    readonly standard: string[];
 }
 
 /**
@@ -118,6 +121,7 @@ interface StackMachineState {
  */
 export class PlStackMachine implements StackMachine {
     readonly inout: PlInout; // inout reference
+    readonly file: PlFile;
 
     stackFrame: PlStackFrame; // The current stack frame
     closureFrames: PlStackFrame[]; // The list of closure frames, with the last being the current closure frame
@@ -129,8 +133,12 @@ export class PlStackMachine implements StackMachine {
     program: PlProgram; // The bytecode program
     pointer: number; // The machine pointer
 
-    constructor(inout: PlInout, args: string[] = []) {
+    standard: string[];
+
+    constructor(inout: PlInout, file: PlFile, args: string[] = []) {
         this.inout = inout;
+        this.file = file;
+        this.standard = [];
 
         this.stackFrame = new PlStackFrame(null, NewPlTraceFrame("|file|"));
         this.closureFrames = [];
@@ -413,6 +421,7 @@ export class PlStackMachine implements StackMachine {
                 key,
                 pl
             );
+            this.standard.push(key);
         }
 
         // Plang Natives
@@ -424,6 +433,7 @@ export class PlStackMachine implements StackMachine {
                     name: UnscrambleFunction(key)[1],
                 } as PlNativeFunction)
             );
+            this.standard.push(key);
         }
 
         // Js Modules
@@ -432,6 +442,7 @@ export class PlStackMachine implements StackMachine {
                 key,
                 PlConverter.JsToPl(entry, this)
             );
+            this.standard.push(key);
         }
 
         // Programing arguments
@@ -446,7 +457,9 @@ export class PlStackMachine implements StackMachine {
                     this.pointer = this.program.program.length;
                 }
             }, this)
-        )
+        );
+        this.standard.push('process');
+
 
         // Basic types
         for (const key of PlStuffTypes) {
@@ -458,8 +471,9 @@ export class PlStackMachine implements StackMachine {
                 key,
                 value
             );
+            const newName = ScrambleName("new", key);
             this.stackFrame.createValue(
-                ScrambleName("new", key),
+                newName,
                 NewPlStuff(PlStuffType.NFunc, {
                     native: (...args) => {
                         const out =  this.convertBasicTypes(value.value, args);
@@ -469,6 +483,7 @@ export class PlStackMachine implements StackMachine {
                     name: "new"
                 } as PlNativeFunction)
             );
+            this.standard.push(key, newName);
         }
     }
 
@@ -565,10 +580,10 @@ export class PlStackMachine implements StackMachine {
                 break;
             }
         }
-        if (this.problems.length > 0) {
-            const error = this.problems[0];
-            trace[0].info = error.info;
-        }
+        // if (this.problems.length > 0) {
+        //     const error = this.problems[0];
+        //     trace[0].info = error.info;
+        // }
         trace.pop(); // this works because we pop the first and last trace
         return trace;
     }
