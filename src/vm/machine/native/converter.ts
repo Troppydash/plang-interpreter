@@ -1,6 +1,6 @@
 import {
-    NewPlStuff,
-    PlInstance,
+    NewPlStuff, PlFunction,
+    PlInstance, PlNativeFunction,
     PlStuff,
     PlStuffFalse,
     PlStuffGetType,
@@ -13,6 +13,7 @@ import {
 } from "../stuff";
 import {StackMachine} from "../index";
 import {ReportCallbackProblems} from "../../../problem";
+import {PlDebugToString} from "../../emitter/debug";
 
 /**
  * Protects a plang like function call
@@ -377,6 +378,37 @@ export namespace PlConverter {
             }
         }
         throw new Error(`PlActions.PlToString failed to match object of type ${PlStuffTypeToString(object.type)}`);
+    }
+
+    /**
+     * Returns the string representation of the object for debugging
+     * @param object The stuff to be repr
+     * @constructor
+     */
+    export function PlToDebugString(object: PlStuff): string {
+        switch (object.type) {
+            case PlStuffType.Bool:
+                return object.value ? "true": 'false';
+            case PlStuffType.Dict:
+                return `Dict(${Object.entries(object.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToDebugString(value,)}`).join(',\n')}\n)`;
+            case PlStuffType.Null:
+                return "null";
+            case PlStuffType.Func:
+                return `Func(${object.value.self ? `self=${PlToDebugString(object.value.self)}, ` : ""}${(object.value as PlFunction).parameters.join(', ')}) -> Any`;
+            case PlStuffType.Inst:
+                return `${(object.value as PlInstance).type}(${Object.entries(object.value.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToDebugString(value)}`).join(',\n')}\n)`;
+            case PlStuffType.List:
+                return `List(${object.value.map(v => PlToDebugString(v)).join(',\n')}\n)`;
+            case PlStuffType.NFunc:
+                return `NFunc() -> Any`;
+            case PlStuffType.Num:
+                return ""+object.value;
+            case PlStuffType.Str:
+                return `"${object.value}"`;
+            case PlStuffType.Type:
+                return `Type(${object.value.type})`;
+        }
+        throw new Error("PlToDebugString failed to match an object");
     }
 }
 

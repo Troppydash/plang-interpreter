@@ -586,7 +586,7 @@ export class PlStackMachine implements StackMachine {
         //     const error = this.problems[0];
         //     trace[0].info = error.info;
         // }
-        trace.pop(); // this works because we pop the first and last trace
+        // trace.pop(); // this works because we pop the first and last trace
         return trace;
     }
 
