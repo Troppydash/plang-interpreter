@@ -18,7 +18,7 @@ export async function IACTTrace(content: string, problems: PlProblem[], trace: P
         const minIndex = 0;
         let traceIndex = 0;
         const renderText = (index) => {
-            const buffer = ['{bold}Interactive Frame Viewer{/bold}', "Press 'enter' to exit", "Press 'w' or 's' to navigate through the callframes", ''];
+            const buffer = ['{bold}Interactive Frame Viewer{/bold}', "Press 'Ctrl-C' to exit", "Press 'w' or 's' to navigate through the callframes", ''];
             buffer.push(colors.red('\nCallframes (Most Recent Last)'));
 
             let line = maxIndex-index;
@@ -101,7 +101,7 @@ export async function IACTTrace(content: string, problems: PlProblem[], trace: P
 
 
 
-        screen.key(['C-c', 'enter'], function (ch, key) {
+        screen.key(['C-c', 'q'], function (ch, key) {
             resolve(0);
         });
 

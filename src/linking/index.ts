@@ -62,7 +62,7 @@ export function RunOnce(vm: PlStackMachine, file: PlFile) {
         debug.endLine += vm.program.program.length;
     }
 
-    vm.addProgram(program);
+    vm.addProgram(program, file.content);
     const out = vm.runProgram();
     if (out == null) {
         const trace = vm.getTrace();
@@ -73,7 +73,7 @@ export function RunOnce(vm: PlStackMachine, file: PlFile) {
     return vm.popStack();
 }
 
-export function RunFile(file: PlFile, vm: PlStackMachine) {
+export function RunFile(vm: PlStackMachine, file: PlFile) {
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
     const ast = parser.parseAll();
@@ -88,7 +88,7 @@ export function RunFile(file: PlFile, vm: PlStackMachine) {
         debug.endLine += vm.program.program.length;
     }
 
-    vm.addProgram(program);
+    vm.addProgram(program, file.content);
     const out = vm.runProgram();
     if (out == null) {
         const trace = vm.getTrace();

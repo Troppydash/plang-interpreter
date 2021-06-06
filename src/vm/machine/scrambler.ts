@@ -37,11 +37,12 @@ export function ScrambleName(name: string, type: string) {
  * @constructor
  */
 export function UnscrambleFunction(scrambled: string): [string, string] {
-    if (scrambled.includes('@')) {
+    if (scrambled.includes(METHOD_SEP)) {
         const out = scrambled.split('@');
         if (out.length != 2) {
             throw new Error(`UnscrambleFunction unscrambled a name that contains more than two @, scrambled: '${scrambled}'`);
         }
+        return [out[0], out[1]];
     }
     return ['', scrambled];
 }

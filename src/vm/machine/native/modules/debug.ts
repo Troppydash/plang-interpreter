@@ -4,6 +4,7 @@ import {PlConverter} from "../converter";
 import {PlProgramToString} from "../../../emitter/printer";
 import {IACTSync} from "../../../../problem/interactive/index";
 import {IACTDebugger} from "../../../../problem/interactive/debugger";
+import {isNode} from "../../../../inout";
 
 const debug = {
         stack: GenerateJsGuardedFunction("stack", [], function (this: StackMachine) {
@@ -40,12 +41,17 @@ const debug = {
         }),
         pointer: GenerateJsGuardedFunction("pointer", [], function (this: StackMachine) {
             return this.pointer;
-        }),
-        debugger: GenerateJsGuardedFunction("debugger", [], function (this: StackMachine) {
-            IACTSync(IACTDebugger(this));
-            return null;
         })
 };
+
+if (isNode) {
+    debug['debugger'] = GenerateJsGuardedFunction("debugger", [], function (this: StackMachine) {
+        if (this.inout.options['mode'] == 'release')
+            return null;
+        IACTSync(IACTDebugger(this));
+        return null;
+    });
+}
 
 export const jsdebug = {
     debug

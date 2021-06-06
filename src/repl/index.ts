@@ -68,7 +68,7 @@ export function StartREPL( filename: string ): number {
     if ( isNode ) {
         const os = require( 'os' );
         inout.print( `Running on ${os.platform()}-${os.arch()}. Hello ${os.hostname()}!` );
-        inout.print( `Press ctrl+c to quit` );
+        inout.print( `Press Ctrl+C to quit` );
     }
 
     let stream = false;
@@ -83,7 +83,7 @@ export function StartREPL( filename: string ): number {
             inout.print(message);
             inout.flush()
         }
-    });
+    }, NewPlFile('repl', ''));
 
     while (true) {
         stream = false;
@@ -109,14 +109,14 @@ export function StartREPL( filename: string ): number {
 export function StartDemo(filename: string): number {
     inout.print( `Running Deviation in demo mode (version ${timestamp})` );
     if (isNode) {
-        inout.print("Press ctrl-c to quit");
+        inout.print("Press Ctrl-C to quit");
     }
 
     const vm = new PlStackMachine({
         ...inout,
         input: _ => {return ''},
         print: _ => {}
-    });
+    }, NewPlFile('demo', ''));
 
     while (true) {
         const line = GetLine(filename);
@@ -148,7 +148,7 @@ export function StartDemo(filename: string): number {
 
         inout.print("[Running] Executing Virtual Machine");
         program.program.pop();
-        vm.addProgram(program);
+        vm.addProgram(program, file.content);
         const result = vm.runProgram();
         if (result == null) {
             inout.print("[Error] VM error found, try again?");

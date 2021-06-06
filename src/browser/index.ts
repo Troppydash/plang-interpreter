@@ -35,12 +35,12 @@ ready(() => {
             inout.print(message);
             inout.flush();
         }
-    }, []);
+    }, NewPlFile('browser.de', ''),[]);
     for (let i = 0; i < sources.length; i++) {
         const source = sources[i];
         const fn = `${filename}${i+1}`;
 
-        const code = RunFile(NewPlFile(fn, source), vm);
+        const code = RunFile(vm, NewPlFile(fn, source));
         console.debug(`[${fn}] sync return code: ${code}`);
 
         if (code !== 0) {

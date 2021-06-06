@@ -155,9 +155,11 @@ export class PlStackMachine implements StackMachine {
     }
 
     // Adds a program into the stack machine
-    addProgram(program: PlProgram) {
+    addProgram(program: PlProgram, content?: string) {
         this.program.program.push(...program.program);
         this.program.debug.push(...program.debug);
+        if (content)
+            this.file.content += content + '\n';
     }
 
     // Resets the stack machine state
