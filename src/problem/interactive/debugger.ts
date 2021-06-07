@@ -6,21 +6,22 @@ import {METHOD_SEP} from "../../vm/emitter";
 import {UnscrambleFunction} from "../../vm/machine/scrambler";
 import {PlStuffGetType, PlStuffTypeToString} from "../../vm/machine/stuff";
 import PlToString = PlConverter.PlToString;
+import PlToDebugString = PlConverter.PlToDebugString;
 
 export async function IACTDebugger(machine: StackMachine): Promise<number> {
     const blessed = require('blessed');
-    // TODO: Add eval and steps
+    // TODO: Add eval and steps, and help alert
 
     /// FOR WINDOWS
     const isWindows = process.platform == "win32";
     const FOCUSED = '{yellow-fg}[F]{/}';
     const addFocus = (text) => {
-        if (text.startsWith(FOCUSED)) return;
+        if (text.startsWith(FOCUSED)) return text;
         return `${FOCUSED} ${text}`;
     };
-    const removeFocus = (text) => {
-        if (!text.startsWith(FOCUSED)) return;
-        return text.slice(FOCUSED.length + 1);
+    const removeFocus = (text: string) => {
+        if (!text.startsWith(FOCUSED)) return text;
+        return text.substring(FOCUSED.length + 1);
     }
 
     let palette = {
@@ -43,17 +44,6 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             }
         };
     }
-    // const handleListFocus = (list) => {
-    //     return (index) => {
-    //         const oldIndex = list.data.oldIndex;
-    //         if (oldIndex != undefined) {
-    //             list.getItem(oldIndex).setContent(removeFocus(list.getItem(oldIndex).content));
-    //         }
-    //         list.data.oldIndex = index;
-    //         list.getItem(index).setContent(addFocus(list.getItem(index).content));
-    //         list.screen.render();
-    //     }
-    // };
 
     return new Promise(resolve => {
         const screen = blessed.screen({
@@ -73,7 +63,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
         if (isWindows) {
             headerBox.setContent(headerBox.getContent() + "\n[F] shows the focused panel, press 'Tab' to switch panels");
         } else {
-            headerBox.setContent(headerBox.getContent() + "\nHover your cursor on a panel to focus");
+            headerBox.setContent(headerBox.getContent() + "\nClick on a panel to focus it");
         }
 
         const contentHeight = `100%-${headerBox.content.split('\n').length + 1}`;
@@ -89,7 +79,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             scrollable: true,
             alwaysScroll: true,
             scrollbar: {
-                style: palette.scrollbar
+                style: {...palette.scrollbar}
             },
             label: contentLabel,
             width: '75%',
@@ -171,7 +161,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             scrollable: true,
             alwaysScroll: true,
             scrollbar: {
-                style: palette.scrollbar
+                style: {...palette.scrollbar}
             },
             style: {
                 focus: {
@@ -179,7 +169,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
                         bg: 'white'
                     }
                 },
-                selected: palette.selected
+                selected: {...palette.selected}
             },
             keys: true,
             tags: true,
@@ -189,31 +179,22 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
         const framesText = [];
         const trace = machine.getTrace();
         trace.reverse();
-        if (trace.length == 0) {
-            framesText.push("none");
-        } else {
-            for (const frame of trace) {
+        for (const frame of trace) {
+            if (frame.info == null) {
+                framesText.push(`'${frame.name}'`);
+            } else {
                 framesText.push(`'${frame.name}' at line ${frame.info.row + 1}`);
             }
         }
         frameList.setItems(framesText);
 
         frameList.on('select', function (item, index) {
-            if (trace.length > 0) {
-                selectedTrace = trace[index];
-                updateLocals();
-            }
+            selectedTrace = trace[index];
+            updateLocals();
         });
 
-        // if (isWindows) {
-        //     frameList.on("select item", handleListFocus(frameList));
-        // }
-
-        let selectedTrace = null;
-        if (trace.length > 0) {
-            frameList.select(trace.length - 1);
-            selectedTrace = trace[trace.length - 1];
-        }
+        frameList.select(trace.length - 1);
+        let selectedTrace = trace[trace.length - 1];
 
 
         const localsLabel = "{bold}Locals{/bold}";
@@ -241,7 +222,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             alwaysScroll: true,
             tags: true,
             scrollbar: {
-                style: palette.scrollbar
+                style: {...palette.scrollbar}
             },
             style: {
                 focus: {
@@ -249,19 +230,15 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
                         bg: 'white'
                     }
                 },
-                selected: palette.selected
+                selected: {...palette.selected}
             },
             keys: true,
         });
 
         let items = {};
         const updateLocals = () => {
-            let newLabel;
-            if (!selectedTrace) {
-                newLabel = `${localsLabel} of 'global'`;
-            } else {
-                newLabel = `${localsLabel} of '${selectedTrace.name}'`;
-            }
+            let newLabel = `${localsLabel} of '${selectedTrace.name}'`;
+
             localsContainer.setLabel(newLabel);
             localsContainer.data.label = newLabel;
 
@@ -301,14 +278,12 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
                     content: `... and ${std} standard values`,
                     height: 1,
                 });
-                localsBox.height = '100%-4';
-            } else {
                 localsBox.height = '100%-3';
+            } else {
+                localsBox.height = '100%-2';
             }
             localsBox.setItems(localsBuffer);
-            // localsBox.data.oldIndex = undefined;
             localsBox.select(0);
-            // if (localsBoxFocus) localsBoxFocus(0);
             screen.render();
         };
         localsBox.on('select', function (_, index) {
@@ -327,6 +302,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             contentBuffer.push(`Name: '${key}'`);
             contentBuffer.push(`Type: {cyan-fg}${PlStuffGetType(item)}{/}`);
             contentBuffer.push(`Str(${key}): {green-fg}${PlToString(item, machine, true)}{/}`);
+            contentBuffer.push(`Debug: {red-fg}${PlToDebugString(item)}{/}`);
             contentBuffer.push(`Internals: {yellow-fg}${json}{/}`)
             detailed.content = contentBuffer.join('\n');
 
@@ -334,13 +310,6 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             detailed.render();
         });
 
-        // let localsBoxFocus = null;
-        // if (isWindows) {
-        //     localsBoxFocus = handleListFocus(localsBox);
-        //     updateLocals();
-        //     localsBox.on("select item", localsBoxFocus);
-        // } else {
-        // }
         updateLocals();
 
 
@@ -366,26 +335,23 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
         })
         detailed.hide();
 
+        contentBox.on('click', () => contentBox.focus());
+        frameList.on('click', () => frameList.focus());
+        localsBox.on('click', () => localsBox.focus());
+
         const elements = [contentBox, frameContainer, localsContainer];
         let index = 0;
         const maxIndex = elements.length - 1;
-        for (let i = 0; i < elements.length; i++) {
-            const box = elements[i];
+        elements.forEach(function (box, i) {
             box.on('click', function () {
                 const oldElement = elements[index];
                 oldElement.setLabel(removeFocus(oldElement.data.label))
                 oldElement.data.label = removeFocus(oldElement.data.label);
                 index = i;
 
-
-                box.focus();
-                if (box.children.length > 1) {
-                    box.children[1].focus();
-                }
-
                 screen.render();
             })
-        }
+        });
         screen.key(['tab'], function () {
             const oldElement = elements[index];
             if (index == maxIndex) {
@@ -413,7 +379,11 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
 
 
         screen.key(['C-c', 'q'], function (ch, key) {
-            screen.destroy(); // make sure to remove the screen
+            for (const child of screen.children) {
+                child.destroy();
+                screen.remove(child);
+            }
+            screen.destroy();
             resolve(0);
         });
 
