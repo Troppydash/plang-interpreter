@@ -17,6 +17,11 @@ export enum PlStuffType {
     Inst,
 }
 
+// For parameters types
+export const PlStuffTypeAny = "*";
+export const PlStuffTypeRest = "...";
+export type PlParameterTypes = PlStuffType | typeof PlStuffTypeAny | typeof PlStuffTypeRest;
+
 // The plstufftypes in string form
 export const PlStuffTypes = ["Num", "Str", "Bool", "Null", "Type", "Func", "List", "Dict", "Inst"] as const;
 // The union type of the plstufftypes
@@ -62,13 +67,14 @@ export interface PlFunction {
     index: number; // index of bytecode
     closure: PlStackFrame; // closure stack frame
     parameters: string[]; // parameter names
-    self?: PlStuff; // self for overloading
+    self: PlStuff | null; // self for overloading
 }
 
 export interface PlNativeFunction {
     native: Function;
     name: string;
-    self?: PlStuff;
+    parameters: PlParameterTypes[];
+    self: PlStuff | null;
 }
 
 export interface PlInstance {
@@ -115,7 +121,28 @@ export function PlStuffTypeFromJsString(string: TypeofTypes): PlStuffType {
             return PlStuffType.Dict;
     }
     throw new Error(`PlStuffTypeFromJsString failed to match with value ${string}`);
+}
 
+export function PlStuffTypeToJsString(type: PlStuffType): TypeofTypes {
+    switch (type) {
+        case PlStuffType.Inst:
+            return "object";
+        case PlStuffType.NFunc:
+        case PlStuffType.Func:
+            return "function";
+        case PlStuffType.Str:
+            return "string";
+        case PlStuffType.Num:
+            return "number";
+        case PlStuffType.Bool:
+            return "boolean";
+        case PlStuffType.Type:
+            return "object";
+        case PlStuffType.Null:
+            return "object";
+        case PlStuffType.List:
+            return "object";
+    }
 }
 
 /**
@@ -162,8 +189,7 @@ export function PlStuffGetType(stuff: PlStuff): PlStuffTypeStrings | string {
 }
 
 /// There can be only one of these, so we don't make them up but rather use these ///
-// TODO: make them frozen
-export const PlStuffTrue = NewPlStuff(PlStuffType.Bool, true);
-export const PlStuffFalse = NewPlStuff(PlStuffType.Bool, false);
-export const PlStuffNull = NewPlStuff(PlStuffType.Null, null);
+export const PlStuffTrue = Object.freeze(NewPlStuff(PlStuffType.Bool, true));
+export const PlStuffFalse = Object.freeze(NewPlStuff(PlStuffType.Bool, false));
+export const PlStuffNull = Object.freeze(NewPlStuff(PlStuffType.Null, null));
 

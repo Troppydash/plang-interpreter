@@ -1,10 +1,14 @@
-import { ScrambleName, ScrambleType } from "../scrambler";
+import {ScrambleName, ScrambleType} from "../scrambler";
 import {
+    PlNativeFunction, PlParameterTypes,
     PlStuff,
     PlStuffFalse,
     PlStuffTrue,
     PlStuffType,
-    PlStuffTypeFromJsString, PlStuffTypes, PlStuffTypeToString,
+    PlStuffTypeAny,
+    PlStuffTypeFromJsString,
+    PlStuffTypes,
+    PlStuffTypeToString,
 } from "../stuff";
 import {MakeArityMessage, MakeOperatorMessage, MakeTypeMessage} from "./messeger";
 import {TypeofTypes} from "../../../extension";
@@ -48,103 +52,45 @@ export function ExpectedNArguments(name: string, got: number, expected: number) 
     }
 }
 
-export function GenerateGuardedFunction(name: string, guards: (PlStuffType | "*")[], func: Function) {
-    return function(...args: PlStuff[]) {
-        ExpectedNArguments(name, args.length, guards.length);
-        for (let i = 0; i < guards.length; ++i) {
-            const guard = guards[i];
-            if (guard == "*") {
-                continue;
-            }
-            AssertType(name, args[i], guard, i+1);
-        }
-        return func.bind(this)(...args);
-    }
+export function GenerateGuardedFunction(name: string, guards: PlParameterTypes[], func: Function): PlNativeFunction {
+    return {
+        name,
+        parameters: guards,
+        native: func,
+        self: null,
+    };
 }
 
-
-export function GenerateGuardedTypeFunction(name: string, guards: (PlStuffType | "*")[], func: Function) {
-    return function(...args: PlStuff[]) {
-        // first one is self
-        const first = args.shift();
-
-        ExpectedNArguments(name, args.length, guards.length);
-        for (let i = 0; i < guards.length; ++i) {
-            const guard = guards[i];
-            if (guard == "*") {
-                continue;
-            }
-            AssertType(name, args[i], guard, i+1);
-        }
-        return func.bind(this)(first, ...args);
-    }
+export function GenerateGuardedTypeFunction(name: string, guards: PlParameterTypes[], func: Function): PlNativeFunction {
+    return {
+        name,
+        parameters: [PlStuffTypeAny, ...guards],
+        self: null,
+        native: func
+    };
 }
 
+//
+// export function GenerateJsGuardedFunction(name: string, guards: (PlStuffType | "*")[], func: Function): PlNativeFunction {
+//     return {
+//         name,
+//         parameters: guards,
+//         self: null,
+//         native: func.bind(this)
+//     };
+// }
+//
+//
+// export function GenerateJsGuardedTypeFunction(name: string, guards: (TypeofTypes | "*")[], func: Function) {
+//     return {
+//         name,
+//         parameters: guards,
+//         self: null,
+//         native: func.bind(this)
+//     };
+// }
 
-export function GenerateJsGuardedFunction(name: string, guards: (TypeofTypes | "*")[], func: Function) {
-    return function(...args: any[]) {
-        ExpectedNArguments(name, args.length, guards.length);
-        for (let i = 0; i < guards.length; ++i) {
-            const guard = guards[i];
-            if (guard == "*") {
-                continue;
-            }
-            AssertTypeof(name, args[i], guard, i+1);
-        }
-        return func.bind(this)(...args);
-    }
-}
-
-
-export function GenerateJsGuardedTypeFunction(name: string, guards: (TypeofTypes | "*")[], func: Function) {
-    return function(...args: any[]) {
-        const first = args.shift();
-        ExpectedNArguments(name, args.length, guards.length);
-        for (let i = 0; i < guards.length; ++i) {
-            const guard = guards[i];
-            if (guard == "*") {
-                continue;
-            }
-            AssertTypeof(name, args[i], guard, i+1);
-        }
-        return func.bind(this)(first, ...args);
-    }
-}
-
-function wrapBool(value: Function) {
-    return (...args) => {
-        return value(...args) == true ? PlStuffTrue : PlStuffFalse;
-    }
-}
-
-export function GenerateCompare(type: PlStuffType, eq: Function | null = null, gt: Function | null = null) {
-    let out = {};
-    if (eq != null) {
-        out = {
-            ...out,
-            [ScrambleType("==", type)]: wrapBool(eq),
-            [ScrambleType("/=", type)]: wrapBool((l, r) => !eq(l, r)),
-        };
-    }
-    if (gt != null) {
-        out = {
-            ...out,
-            [ScrambleType(">", type)]: wrapBool(gt),
-            [ScrambleType("<=", type)]: wrapBool((l, r) => !gt(l, r)),
-        };
-    }
-    if (eq != null && gt != null) {
-        out = {
-            ...out,
-            [ScrambleType("<", type)]: wrapBool((l, r) => !eq(l, r) && !gt(l, r)),
-            [ScrambleType(">=", type)]: wrapBool((l, r) => eq(l, r) || gt(l, r)),
-        };
-    }
-    return out;
-}
-
-
-export function GenerateForAll(name: string, func: Function) {
+export function GenerateForAll(name: string, func: PlNativeFunction) {
     const out = {};
     for (const item of PlStuffTypes) {
         out[ScrambleName(name, item)] = func;
@@ -152,7 +98,7 @@ export function GenerateForAll(name: string, func: Function) {
     return out;
 }
 
-export function GenerateForSome(name: string, types: PlStuffType[], func: Function) {
+export function GenerateForSome(name: string, types: PlStuffType[], func: PlNativeFunction) {
     const strs = types.map(t => PlStuffTypeToString(t));
     const out = {};
     for (const item of PlStuffTypes) {

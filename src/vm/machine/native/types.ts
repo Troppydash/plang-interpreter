@@ -1,7 +1,4 @@
-import {PlStuff} from "../stuff";
+import {PlNativeFunction, PlStuff} from "../stuff";
 
-type NativeFunction = (...args: PlStuff[]) => PlStuff;
-type JsFunction = (...args: any[]) => any;
-
-export type ExportNative = Record<string, NativeFunction>;
-export type ExportJs = Record<string, JsFunction>;
+export type ExportNative = Record<string, PlNativeFunction>;
+export type ExportJs = Record<string, PlNativeFunction>;

@@ -1,6 +1,6 @@
 import {ScrambleType} from "../../scrambler";
-import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../../stuff";
-import {AssertType, GenerateGuardedTypeFunction, GenerateJsGuardedTypeFunction} from "../helpers";
+import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType, PlStuffTypeAny} from "../../stuff";
+import {AssertType, GenerateGuardedTypeFunction} from "../helpers";
 import {equals} from "../operators";
 import {MakeNoTypeFunctionMessage, MakeOutOfRangeMessage} from "../messeger";
 import {StackMachine} from "../../index";
@@ -28,10 +28,10 @@ function shuffle(array) {
 }
 
 export const jsList = {
-    [ScrambleType("size", PlStuffType.List)]: GenerateJsGuardedTypeFunction("size", [], function (lst) {
+    [ScrambleType("size", PlStuffType.List)]: GenerateGuardedTypeFunction("size", [], function (lst) {
         return lst.length;
     }),
-    [ScrambleType("iter", PlStuffType.List)]: GenerateJsGuardedTypeFunction("iter", [], function (self) {
+    [ScrambleType("iter", PlStuffType.List)]: GenerateGuardedTypeFunction("iter", [], function (self) {
         let index = 0;
         return {
             next: () => {
@@ -42,7 +42,7 @@ export const jsList = {
             }
         }
     }),
-    [ScrambleType("map", PlStuffType.List)]: GenerateJsGuardedTypeFunction("map", ["function"], function (self, func) {
+    [ScrambleType("map", PlStuffType.List)]: GenerateGuardedTypeFunction("map", [PlStuffType.Func], function (self, func) {
         const newList = [];
         for (let i = 0; i < self.length; i++) {
             try {
@@ -57,7 +57,7 @@ export const jsList = {
 };
 
 export const list = {
-    [ScrambleType("get", PlStuffType.List)]: GenerateGuardedTypeFunction("get", ["*"], function (self, index: PlStuff) {
+    [ScrambleType("get", PlStuffType.List)]: GenerateGuardedTypeFunction("get", [PlStuffTypeAny], function (self, index: PlStuff) {
         if (index.type != PlStuffType.List && index.type != PlStuffType.Num) {
             throw new Error("'get' requires a number or a list as argument");
         }
@@ -83,11 +83,11 @@ export const list = {
         }
         return list[idx];
     }),
-    [ScrambleType("add", PlStuffType.List)]: GenerateGuardedTypeFunction("add", ["*"], function (self: PlStuff, value: PlStuff) {
+    [ScrambleType("add", PlStuffType.List)]: GenerateGuardedTypeFunction("add", [PlStuffTypeAny], function (self: PlStuff, value: PlStuff) {
         self.value.push(value);
         return self;
     }),
-    [ScrambleType("insert", PlStuffType.List)]: GenerateGuardedTypeFunction("insert", [PlStuffType.Num, "*"], function (self: PlStuff, index: PlStuff, value: PlStuff) {
+    [ScrambleType("insert", PlStuffType.List)]: GenerateGuardedTypeFunction("insert", [PlStuffType.Num, PlStuffTypeAny], function (self: PlStuff, index: PlStuff, value: PlStuff) {
         const idx = index.value - 1;
         if (idx < 0 || idx >= self.value.length) {
             throw new Error(MakeOutOfRangeMessage("insert", PlStuffType.List, self.value.length, index.value));
@@ -101,7 +101,7 @@ export const list = {
     [ScrambleType("shift", PlStuffType.List)]: GenerateGuardedTypeFunction("shift", [], function (self: PlStuff) {
         return self.value.shift();
     }),
-    [ScrambleType("set", PlStuffType.List)]: GenerateGuardedTypeFunction("set", [PlStuffType.Num, "*"], function (self: PlStuff, index: PlStuff, value: PlStuff) {
+    [ScrambleType("set", PlStuffType.List)]: GenerateGuardedTypeFunction("set", [PlStuffType.Num, PlStuffTypeAny], function (self: PlStuff, index: PlStuff, value: PlStuff) {
         const idx = index.value - 1;
         const list = self.value;
         if (idx < 0 || idx >= list.length) {
@@ -110,7 +110,7 @@ export const list = {
         list[idx] = value;
         return self;
     }),
-    [ScrambleType("have", PlStuffType.List)]: GenerateGuardedTypeFunction("have", ["*"], function (self, value) {
+    [ScrambleType("have", PlStuffType.List)]: GenerateGuardedTypeFunction("have", [PlStuffTypeAny], function (self, value) {
         for (const item of self.value) {
             if (equals(item, value)) {
                 return PlStuffTrue;
@@ -118,7 +118,7 @@ export const list = {
         }
         return PlStuffFalse;
     }),
-    [ScrambleType("index", PlStuffType.List)]: GenerateGuardedTypeFunction("index", ["*"], function (self, value) {
+    [ScrambleType("index", PlStuffType.List)]: GenerateGuardedTypeFunction("index", [PlStuffTypeAny], function (self, value) {
         for (let i = 0; i < self.value.length; i++) {
             if (equals(self.value[i], value)) {
                 return NewPlStuff(PlStuffType.Num, i + 1);

@@ -128,6 +128,8 @@ const templates = {
     RE0016: "expected the '.%0' type function on the value of type '%1'",
 
     RE0017: "cannot use 'not' on a non-boolean value, got type '%0'",
+
+    RE0018: "function expected a type of '%0' for the '%1'th argument, got '%2'"
 }
 
 // because I am lazy
@@ -261,6 +263,7 @@ const hints: Record<PlProblemCode, string> = {
     RE0015: "I can only increment or decrement numbers, nothing else",
     RE0016: "only a value that contain the '.iter' type function can be used in a each..of loop",
     RE0017: "I can only 'not' booleans, this language does not like implicit truthy conditions",
+    RE0018: "",
 }
 
 const problemFullName = {

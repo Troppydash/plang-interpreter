@@ -1,13 +1,14 @@
-import {PlActions, PlConverter} from "./converter";
-import {NewPlStuff, PlStuff, PlStuffNull, PlStuffType} from "../stuff";
-import {AssertTypeof, GenerateGuardedFunction, GenerateJsGuardedFunction} from "./helpers";
+import {PlConverter} from "./converter";
+import {NewPlStuff, PlStuff, PlStuffNull, PlStuffType, PlStuffTypeAny, PlStuffTypeRest} from "../stuff";
+import {AssertTypeof, GenerateGuardedFunction} from "./helpers";
 import {StackMachine} from "../index"; // Hopefully this doesn't cause a circular dependency problem
 import {MakeNoTypeFunctionMessage} from "./messeger";
+import {ExportNative} from "./types";
+import {isNode} from "../../../inout";
 import PlToString = PlConverter.PlToString;
-import inout, {isNode} from "../../../inout";
 
 export const jsSpecial = {
-    "range": function (start, end, step) {
+    "range": GenerateGuardedFunction("range", [PlStuffTypeRest], function (start, end, step) {
         if (start != undefined)
             AssertTypeof("range", start, "number", 1);
         if (end != undefined)
@@ -48,9 +49,8 @@ export const jsSpecial = {
                 }
             }
         }
-    },
-
-    "try": GenerateJsGuardedFunction("try", ["function", "function"], function (this: StackMachine, attempt, error) {
+    }),
+    "try": GenerateGuardedFunction("try", [PlStuffType.Func, PlStuffType.Func], function (this: StackMachine, attempt, error) {
         const saved = this.saveState();
         try {
             return attempt();
@@ -59,11 +59,10 @@ export const jsSpecial = {
             return error(this.problems.pop());
         }
     }),
-
 };
 
-export const special = {
-    "eval": GenerateGuardedFunction("eval", ["*"], function (this: StackMachine, target: PlStuff) {
+export const special: ExportNative = {
+    "eval": GenerateGuardedFunction("eval", [PlStuffTypeAny], function (this: StackMachine, target: PlStuff) {
         let iter = null; // TODO: maybe make all iterator based
         if (target.type == PlStuffType.Dict
             && "iter" in target.value
@@ -89,13 +88,13 @@ export const special = {
 
         return NewPlStuff(PlStuffType.List, out);
     }),
-    "ask": function (this: StackMachine, ...message: any) {
+    "ask": GenerateGuardedFunction("ask", [PlStuffTypeRest], function (this: StackMachine, ...message: any) {
         const str = this.inout.input(message.map(m => PlToString(m, this)).join('\n'));
         if (str == null) {
             return PlStuffNull;
         }
         return NewPlStuff(PlStuffType.Str, str);
-    },
+    }),
     "javascript": GenerateGuardedFunction("javascript", [PlStuffType.Str], function (this: StackMachine, code: PlStuff) {
         const _import = (function (key) {
             const value = this.findValue(key);
@@ -123,10 +122,10 @@ export const special = {
             throw new Error(`[Javascript ${e.name}] ${e.message}`);
         }
     }),
-    "panic": function (...message: PlStuff[]) {
+    "panic": GenerateGuardedFunction("panic", [PlStuffTypeRest], function (...message: PlStuff[]) {
         throw new Error(message.map(m => PlToString(m, this)).join(' '));
-    },
-    "say": function (this: StackMachine, ...message: PlStuff[]) {
+    }),
+    "say": GenerateGuardedFunction("say", [PlStuffTypeRest], function (this: StackMachine, ...message: PlStuff[]) {
         if (message.length == 0) {
             this.inout.print('\n');
         } else {
@@ -134,8 +133,8 @@ export const special = {
             this.inout.print(combined);
         }
         return PlStuffNull;
-    },
-    "log": function (this: StackMachine, ...message: PlStuff[]) {
+    }),
+    "log": GenerateGuardedFunction("log", [PlStuffTypeRest], function (this: StackMachine, ...message: PlStuff[]) {
         if (message.length == 0) {
             console.log('\n');
         } else {
@@ -143,7 +142,7 @@ export const special = {
             console.log(combined);
         }
         return PlStuffNull;
-    }
+    })
 };
 
 // FETCH STUFF
@@ -201,7 +200,7 @@ if (isNode) {
     const fetch = require('node-fetch');
     const syncFetch = deasync(callbackFetch(fetch));
 
-    jsSpecial['fetch'] = GenerateJsGuardedFunction('fetch', ["string", "object"], function (this, url, options) {
+    jsSpecial['fetch'] = GenerateGuardedFunction('fetch', [PlStuffType.Str, PlStuffType.Dict], function (this, url, options) {
         const opt = sanitizeOptions(options);
         return syncFetch(url, opt);
     });
@@ -214,8 +213,8 @@ if (isNode) {
     const path = require('path');
     const fs = require('fs');
     const cp = require('child_process');
-    jsSpecial['$'] = GenerateJsGuardedFunction("$", ["string", "string"], function (command, rel) {
-        const targetPath = path.join(inout.paths.rootPath, rel);
+    jsSpecial['$'] = GenerateGuardedFunction("$", [PlStuffType.Str, PlStuffType.Dict], function (command, rel) {
+        const targetPath = path.join(this.inout.paths.rootPath, rel);
         if (!fs.existsSync(targetPath)) {
             return {
                 text: `the target path '${targetPath}' does not exist`,
@@ -238,8 +237,8 @@ if (isNode) {
             } as ExecOutput;
         }
     });
-    jsSpecial['exec'] = GenerateJsGuardedFunction("exec", ["string", "string"], function (command, rel) {
-        const targetPath = path.join(inout.paths.rootPath, rel);
+    jsSpecial['exec'] = GenerateGuardedFunction("exec", [PlStuffType.Str, PlStuffType.Dict], function (command, rel) {
+        const targetPath = path.join(this.inout.paths.rootPath, rel);
         if (!fs.existsSync(targetPath)) {
             return {
                 text: `the target path '${targetPath}' does not exist`,
@@ -263,7 +262,7 @@ if (isNode) {
         }
     });
 
-    jsSpecial["require"] = GenerateJsGuardedFunction("require", ["string"], function (p: string) {
+    jsSpecial["require"] = GenerateGuardedFunction("require", [PlStuffType.Str], function (p: string) {
         try {
             if (/^\w+$/.test(p)) {
                 return {
@@ -273,7 +272,7 @@ if (isNode) {
             }
             return {
                 ok: true,
-                data: require(path.join(inout.paths.rootPath, p)),
+                data: require(path.join(this.inout.paths.rootPath, p)),
             };
         } catch (e) {
             return {
@@ -284,7 +283,7 @@ if (isNode) {
 
     })
 } else {
-    jsSpecial['fetch'] = GenerateJsGuardedFunction('fetch', ["string", "object"], function (this, url, options: FetchOptions) {
+    jsSpecial['fetch'] = GenerateGuardedFunction('fetch', [PlStuffType.Str, PlStuffType.Dict], function (this, url, options: FetchOptions) {
         const opt = sanitizeOptions(options);
 
         const request = new XMLHttpRequest();
@@ -315,13 +314,13 @@ if (isNode) {
         preventDefault: () => void;
     }
 
-    jsSpecial["$"] = GenerateJsGuardedFunction("$", ["string"], function (this, selector) {
+    jsSpecial["$"] = GenerateGuardedFunction("$", [PlStuffType.Str], function (this, selector) {
         let result: HTMLElement[] = Array.from(document.querySelectorAll(selector)); // this closure might impact performance, but too bad
         const obj = {
             _native() {
                 return result;
             },
-            limit: GenerateJsGuardedFunction("limit", ["number"], function (amount) {
+            limit: GenerateGuardedFunction("limit", [PlStuffType.Num], function (amount) {
                 if (amount >= result.length) {
                     return obj; // we dont have this as it is the stack machine
                 }
@@ -331,7 +330,7 @@ if (isNode) {
             text() {
                 return result.map(node => node.innerText);
             },
-            setText: GenerateJsGuardedFunction("setText", ["string"], function (text) {
+            setText: GenerateGuardedFunction("setText", [PlStuffType.Str], function (text) {
                 result.forEach(node => {
                     node.innerText = text;
                 })
@@ -340,20 +339,20 @@ if (isNode) {
             html() {
                 return result.map(node => node.innerHTML);
             },
-            setHTML: GenerateJsGuardedFunction("setHTML", ["string"], function (text) {
+            setHTML: GenerateGuardedFunction("setHTML", [PlStuffType.Str], function (text) {
                 result.forEach(node => {
                     node.innerHTML = text;
                 })
                 return obj;
             }),
-            attr: GenerateJsGuardedFunction("attr", ["string"], function(attr) {
+            attr: GenerateGuardedFunction("attr", [PlStuffType.Str], function(attr) {
                 return result.map(node => node[attr]);
             }),
-            setAttr: GenerateJsGuardedFunction("attr", ["string", "*"], function(attr, value) {
+            setAttr: GenerateGuardedFunction("attr", [PlStuffType.Str, PlStuffTypeAny], function(attr, value) {
                 result.forEach(node => node[attr] = value);
                 return obj;
             }),
-            listen: GenerateJsGuardedFunction("listen", ["string", "function"], function (this: StackMachine, event, callback) {
+            listen: GenerateGuardedFunction("listen", [PlStuffType.Str, PlStuffType.Func], function (this: StackMachine, event, callback) {
                 for (const node of result) {
                     node.addEventListener(event, (event: Event) => {
                         const e = {

@@ -1,12 +1,22 @@
-import { GenerateForAll, GenerateForSome, GenerateGuardedTypeFunction } from "../helpers";
-import { PlActions, PlConverter } from "../converter";
-import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffGetType, PlStuffTrue, PlStuffType, PlType} from "../../stuff";
-import { StackMachine } from "../../index";
-import { ScrambleType } from "../../scrambler";
-import { MakeNoTypeFunctionMessage } from "../messeger";
+import {GenerateForAll, GenerateForSome, GenerateGuardedTypeFunction} from "../helpers";
+import {PlActions, PlConverter} from "../converter";
+import {
+    NewPlStuff,
+    PlStuff,
+    PlStuffFalse,
+    PlStuffGetType,
+    PlStuffTrue,
+    PlStuffType,
+    PlStuffTypeAny,
+    PlType
+} from "../../stuff";
+import {StackMachine} from "../../index";
+import {ScrambleType} from "../../scrambler";
+import {MakeNoTypeFunctionMessage} from "../messeger";
+import {ExportNative} from "../types";
 
 
-export const all = {
+export const all: ExportNative = {
     ...GenerateForAll("copy", GenerateGuardedTypeFunction("copy", [], object => {
         return PlActions.PlCopy(object);
     })),
@@ -53,7 +63,7 @@ export const all = {
             format: null
         } as PlType);
     })),
-    ...GenerateForAll("in", GenerateGuardedTypeFunction("in", ["*"], function (this: StackMachine, self: PlStuff, other: PlStuff) {
+    ...GenerateForAll("in", GenerateGuardedTypeFunction("in", [PlStuffTypeAny], function (this: StackMachine, self: PlStuff, other: PlStuff) {
         const value = this.findValue(ScrambleType("have", other.type));
         if (value.type == PlStuffType.NFunc) {
             return value.value.native(other, self);
@@ -62,7 +72,7 @@ export const all = {
         }
         throw new Error(MakeNoTypeFunctionMessage("in", "have", other));
     })),
-    ...GenerateForAll("from", GenerateGuardedTypeFunction("from", ["*"], function (this: StackMachine, self: PlStuff, other: PlStuff) {
+    ...GenerateForAll("from", GenerateGuardedTypeFunction("from", [PlStuffTypeAny], function (this: StackMachine, self: PlStuff, other: PlStuff) {
         const value = this.findValue(ScrambleType("get", other.type));
         if (value.type == PlStuffType.NFunc) {
             return value.value.native(other, self);

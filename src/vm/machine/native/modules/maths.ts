@@ -1,10 +1,11 @@
-import {GenerateJsGuardedFunction} from "../helpers";
+import {GenerateGuardedFunction} from "../helpers";
+import {PlStuffType} from "../../stuff";
 
 function generateBindings(target: any, converter: Record<string, string>): object {
     const out = {};
     for (const [key, entry] of Object.entries(converter)) {
         if (typeof target[entry] == "function") {
-            out[key] = GenerateJsGuardedFunction(key, ["number"], target[entry]);
+            out[key] = GenerateGuardedFunction(key, [PlStuffType.Num], target[entry]);
         } else {
             out[key] = target[entry];
         }

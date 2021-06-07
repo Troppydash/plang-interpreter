@@ -1,12 +1,9 @@
 import {ScrambleType} from "../scrambler";
-import {PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType} from "../stuff";
+import {PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType, PlStuffTypeAny} from "../stuff";
 import {
-    AssertOperatorsSide,
-    AssertTypeEqual,
-    GenerateCompare,
-    GenerateJsGuardedTypeFunction
+    GenerateGuardedTypeFunction,
 } from "./helpers";
-import { ExportJs, ExportNative } from "./types";
+import {ExportJs, ExportNative} from "./types";
 
 export function equals(l: PlStuff, r: PlStuff) {
     if (l.type != r.type) {
@@ -33,7 +30,7 @@ export function equals(l: PlStuff, r: PlStuff) {
         case PlStuffType.Dict:
         case PlStuffType.NFunc:
         case PlStuffType.Func:
-            out = false; // TODO: WRITE THESE
+            out = false;
             break;
     }
     return out
@@ -43,28 +40,78 @@ function greater(l: PlStuff, r: PlStuff) {
     return l.value > r.value;
 }
 
+function generateOperation(name: string, operand: PlStuffType, func: Function) {
+    return GenerateGuardedTypeFunction(name, [operand], func);
+}
+
+function wrapBool(value: Function) {
+    return (...args) => {
+        return value(...args) == true ? PlStuffTrue : PlStuffFalse;
+    }
+}
+
+function generateCompare(type: PlStuffType, eq: Function | null = null, gt: Function | null = null) {
+    let equals;
+    let nequals;
+    let greater;
+    let ngreater;
+    if (eq) {
+        equals = GenerateGuardedTypeFunction("==", [PlStuffTypeAny], wrapBool(eq));
+        nequals = GenerateGuardedTypeFunction("!=", [PlStuffTypeAny], wrapBool((l, r) => !eq(l, r)));
+    }
+    if (gt) {
+        greater = generateOperation(">", type, wrapBool(gt));
+        ngreater = generateOperation("<=", type, wrapBool((l, r) => !gt(l, r)));
+    }
+
+    let out = {};
+    if (equals) {
+        out = {
+            ...out,
+            [ScrambleType("==", type)]: equals,
+            [ScrambleType("/=", type)]: nequals,
+        };
+    }
+    if (greater) {
+        out = {
+            ...out,
+            [ScrambleType(">", type)]: greater,
+            [ScrambleType("<=", type)]: ngreater,
+        };
+    }
+    if (equals && greater) {
+        out = {
+            ...out,
+            [ScrambleType("<", type)]: generateOperation("<", type, wrapBool((l, r) => !eq(l, r) && !gt(l, r))),
+            [ScrambleType(">=", type)]: generateOperation("<", type, wrapBool((l, r) => eq(l, r) || gt(l, r))),
+        };
+    }
+    return out;
+}
+
+
 export const jsOperators: ExportJs = {
-    // numbers
-    [ScrambleType("+", PlStuffType.Num)]: AssertOperatorsSide("+", (l, r) => l + r),
-    [ScrambleType("-", PlStuffType.Num)]: AssertOperatorsSide("-",(l, r) => l - r),
-    [ScrambleType("*", PlStuffType.Num)]: AssertOperatorsSide("*",(l, r) => l * r),
-    [ScrambleType("/", PlStuffType.Num)]: AssertOperatorsSide("/",(l, r) => l / r),
-    [ScrambleType("mod", PlStuffType.Num)]: AssertOperatorsSide("mod",(l, r) => l % r),
+    // // numbers
+    [ScrambleType("+", PlStuffType.Num)]: generateOperation("+", PlStuffType.Num, (l, r) => l + r),
+    [ScrambleType("-", PlStuffType.Num)]: generateOperation("-", PlStuffType.Num, (l, r) => l - r),
+    [ScrambleType("*", PlStuffType.Num)]: generateOperation("*", PlStuffType.Num, (l, r) => l * r),
+    [ScrambleType("/", PlStuffType.Num)]: generateOperation("/", PlStuffType.Num, (l, r) => l / r),
+    [ScrambleType("mod", PlStuffType.Num)]: generateOperation("mod", PlStuffType.Num, (l, r) => l % r),
 
     // strings
-    [ScrambleType("+", PlStuffType.Str)]: AssertOperatorsSide("+", (l, r) => l + r),
-    [ScrambleType("*", PlStuffType.Str)]: GenerateJsGuardedTypeFunction("*", ["number"], (l, r) => {
+    [ScrambleType("+", PlStuffType.Str)]: generateOperation("+", PlStuffType.Str, (l, r) => l + r),
+    [ScrambleType("*", PlStuffType.Str)]: GenerateGuardedTypeFunction("*", [PlStuffType.Num], (l, r) => {
         return l.repeat(r);
-    })
+    }),
 };
 
 export const operators: ExportNative = {
-    ...GenerateCompare(PlStuffType.Num, equals, AssertTypeEqual(">", greater)),
-    ...GenerateCompare(PlStuffType.Str, equals, AssertTypeEqual(">", greater)),
-    ...GenerateCompare(PlStuffType.Bool, equals),
-    ...GenerateCompare(PlStuffType.Null, equals),
-    ...GenerateCompare(PlStuffType.Type, equals),
-    ...GenerateCompare(PlStuffType.Func, equals),
-    ...GenerateCompare(PlStuffType.List, equals),
-    ...GenerateCompare(PlStuffType.Dict, equals),
+    ...generateCompare(PlStuffType.Num, equals, greater),
+    ...generateCompare(PlStuffType.Str, equals, greater),
+    ...generateCompare(PlStuffType.Bool, equals),
+    ...generateCompare(PlStuffType.Null, equals),
+    ...generateCompare(PlStuffType.Type, equals),
+    ...generateCompare(PlStuffType.Func, equals),
+    ...generateCompare(PlStuffType.List, equals),
+    ...generateCompare(PlStuffType.Dict, equals),
 };

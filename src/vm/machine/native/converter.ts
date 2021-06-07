@@ -1,6 +1,7 @@
 import {
     NewPlStuff,
     PlInstance,
+    PlNativeFunction,
     PlStuff,
     PlStuffFalse,
     PlStuffGetType,
@@ -8,6 +9,7 @@ import {
     PlStuffTrue,
     PlStuffType,
     PlStuffTypeFromString,
+    PlStuffTypeRest,
     PlStuffTypeToString,
     PlType
 } from "../stuff";
@@ -211,8 +213,10 @@ export namespace PlConverter {
                     native: (...args) => {
                         return JsToPl(object.bind(sm)(...args.map(a => PlToJs(a, sm))), sm);
                     },
-                    name: "native"
-                });
+                    name: "native",
+                    parameters: [PlStuffTypeRest],
+                    self: null,
+                } as PlNativeFunction);
             }
             case "undefined": {
                 return PlStuffNull;

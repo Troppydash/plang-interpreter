@@ -12,11 +12,14 @@ import {
     PlStuffNull,
     PlStuffTrue,
     PlStuffType,
+    PlStuffTypeAny,
+    PlStuffTypeRest,
     PlStuffTypes,
+    PlStuffTypeToString,
     PlType,
 } from "./stuff";
 import {jsModules, jsNatives, natives} from "./native";
-import {ScrambleImpl, ScrambleName, ScrambleType, UnscrambleFunction} from "./scrambler";
+import {ScrambleImpl, ScrambleName} from "./scrambler";
 import {PlProblemCode} from "../../problem/codes";
 import {PlActions, PlConverter} from "./native/converter";
 import {PlProgram} from "../emitter";
@@ -285,6 +288,11 @@ export class PlStackMachine implements StackMachine {
     }
 
 
+    /**
+     * Method to convert types using the Type calling
+     * @param value
+     * @param args
+     */
     convertBasicTypes(value: PlType, args: PlStuff[]): PlStuff | null {
         if (args.length != 1) {
             this.newProblem("RE0006", this.pointer, '1', '' + args.length);
@@ -361,9 +369,37 @@ export class PlStackMachine implements StackMachine {
             }
             case PlStuffType.NFunc: {
                 const value = func.value as PlNativeFunction;
+                const parameters = value.parameters;
+                // check for function arity
+                let hasRest = false;
+                for (let i = 0; i < parameters.length; i++) {
+                    const param = parameters[i];
+                    if (param == PlStuffTypeRest) {
+                        hasRest = true;
+                        break;
+                    }
+                    if (i >= args.length) {
+                        break;
+                    }
+                    if (param == PlStuffTypeAny) {
+                        continue;
+                    }
+                    if (PlStuffTypeToString(args[i].type) != PlStuffTypeToString(param)) {
+                        this.newProblem("RE0018", this.pointer, PlStuffTypeToString(param), ""+(i+1), PlStuffTypeToString(args[i].type));
+                        return false;
+                    }
+                }
+                if (!hasRest) {
+                    if (args.length != value.parameters.length) {
+                        this.newProblem("RE0006", this.pointer, '' + value.parameters.length, '' + args.length);
+                        return false;
+                    }
+                }
+
                 const stackFrame = this.stackFrame;
                 try {
-                    this.pushStack(value.native(...args));
+                    const out = value.native(...args);
+                    this.pushStack(out);
                 } catch (e) {
                     // insert stackFrame
                     const info = callDebug == null ? null : callDebug.span.info;
@@ -417,34 +453,43 @@ export class PlStackMachine implements StackMachine {
     seedFrame(args: string[]) {
         // Javascript Natives
         for (const [key, entry] of Object.entries(jsNatives)) {
-            const pl = PlConverter.JsToPl(entry, this);
-            (pl.value as PlNativeFunction).name = UnscrambleFunction(key)[1];
+            entry.native = PlConverter.JsToPl(entry.native, this).value.native;
             this.stackFrame.createValue(
                 key,
-                pl
+                NewPlStuff(
+                    PlStuffType.NFunc,
+                    entry
+                ),
             );
             this.standard.push(key);
         }
 
         // Plang Natives
         for (const [key, entry] of Object.entries(natives)) {
+            entry.native = entry.native.bind(this);
             this.stackFrame.createValue(
                 key,
-                NewPlStuff(PlStuffType.NFunc, {
-                    native: entry.bind(this),
-                    name: UnscrambleFunction(key)[1],
-                } as PlNativeFunction)
+                NewPlStuff(PlStuffType.NFunc, entry)
             );
             this.standard.push(key);
         }
 
         // Js Modules
-        for (const [key, entry] of Object.entries(jsModules)) {
+        for (const [moduleName, module] of Object.entries(jsModules)) {
+            const obj = {};
+            for (const [methodName, method] of Object.entries(module)) {
+                if (typeof method != "object") {
+                    obj[methodName] = PlConverter.JsToPl(method, this);
+                    continue;
+                }
+                (method as any).native = PlConverter.JsToPl((method as any).native, this).value.native;
+                obj[methodName] = NewPlStuff(PlStuffType.NFunc, method);
+            }
             this.stackFrame.createValue(
-                key,
-                PlConverter.JsToPl(entry, this)
+                moduleName,
+                NewPlStuff(PlStuffType.Dict, obj)
             );
-            this.standard.push(key);
+            this.standard.push(moduleName);
         }
 
         // Programing arguments
@@ -457,6 +502,7 @@ export class PlStackMachine implements StackMachine {
                         process.exit(code);
                     }
                     this.pointer = this.program.program.length;
+                    return null;
                 }
             }, this)
         );
@@ -482,7 +528,9 @@ export class PlStackMachine implements StackMachine {
                         if (out == null) throw null;
                         return out;
                     },
-                    name: "new"
+                    name: "new",
+                    self: null,
+                    parameters: [PlStuffTypeAny]
                 } as PlNativeFunction)
             );
             this.standard.push(key, newName);

@@ -1,4 +1,5 @@
-import { AssertTypeof, GenerateJsGuardedFunction } from "../helpers";
+import {AssertTypeof, GenerateGuardedFunction} from "../helpers";
+import {PlStuffType, PlStuffTypeRest} from "../../stuff";
 
 function randomNumber(lower, upper) {
     if (lower != null) {
@@ -23,18 +24,13 @@ function randomNumber(lower, upper) {
 
 export const random = {
     random: {
-        number: randomNumber,
-        list: function(n, lower, upper) {
-            if (n == null) {
-                n = 10;
-            }
-            // TODO: make this lower upper known
+        number: GenerateGuardedFunction("number", [PlStuffTypeRest], randomNumber),
+        list: GenerateGuardedFunction("list", [PlStuffType.Num, PlStuffType.Num, PlStuffType.Num], function (lower, upper, n) {
             let out = [];
             for (let i = 0; i < n; i++) {
                 out.push(randomNumber(lower, upper));
             }
-
             return out;
-        }
+        })
     }
 };

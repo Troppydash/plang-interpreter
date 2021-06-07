@@ -1,16 +1,17 @@
-import { GenerateJsGuardedFunction } from "../helpers";
+import {GenerateGuardedFunction} from "../helpers";
+import {PlStuffType} from "../../stuff";
 
 export const time = {
     time: {
-        now: GenerateJsGuardedFunction("now", [], () => {
+        now: GenerateGuardedFunction("now", [], () => {
             return (new Date()).getTime();
         }),
-        measure: GenerateJsGuardedFunction("measure", ["function"], (closure) => {
+        measure: GenerateGuardedFunction("measure", [PlStuffType.Func], (closure) => {
             const start = (new Date()).getTime();
             closure();
             return (new Date()).getTime() - start;
         }),
-        benchmark: GenerateJsGuardedFunction("benchmark", ["number", "function"], (amount, closure) => {
+        benchmark: GenerateGuardedFunction("benchmark", [PlStuffType.Num, PlStuffType.Func], (amount, closure) => {
             const trial = [];
             for (let i = 0; i < amount; i++) {
                 const start = (new Date()).getTime();

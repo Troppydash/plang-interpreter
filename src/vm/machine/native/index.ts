@@ -15,8 +15,8 @@ import {func} from "./impl/func";
 
 export const jsNatives: ExportJs = {
     ...jsOperators,
-    ...jsList,
     ...jsDict,
+    ...jsList,
     ...jsStr,
     ...jsNum,
     ...jsSpecial,

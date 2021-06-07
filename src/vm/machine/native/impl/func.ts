@@ -1,6 +1,14 @@
 import {ExportNative} from "../types";
 import {ScrambleType} from "../../scrambler";
-import {NewPlStuff, PlFunction, PlNativeFunction, PlStuff, PlStuffFunction, PlStuffType} from "../../stuff";
+import {
+    NewPlStuff,
+    PlFunction,
+    PlNativeFunction,
+    PlStuff,
+    PlStuffFunction,
+    PlStuffType,
+    PlStuffTypeAny
+} from "../../stuff";
 import {GenerateGuardedTypeFunction} from "../helpers";
 import {StackMachine} from "../../index";
 import {PlActions} from "../converter";
@@ -13,8 +21,8 @@ export const func: ExportNative = {
              throw null;
          }
     }),
-    [ScrambleType("bind", PlStuffType.Func)]: GenerateGuardedTypeFunction("bind", ["*"], function(this: StackMachine, self, newSelf) {
-        const newFunc = PlActions.PlClone(self);
+    [ScrambleType("bind", PlStuffType.Func)]: GenerateGuardedTypeFunction("bind", [PlStuffTypeAny], function(this: StackMachine, self, newSelf) {
+        const newFunc = PlActions.PlCopy(self);
         newFunc.value.self = newSelf;
         newFunc.value.name += '.bind()'
         return newFunc;
