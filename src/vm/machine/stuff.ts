@@ -57,7 +57,6 @@ export interface PlStuffT extends PlStuff {
 }
 
 
-
 /// These are possible types for the plstuff.value field ///
 export interface PlFunction {
     index: number; // index of bytecode

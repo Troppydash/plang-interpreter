@@ -86,7 +86,7 @@ export namespace PlConverter {
             switch (js["_version"]) {
                 case 1:
                     if ("type" in js && typeof js["type"] == "string") {
-                        if ("value" in js && typeof js["value"] === 'object' &&  js["value"] !== null) {
+                        if ("value" in js && typeof js["value"] === 'object' && js["value"] !== null) {
                             return true;
                         }
                     }
@@ -208,7 +208,7 @@ export namespace PlConverter {
             }
             case "function": {
                 return NewPlStuff(PlStuffType.NFunc, {
-                    native:(...args) => {
+                    native: (...args) => {
                         return JsToPl(object.bind(sm)(...args.map(a => PlToJs(a, sm))), sm);
                     },
                     name: "native"
@@ -349,7 +349,7 @@ export namespace PlConverter {
             case PlStuffType.Bool:
                 return object.value ? "true" : "false";
             case PlStuffType.Dict:
-                return `dict(${Object.entries(object.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToString(value, sm,true)}`).join(', ')})`;
+                return `dict(${Object.entries(object.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToString(value, sm, true)}`).join(', ')})`;
             case PlStuffType.NFunc:
             case PlStuffType.Func:
                 return `[function]`;
@@ -397,16 +397,18 @@ export namespace PlActions {
             case PlStuffType.Num:
             case PlStuffType.Str:
             case PlStuffType.List:
-            case PlStuffType.Func:
             case PlStuffType.Dict:
                 return NewPlStuff(type, value);
 
             case PlStuffType.Inst:
             case PlStuffType.Type:
-            case PlStuffType.Null:
             case PlStuffType.Bool:
-            case PlStuffType.NFunc:
+            case PlStuffType.Null:
                 return object;
+
+            case PlStuffType.Func:
+            case PlStuffType.NFunc:
+                return NewPlStuff(type, {...value});
         }
         throw new Error(`PlActions.PlCopy failed to match type ${PlStuffTypeToString(object.type)}`);
     }
@@ -425,8 +427,11 @@ export namespace PlActions {
 
             case PlStuffType.List:
                 return NewPlStuff(type, value.map(v => PlClone(v)));
+
             case PlStuffType.Func:
+            case PlStuffType.NFunc:
                 return NewPlStuff(type, {...value});
+
             case PlStuffType.Inst: {
                 const newObj = {};
                 Object.entries(value.value).forEach(([k, v]) => {
@@ -447,7 +452,6 @@ export namespace PlActions {
             case PlStuffType.Type:
             case PlStuffType.Null:
             case PlStuffType.Bool:
-            case PlStuffType.NFunc:
                 return object;
         }
         throw new Error(`PlActions.PlClone failed to match type ${PlStuffTypeToString(object.type)}`);

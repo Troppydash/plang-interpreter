@@ -413,11 +413,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
 
 
         screen.key(['C-c', 'q'], function (ch, key) {
-            for (const child of screen.children) {
-                child.free();
-                screen.remove(child);
-            }
-            screen.free();
+            screen.destroy(); // make sure to remove the screen
             resolve(0);
         });
 

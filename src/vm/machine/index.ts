@@ -896,19 +896,13 @@ export class PlStackMachine implements StackMachine {
                                 this.pushStack(value);
                                 break;
                             }
-                            // // instance impl functions are different
-                            // value = this.findValue(ScrambleType(name, bTarget.type));
-                            // if (value != null) {
-                            //     value.value.self = bTarget;
-                            //     this.pushStack(value);
-                            //     break;
-                            // }
                         } else if (bTarget.type == PlStuffType.Type) {
                             // try to find static functions
                             const value = this.findValue(ScrambleName(name, bTarget.value.type));
                             if (value != null) {
-                                value.value.self = null;
-                                this.pushStack(value);
+                                const fn = PlActions.PlCopy(value);
+                                fn.value.self = null;
+                                this.pushStack(fn);
                                 break;
                             }
                         }
@@ -916,11 +910,11 @@ export class PlStackMachine implements StackMachine {
                         // try finding impl
                         const value = this.findValue(ScrambleImpl(name, bTarget));
                         if (value != null) {
-                            value.value.self = bTarget;
-                            this.pushStack(value);
+                            const fn = PlActions.PlCopy(value);
+                            fn.value.self = bTarget;
+                            this.pushStack(fn);
                             break;
                         }
-
 
 
                         return this.newProblem({
