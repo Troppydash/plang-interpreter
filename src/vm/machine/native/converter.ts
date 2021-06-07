@@ -1,5 +1,5 @@
 import {
-    NewPlStuff,
+    NewPlStuff, PlFunction,
     PlInstance,
     PlNativeFunction,
     PlStuff,
@@ -381,6 +381,55 @@ export namespace PlConverter {
             }
         }
         throw new Error(`PlActions.PlToString failed to match object of type ${PlStuffTypeToString(object.type)}`);
+    }
+
+    /**
+     * Returns the string representation of the object for debugging
+     * @param object The stuff to be repr
+     * @constructor
+     */
+    export function PlToDebugString(object: PlStuff): string {
+        switch (object.type) {
+            case PlStuffType.Bool:
+                return object.value ? "true": 'false';
+            case PlStuffType.Dict:
+                return `Dict(\n${Object.entries(object.value).map(([key, value]: [string, PlStuff]) => `  ${key}: ${PlToDebugString(value,)}`).join(',\n')}\n)`;
+            case PlStuffType.Null:
+                return "null";
+            case PlStuffType.Inst:
+                return `${(object.value as PlInstance).type}(${Object.entries(object.value.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToDebugString(value)}`).join(',\n')}\n)`;
+            case PlStuffType.List:
+                return `List(\n${object.value.map(v => "  " + PlToDebugString(v)).join(',\n')}\n)`;
+            case PlStuffType.Func: {
+                const params = [];
+                if (object.value.self)
+                    params.push(`self=${PlToDebugString(object.value.self)}`);
+                for (const param of object.value.parameters) {
+                    params.push(param);
+                }
+                return `Func(${params.join(', ')}) -> Any`;
+            }
+            case PlStuffType.NFunc: {
+                const params = [];
+                if (object.value.self)
+                    params.push(`self=${PlToDebugString(object.value.self)}`);
+                for (const type of object.value.parameters) {
+                    if (typeof type == "string") {
+                        params.push(type);
+                        continue;
+                    }
+                    params.push(PlStuffTypeToString(type));
+                }
+                return `NFunc(${params.join(', ')}) -> Any`;
+            }
+            case PlStuffType.Num:
+                return ""+object.value;
+            case PlStuffType.Str:
+                return `"${object.value}"`;
+            case PlStuffType.Type:
+                return `Type(${object.value.type})`;
+        }
+        throw new Error("PlToDebugString failed to match an object");
     }
 }
 
