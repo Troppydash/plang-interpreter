@@ -393,13 +393,13 @@ export namespace PlConverter {
             case PlStuffType.Bool:
                 return object.value ? "true": 'false';
             case PlStuffType.Dict:
-                return `Dict(\n${Object.entries(object.value).map(([key, value]: [string, PlStuff]) => `  ${key}: ${PlToDebugString(value,)}`).join(',\n')}\n)`;
+                return `Dict(${Object.entries(object.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToDebugString(value,)}`).join(', ')})`;
             case PlStuffType.Null:
                 return "null";
             case PlStuffType.Inst:
                 return `${(object.value as PlInstance).type}(${Object.entries(object.value.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToDebugString(value)}`).join(',\n')}\n)`;
             case PlStuffType.List:
-                return `List(\n${object.value.map(v => "  " + PlToDebugString(v)).join(',\n')}\n)`;
+                return `List(${object.value.map(v => PlToDebugString(v)).join(', ')})`;
             case PlStuffType.Func: {
                 const params = [];
                 if (object.value.self)

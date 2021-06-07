@@ -96,6 +96,7 @@ export interface StackMachine {
      */
     getProblems(): PlProblem[];
 
+    runProgram(position?: number, until?: number): PlStuff | null;
 
 
     readonly stack: PlStuff[];
@@ -666,15 +667,16 @@ export class PlStackMachine implements StackMachine {
     /**
      * Runs the stack machine from position **position**
      * @param position The position to start at
+     * @param until
      */
-    runProgram(position: number = this.pointer): PlStuff | null {
+    runProgram(position: number = this.pointer, until: number = this.program.program.length): PlStuff | null {
         /// WE ASSUME THAT THE PROGRAM IS VALID ///
         const {program} = this.program;
         this.pointer = position;
 
         try {
             // execution
-            while (this.pointer < program.length) {
+            while (this.pointer < program.length && this.pointer < until) {
                 // the larget bytecode switch
                 const byte = program[this.pointer];
                 switch (byte.type) {

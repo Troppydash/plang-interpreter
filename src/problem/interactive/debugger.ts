@@ -66,7 +66,77 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             headerBox.setContent(headerBox.getContent() + "\nClick on a panel to focus it");
         }
 
-        const contentHeight = `100%-${headerBox.content.split('\n').length + 1}`;
+        const headerHeight = headerBox.content.split('\n').length;
+
+        const debugBox = blessed.box({
+            parent: screen,
+            top: headerHeight,
+            left: 0,
+            height: 3,
+            label: "{bold}Stepper{/}",
+            border: 'line',
+            tags: true,
+            padding: {
+                left: 1,
+                right: 1,
+            }
+        });
+
+        const stepNextButton = blessed.button({
+            parent: debugBox,
+            top: 0,
+            left: 0,
+            content: "Step",
+        });
+
+
+        let line = machine.pointer;
+        let currentLineDebug: PlDebug = null;
+        for (const debug of machine.program.debug) {
+            if (line <= debug.endLine && line >= (debug.endLine - debug.length)) {
+                if (currentLineDebug == null) currentLineDebug = debug;
+                else {
+                    if (currentLineDebug.length > debug.length) currentLineDebug = debug;
+                }
+            }
+        }
+
+        const stepNext = function() {
+            // step next
+            const nextLine = currentLineDebug.span.info.row + 1;
+
+            // find the start of the next line of instructions
+            let found = false;
+            const program = machine.program.program.slice(machine.pointer);
+            for (let i = 0; i < program.length; i++) {
+                for (const debug of machine.program.debug) {
+                    if (debug.endLine+debug.length == (i+machine.pointer)) {
+                        if (debug.span.info.row == nextLine) {
+                            currentLineDebug = debug;
+                            line = i+machine.pointer;
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            // use the step out then
+            if (!found)
+                return;
+
+            // TODO: Fix this i am going to sleep
+            machine.runProgram(machine.pointer, line); // check for errors and such
+
+            updateContents();
+            updateFrames();
+            updateLocals();
+        };
+
+
+        stepNextButton.on('press', stepNext);
+        screen.key(['n'], stepNext);
+
+        const contentHeight = `100%-${headerHeight + 3}`;
 
         const contentLabel = `"${machine.file.filename}"`;
         // text box
@@ -100,18 +170,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
         contentBox.data.label = contentLabel;
 
         // SET CONTENT
-        { // get current line
-            const line = machine.pointer;
-            let d: PlDebug = null;
-            for (const debug of machine.program.debug) {
-                if (line <= debug.endLine && line >= (debug.endLine - debug.length)) {
-                    if (d == null) d = debug;
-                    else {
-                        if (d.length > debug.length) d = debug;
-                    }
-                }
-            }
-
+        const updateContents = function() {
             // add line numbers
             const fileContent = machine.file.content.split('\n');
             const margin = ('' + (fileContent.length - 1)).length;
@@ -119,7 +178,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
                 index += 1;
                 const prefix = `${' '.repeat(margin - ('' + index).length)}${index}`;
                 const newLine = `${prefix}|  ${line}`
-                if (d.span.info.row + 1 == index) {
+                if (currentLineDebug.span.info.row + 1 == index) {
                     return `{red-bg}{white-fg}${newLine}{/white-fg}{/red-bg}`;
                 }
                 return newLine;
@@ -127,8 +186,10 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             contentBox.setContent(text);
 
             // set scroll to current line
-            contentBox.setScroll(d.span.info.row - 1);
+            contentBox.setScroll(currentLineDebug.span.info.row - 1);
+            screen.render();
         }
+        updateContents();
 
         const infoContainer = blessed.box({
             parent: screen,
@@ -176,25 +237,32 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
         });
 
         // FRAMES
-        const framesText = [];
-        const trace = machine.getTrace();
-        trace.reverse();
-        for (const frame of trace) {
-            if (frame.info == null) {
-                framesText.push(`'${frame.name}'`);
-            } else {
-                framesText.push(`'${frame.name}' at line ${frame.info.row + 1}`);
+        let selectedTrace;
+        const updateFrames = function() {
+            frameList.clearItems();
+
+            const framesText = [];
+            const trace = machine.getTrace();
+            trace.reverse();
+            for (const frame of trace) {
+                if (frame.info == null) {
+                    framesText.push(`'${frame.name}'`);
+                } else {
+                    framesText.push(`'${frame.name}' at line ${frame.info.row + 1}`);
+                }
             }
+            frameList.setItems(framesText);
+
+            frameList.on('select', function (item, index) {
+                selectedTrace = trace[index];
+                updateLocals();
+            });
+
+            frameList.select(trace.length - 1);
+            selectedTrace = trace[trace.length - 1];
+            screen.render();
         }
-        frameList.setItems(framesText);
-
-        frameList.on('select', function (item, index) {
-            selectedTrace = trace[index];
-            updateLocals();
-        });
-
-        frameList.select(trace.length - 1);
-        let selectedTrace = trace[trace.length - 1];
+        updateFrames();
 
 
         const localsLabel = "{bold}Locals{/bold}";
