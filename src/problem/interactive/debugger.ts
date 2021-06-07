@@ -278,14 +278,12 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
                     content: `... and ${std} standard values`,
                     height: 1,
                 });
-                localsBox.height = '100%-4';
-            } else {
                 localsBox.height = '100%-3';
+            } else {
+                localsBox.height = '100%-2';
             }
             localsBox.setItems(localsBuffer);
-            // localsBox.data.oldIndex = undefined;
             localsBox.select(0);
-            // if (localsBoxFocus) localsBoxFocus(0);
             screen.render();
         };
         localsBox.on('select', function (_, index) {
@@ -382,10 +380,10 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
 
         screen.key(['C-c', 'q'], function (ch, key) {
             for (const child of screen.children) {
-                child.free();
+                child.destroy();
                 screen.remove(child);
             }
-            screen.free();
+            screen.destroy();
             resolve(0);
         });
 
