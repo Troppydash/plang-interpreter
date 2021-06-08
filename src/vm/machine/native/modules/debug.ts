@@ -49,7 +49,7 @@ if (isNode) {
         if (this.inout.options['mode'] == 'release')
             return null;
         IACTSync(IACTDebugger(this));
-        return null;
+        throw "debugger";
     });
 }
 

@@ -4,13 +4,26 @@ import {PlConverter} from "../../vm/machine/native/converter";
 import {dddString} from "../../extension/text";
 import {METHOD_SEP} from "../../vm/emitter";
 import {UnscrambleFunction} from "../../vm/machine/scrambler";
-import {PlStuffGetType, PlStuffTypeToString} from "../../vm/machine/stuff";
+import {PlStuffGetType, PlStuffType, PlStuffTypeToString} from "../../vm/machine/stuff";
+import {PlBytecodeType} from "../../vm/emitter/bytecode";
+import {PlStackFrame} from "../../vm/machine/memory";
 import PlToString = PlConverter.PlToString;
 import PlToDebugString = PlConverter.PlToDebugString;
 
+let isDebugging = false;
+
 export async function IACTDebugger(machine: StackMachine): Promise<number> {
+    // early return
+    machine.stack.push(null);
+
+    if (isDebugging) {
+        return Promise.resolve(0);
+    }
+    isDebugging = true;
+
     const blessed = require('blessed');
-    // TODO: Add eval and steps, and help alert
+
+    // TODO: Add eval and help alert
 
     /// FOR WINDOWS
     const isWindows = process.platform == "win32";
@@ -86,9 +99,8 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             parent: debugBox,
             top: 0,
             left: 0,
-            content: "Step",
+            content: "Step [N]",
         });
-
 
         let line = machine.pointer;
         let currentLineDebug: PlDebug = null;
@@ -101,32 +113,74 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             }
         }
 
-        const stepNext = function() {
-            // step next
-            const nextLine = currentLineDebug.span.info.row + 1;
+        const stepNext = function () {
+            const program = machine.program.program;
+            // stop returning here
+            if (program[machine.pointer].type == PlBytecodeType.DORETN)
+                return;
 
-            // find the start of the next line of instructions
-            let found = false;
-            const program = machine.program.program.slice(machine.pointer);
-            for (let i = 0; i < program.length; i++) {
-                for (const debug of machine.program.debug) {
-                    if (debug.endLine+debug.length == (i+machine.pointer)) {
-                        if (debug.span.info.row == nextLine) {
-                            currentLineDebug = debug;
-                            line = i+machine.pointer;
-                            found = true;
-                            break;
+            const oldLine = currentLineDebug.span.info.row;
+            let surround = 0;
+            let lastState = machine.saveState();
+            let first = true;
+            machine.runProgram(machine.pointer, (lastPointer, thisPointer) => {
+                if (first) {
+                    first = false;
+                    return false;
+                }
+
+                const lastByte = program[lastPointer];
+                if (lastByte.type == PlBytecodeType.DOCALL) {
+                    // check if it is function
+                    const fn = lastState.stack[lastState.stack.length - 1];
+                    if (fn && fn.type == PlStuffType.Func) {
+                        surround += 1;
+                    }
+                }
+                const thisByte = program[thisPointer];
+                if (thisByte.type == PlBytecodeType.JMPREL || thisByte.type == PlBytecodeType.STKEXT || thisByte.type == PlBytecodeType.STKENT) {
+                    return false;
+                }
+                if (thisByte.type == PlBytecodeType.DORETN) {
+                    if (surround == 0)
+                        return true;
+                }
+                if (lastByte.type == PlBytecodeType.DORETN) {
+                    if (surround > 0)
+                        surround -= 1;
+                } else if (lastByte.type == PlBytecodeType.STKPOP || lastByte.type == PlBytecodeType.JMPICF) {
+                    if (surround <= 0) {
+                        let found = null;
+                        for (const debug of machine.program.debug) {
+                            if (thisPointer <= debug.endLine && (debug.endLine - debug.length) <= thisPointer) {
+                                if (debug.span.info.row != oldLine) {
+                                    if (found == null) {
+                                        found = debug;
+                                    } else if (debug.length < found.length) {
+                                        found = debug;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        if (found && found.span.info.filename.length > 0) {
+                            currentLineDebug = found;
+                            line = thisPointer;
+                            return true;
+                        } else {
+                            return false;
                         }
                     }
                 }
+
+                lastState = machine.saveState();
+                return false;
+            }); // check for errors and such
+
+            if (machine.problems.length != 0) {
+                cleanup();
+                throw null;
             }
-            // use the step out then
-            if (!found)
-                return;
-
-            // TODO: Fix this i am going to sleep
-            machine.runProgram(machine.pointer, line); // check for errors and such
-
             updateContents();
             updateFrames();
             updateLocals();
@@ -170,10 +224,10 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
         contentBox.data.label = contentLabel;
 
         // SET CONTENT
-        const updateContents = function() {
+        const updateContents = function () {
             // add line numbers
             const fileContent = machine.file.content.split('\n');
-            const margin = ('' + (fileContent.length - 1)).length;
+            const margin = ('' + (fileContent.length)).length;
             const text = fileContent.map((line, index) => {
                 index += 1;
                 const prefix = `${' '.repeat(margin - ('' + index).length)}${index}`;
@@ -237,31 +291,34 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
         });
 
         // FRAMES
-        let selectedTrace;
-        const updateFrames = function() {
+        let selectedFrame;
+        let frames;
+        const updateFrames = function () {
             frameList.clearItems();
 
             const framesText = [];
-            const trace = machine.getTrace();
-            trace.reverse();
-            for (const frame of trace) {
-                if (frame.info == null) {
-                    framesText.push(`'${frame.name}'`);
+            frames = machine.getFrames();
+            frames.reverse();
+            for (const frame of frames) {
+                if (frame.trace) {
+                    if (frame.trace.info == null) {
+                        framesText.push(`'${frame.trace.name}'`);
+                    } else {
+                        framesText.push(`'${frame.trace.name}' at line ${frame.trace.info.row + 1}`);
+                    }
                 } else {
-                    framesText.push(`'${frame.name}' at line ${frame.info.row + 1}`);
+                    framesText.push(`|frame|`);
                 }
             }
             frameList.setItems(framesText);
-
-            frameList.on('select', function (item, index) {
-                selectedTrace = trace[index];
-                updateLocals();
-            });
-
-            frameList.select(trace.length - 1);
-            selectedTrace = trace[trace.length - 1];
+            frameList.select(frames.length - 1);
+            selectedFrame = frames[frames.length - 1];
             screen.render();
         }
+        frameList.on('select', function (item, index) {
+            selectedFrame = frames[index];
+            updateLocals();
+        });
         updateFrames();
 
 
@@ -305,23 +362,17 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
 
         let items = {};
         const updateLocals = () => {
-            let newLabel = `${localsLabel} of '${selectedTrace.name}'`;
+            let newLabel = `${localsLabel} of '|frame|'`;
+            if (selectedFrame.trace) {
+                newLabel = `${localsLabel} of '${selectedFrame.trace.name}'`;
+            }
 
             localsContainer.setLabel(newLabel);
             localsContainer.data.label = newLabel;
 
             const localsBuffer = [];
 
-            let frame = machine.stackFrame;
-            if (selectedTrace) {
-                do {
-                    if (frame.trace == selectedTrace) {
-                        break;
-                    }
-                    frame = frame.outer;
-                } while (frame != null);
-                if (frame == null) return;
-            }
+            const frame: PlStackFrame = selectedFrame;
 
             items = {};
             let std = 0;
@@ -334,7 +385,11 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
                 const v = dddString(PlConverter.PlToString(value, machine, true), contentBox.width - key.length - 6);
                 if (key.includes(METHOD_SEP)) {
                     const total = UnscrambleFunction(key);
-                    localsBuffer.push(`{cyan-fg}${total[0]}{/cyan-fg}.${total[1]}: ${v}`);
+                    if (total[1].length == 0) {
+                        localsBuffer.push(`{yellow-fg}H{/} {cyan-fg}${PlStuffTypeToString(value.type)}{/cyan-fg} ${total[0]}: ${v}`);
+                    } else {
+                        localsBuffer.push(`{cyan-fg}${total[0]}{/cyan-fg}.${total[1]}: ${v}`);
+                    }
                     continue;
                 }
                 localsBuffer.push(`{cyan-fg}${PlStuffTypeToString(value.type)}{/cyan-fg} ${key}: ${v}`);
@@ -445,11 +500,15 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
         elements[0].setLabel(`${FOCUSED} ` + elements[0].data.label);
         elements[0].data.label = `${FOCUSED} ` + elements[0].data.label;
 
-
-        screen.key(['C-c', 'q'], function (ch, key) {
+        machine.pointer += 1;
+        const cleanup = function () {
+            isDebugging = false;
             screen.destroy();
+            machine.pointer -= 1;
             resolve(0);
-        });
+        }
+
+        screen.key(['C-c', 'q'], cleanup);
 
         contentBox.focus();
         screen.render();

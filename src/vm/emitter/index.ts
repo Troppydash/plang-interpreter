@@ -58,7 +58,6 @@ export function EmitStatement( statement: ASTStatement ): PlProgram {
         .addPWD( traverseAST( statement ) )
         .addBytecode( NewBytecode( PlBytecodeType.STKPOP ) )
         .toProgram();
-
 }
 
 class ProgramBuilder {
@@ -291,7 +290,6 @@ function traverseAST( node: ASTNode ): PlProgram {
             programBuilder.addBytecode( NewBytecode( PlBytecodeType.DEFNUL ) );
         }
         return programBuilder.addBytecode( NewBytecode( PlBytecodeType.DORETN ) )
-            .addEmpty()
             .addStretch( node )
             .toProgram();
     } else if ( node instanceof ASTFunction ) {

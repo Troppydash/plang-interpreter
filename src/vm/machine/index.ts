@@ -37,7 +37,6 @@ const JUMP_ERRORS: Record<string, PlProblemCode> = {
 // Custom type constructor name
 export const CTOR_NAME = "new";
 
-
 export interface StackMachine {
     /**
      * Find a value in the stack machine at the current state
@@ -75,6 +74,7 @@ export interface StackMachine {
     findFunction(name: string, target?: PlStuff): PlStuff | null;
 
     callSomething(func: PlStuff, args: PlStuff[], callDebug: PlDebug | null): boolean;
+
     /**
      * Save the stack machine state for try catch calls
      */
@@ -91,12 +91,14 @@ export interface StackMachine {
      */
     getTrace(): PlTrace;
 
+    getFrames(): PlStackFrame[]
+
     /**
      * Returns the problems of the stack machine, doesn't modify anything
      */
     getProblems(): PlProblem[];
 
-    runProgram(position?: number, until?: number): PlStuff | null;
+    runProgram(position?: number, until?: Function): PlStuff | null;
 
 
     readonly stack: PlStuff[];
@@ -104,7 +106,7 @@ export interface StackMachine {
     readonly inout: PlInout;
     readonly stackFrame: PlStackFrame;
     readonly closureFrame: PlStackFrame;
-    readonly pointer: number;
+    pointer: number;
     readonly program: PlProgram;
     readonly file: PlFile;
     readonly standard: string[];
@@ -386,7 +388,7 @@ export class PlStackMachine implements StackMachine {
                         continue;
                     }
                     if (PlStuffTypeToString(args[i].type) != PlStuffTypeToString(param)) {
-                        this.newProblem("RE0018", this.pointer, PlStuffTypeToString(param), ""+(i+1), PlStuffTypeToString(args[i].type));
+                        this.newProblem("RE0018", this.pointer, PlStuffTypeToString(param), "" + (i + 1), PlStuffTypeToString(args[i].type));
                         return false;
                     }
                 }
@@ -402,6 +404,9 @@ export class PlStackMachine implements StackMachine {
                     const out = value.native(...args);
                     this.pushStack(out);
                 } catch (e) {
+                    if (e == "debugger") {
+                        break;
+                    }
                     // insert stackFrame
                     const info = callDebug == null ? null : callDebug.span.info;
                     if (stackFrame == this.stackFrame) {
@@ -438,7 +443,7 @@ export class PlStackMachine implements StackMachine {
         const {debug} = this.program;
         if (debug) {
             for (const d of debug) {
-                if (d.endLine == pointer+1) {
+                if (d.endLine == pointer + 1) {
                     return d;
                 }
             }
@@ -525,7 +530,7 @@ export class PlStackMachine implements StackMachine {
                 newName,
                 NewPlStuff(PlStuffType.NFunc, {
                     native: (...args) => {
-                        const out =  this.convertBasicTypes(value.value, args);
+                        const out = this.convertBasicTypes(value.value, args);
                         if (out == null) throw null;
                         return out;
                     },
@@ -631,12 +636,19 @@ export class PlStackMachine implements StackMachine {
                 break;
             }
         }
-        // if (this.problems.length > 0) {
-        //     const error = this.problems[0];
-        //     trace[0].info = error.info;
-        // }
-        // trace.pop(); // this works because we pop the first and last trace
         return trace;
+    }
+
+    getFrames(): PlStackFrame[] {
+        const frames = [];
+        let frame = this.stackFrame;
+        while (true) {
+            frames.push(frame);
+            if ((frame = frame.outer) == null) {
+                break;
+            }
+        }
+        return frames;
     }
 
     findValue(key: string): PlStuff | null {
@@ -669,16 +681,23 @@ export class PlStackMachine implements StackMachine {
      * @param position The position to start at
      * @param until
      */
-    runProgram(position: number = this.pointer, until: number = this.program.program.length): PlStuff | null {
+    runProgram(position: number = this.pointer, until?: Function): PlStuff | null {
         /// WE ASSUME THAT THE PROGRAM IS VALID ///
         const {program} = this.program;
         this.pointer = position;
 
+        let lastPointer = this.pointer - 1;
         try {
             // execution
-            while (this.pointer < program.length && this.pointer < until) {
+            while (this.pointer < program.length) {
+                if (until) {
+                    if (until(lastPointer, this.pointer)) {
+                        break;
+                    }
+                }
                 // the larget bytecode switch
                 const byte = program[this.pointer];
+                lastPointer = this.pointer;
                 switch (byte.type) {
                     // popping from stack
                     case PlBytecodeType.STKPOP: {
@@ -881,7 +900,7 @@ export class PlStackMachine implements StackMachine {
                         }
 
                         const args = [target];
-                        const remain = (+arity.value)-1;
+                        const remain = (+arity.value) - 1;
                         for (let i = 0; i < remain; ++i) {
                             args.push(PlActions.PlCopy(this.popStack()));
                         }
@@ -978,7 +997,9 @@ export class PlStackMachine implements StackMachine {
                         // return value and address
                         const retVal = this.popStack();
                         const address = this.popStack();
-
+                        if (address == null) {
+                            return retVal;
+                        }
                         // get old stack frame back
                         let outer = this.stackFrame;
                         while (outer.trace == null) { // reach function frame
@@ -988,12 +1009,8 @@ export class PlStackMachine implements StackMachine {
                         this.stackFrame = outer.outer; // reach outside function frame
                         this.closureFrames.pop();
 
-                        if (address == null) {
-                            return retVal;
-                        } else {
-                            this.pointer = address.value;
-                            this.stack.push(retVal);
-                        }
+                        this.pointer = address.value;
+                        this.stack.push(retVal);
                         break;
                     }
 
