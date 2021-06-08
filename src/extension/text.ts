@@ -88,3 +88,10 @@ export function lineWrap(s: string, w: number): string {
        new RegExp(`(?![^\\n]{1,${w}}$)([^\\n]{1,${w}})\\s`, 'g'), '$1\n'
    );
 }
+
+export function shallowJSON(object: any): string {
+    // https://stackoverflow.com/questions/16466220/limit-json-stringification-depth
+    return JSON.stringify(object, function (k, v) {
+        return k && v && typeof v !== "number" ? (Array.isArray(v) ? `[array ${v.length}]` : "" + v) : v;
+    }, 2);
+}

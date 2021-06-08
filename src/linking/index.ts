@@ -31,7 +31,7 @@ export function RunEmitter(file: PlFile): PlProgram | null {
         return null;
     }
 
-    return EmitProgram(ast);
+    return EmitProgram(ast, true);
 }
 
 
@@ -130,6 +130,7 @@ export function RunVmFast(file: PlFile, args: string[]): number {
             return 1;
         }
 
+        // we don't need to worry about the final return because there are no debugger anyways
         vm.addProgram(EmitStatement(statement));
         out = vm.runProgram();
         if (out == null) {
@@ -140,7 +141,7 @@ export function RunVmFast(file: PlFile, args: string[]): number {
             return 1;
         }
     }
-    if (out != null && typeof out.value == "number")
+    if (typeof out.value == "number")
         return out.value;
     return 0;
 }
@@ -155,7 +156,7 @@ export function RunVM(file: PlFile, args: string[]): number {
         return 1;
     }
 
-    const program = EmitProgram(ast);
+    const program = EmitProgram(ast, true);
     const vm = new PlStackMachine({
         ...inout,
         print: message => {

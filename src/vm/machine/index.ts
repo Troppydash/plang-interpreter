@@ -100,9 +100,10 @@ export interface StackMachine {
 
     runProgram(position?: number, until?: Function): PlStuff | null;
 
+    addProgram(program: PlProgram, content?: string);
 
     readonly stack: PlStuff[];
-    readonly problems: PlProblem[];
+    problems: PlProblem[];
     readonly inout: PlInout;
     readonly stackFrame: PlStackFrame;
     readonly closureFrame: PlStackFrame;
@@ -110,6 +111,7 @@ export interface StackMachine {
     readonly program: PlProgram;
     readonly file: PlFile;
     readonly standard: string[];
+    returnCode: number | null;
 }
 
 /**
@@ -140,11 +142,13 @@ export class PlStackMachine implements StackMachine {
     pointer: number; // The machine pointer
 
     standard: string[];
+    returnCode: number | null;
 
     constructor(inout: PlInout, file: PlFile, args: string[] = []) {
         this.inout = inout;
         this.file = file;
         this.standard = [];
+        this.returnCode = null;
 
         this.stackFrame = new PlStackFrame(null, NewPlTraceFrame("|file|"));
         this.closureFrames = [];
@@ -686,15 +690,18 @@ export class PlStackMachine implements StackMachine {
         const {program} = this.program;
         this.pointer = position;
 
-        let lastPointer = this.pointer - 1;
         try {
             // execution
+            let lastPointer = this.pointer - 1;
             while (this.pointer < program.length) {
+                if (this.returnCode != null)
+                    return NewPlStuff(PlStuffType.Num, this.returnCode);
                 if (until) {
                     if (until(lastPointer, this.pointer)) {
-                        break;
+                        return null;
                     }
                 }
+
                 // the larget bytecode switch
                 const byte = program[this.pointer];
                 lastPointer = this.pointer;

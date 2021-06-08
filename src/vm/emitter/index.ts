@@ -1,4 +1,4 @@
-import { NewBytecode, PlBytecode, PlBytecodeType } from "./bytecode";
+import {NewBytecode, PlBytecode, PlBytecodeType} from "./bytecode";
 import {
     ASTAssign,
     ASTAttributes,
@@ -35,7 +35,7 @@ import {
     ASTWhile
 } from "../../compiler/parsing/ast";
 import {NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram} from "./debug";
-import { NewFakePlToken, PlTokenType } from "../../compiler/lexing/token";
+import {NewFakePlToken, PlTokenType} from "../../compiler/lexing/token";
 import inout from "../../inout";
 
 export const METHOD_SEP = '@';
@@ -45,12 +45,17 @@ export const MATCH_VALUE = 'value@';
 
 export type PlProgram = { program: PlBytecode[], debug: PlDebugProgram };
 
-export function EmitProgram( ast: ASTProgram ): PlProgram {
+// this addReturn should be false by default, but I am now too lazy to hunt it down
+export function EmitProgram( ast: ASTProgram, addReturn: boolean = false ): PlProgram {
     let programBuilder = new ProgramBuilder();
     for ( const statement of ast ) {
         programBuilder.addPWD( EmitStatement( statement ) );
     }
-    return programBuilder.toProgram();
+    const program = programBuilder.toProgram();
+    if (addReturn && (program.program.length == 0 || program.program[program.program.length-1].type != PlBytecodeType.DORETN)) {
+        program.program.push(makeNull(), NewBytecode(PlBytecodeType.DORETN));
+    }
+    return program;
 }
 
 export function EmitStatement( statement: ASTStatement ): PlProgram {
@@ -700,7 +705,7 @@ function makeVariable( node: ASTVariable ) {
     return NewBytecode( PlBytecodeType.DEFSTR, node.content );
 }
 
-function makeNull( node: ASTNull ) {
+function makeNull( node?: ASTNull ) {
     return NewBytecode( PlBytecodeType.DEFNUL, null );
 }
 
@@ -715,13 +720,13 @@ function makeString( node: ASTString ) {
 function makeEvalBlock( node: ASTBlock ): PlProgram {
     return (new ProgramBuilder())
         .addBytecode( NewBytecode( PlBytecodeType.STKENT ) )
-        .addPWD( EmitProgram( node.statements, ) )
+        .addPWD( EmitProgram( node.statements, false ) )
         .addBytecode( NewBytecode( PlBytecodeType.STKEXT ) )
         .toProgram();
 }
 
 function makePureBlock( node: ASTBlock ): PlProgram {
     return (new ProgramBuilder())
-        .addPWD( EmitProgram( node.statements ) )
+        .addPWD( EmitProgram( node.statements, false ) )
         .toProgram();
 }

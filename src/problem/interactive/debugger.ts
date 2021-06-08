@@ -1,23 +1,28 @@
 import {StackMachine} from "../../vm/machine";
 import {PlDebug} from "../../vm/emitter/debug";
 import {PlConverter} from "../../vm/machine/native/converter";
-import {dddString} from "../../extension/text";
-import {METHOD_SEP} from "../../vm/emitter";
+import {dddString, shallowJSON} from "../../extension/text";
+import {EmitProgram, METHOD_SEP} from "../../vm/emitter";
 import {UnscrambleFunction} from "../../vm/machine/scrambler";
-import {PlStuffGetType, PlStuffType, PlStuffTypeToString} from "../../vm/machine/stuff";
+import {PlStuff, PlStuffGetType, PlStuffType, PlStuffTypeToString} from "../../vm/machine/stuff";
 import {PlBytecodeType} from "../../vm/emitter/bytecode";
 import {PlStackFrame} from "../../vm/machine/memory";
 import PlToString = PlConverter.PlToString;
 import PlToDebugString = PlConverter.PlToDebugString;
+import {NewPlFile} from "../../inout/file";
+import {PlAstParser} from "../../compiler/parsing";
+import PlLexer from "../../compiler/lexing";
 
+
+/// THIS IS A BADLY WRITTEN DEBUGGER, THERE ARE A LOT OF BUGS HERE SO GOOD LUCK
 let isDebugging = false;
 
-export async function IACTDebugger(machine: StackMachine): Promise<number> {
+export async function IACTDebugger(machine: StackMachine): Promise<number | null> {
     // early return
     machine.stack.push(null);
 
     if (isDebugging) {
-        return Promise.resolve(0);
+        return Promise.resolve(null);
     }
     isDebugging = true;
 
@@ -86,7 +91,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             top: headerHeight,
             left: 0,
             height: 3,
-            label: "{bold}Stepper{/}",
+            label: "{bold}Functions{/}",
             border: 'line',
             tags: true,
             padding: {
@@ -95,11 +100,22 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             }
         });
 
+        // STEP NEXT
         const stepNextButton = blessed.button({
             parent: debugBox,
+            content: "Step [N]",
+            height: 1,
             top: 0,
             left: 0,
-            content: "Step [N]",
+            mouse: true,
+            shrink: true,
+
+            style: {
+                fg: 'green',
+                focus: {
+                    fg: 'white'
+                }
+            }
         });
 
         let line = machine.pointer;
@@ -123,7 +139,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             let surround = 0;
             let lastState = machine.saveState();
             let first = true;
-            machine.runProgram(machine.pointer, (lastPointer, thisPointer) => {
+            const out = machine.runProgram(machine.pointer, (lastPointer, thisPointer) => {
                 if (first) {
                     first = false;
                     return false;
@@ -138,12 +154,8 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
                     }
                 }
                 const thisByte = program[thisPointer];
-                if (thisByte.type == PlBytecodeType.JMPREL || thisByte.type == PlBytecodeType.STKEXT || thisByte.type == PlBytecodeType.STKENT) {
+                if ([PlBytecodeType.JMPREL, PlBytecodeType.STKEXT, PlBytecodeType.STKENT].includes(thisByte.type)) {
                     return false;
-                }
-                if (thisByte.type == PlBytecodeType.DORETN) {
-                    if (surround == 0)
-                        return true;
                 }
                 if (lastByte.type == PlBytecodeType.DORETN) {
                     if (surround > 0)
@@ -163,7 +175,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
                                 }
                             }
                         }
-                        if (found && found.span.info.filename.length > 0) {
+                        if (found && found.name != "ASTCondition" && found.span.info.filename.length > 0) {
                             currentLineDebug = found;
                             line = thisPointer;
                             return true;
@@ -176,19 +188,110 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
                 lastState = machine.saveState();
                 return false;
             }); // check for errors and such
-
             if (machine.problems.length != 0) {
                 cleanup();
                 throw null;
+            }
+
+            // top level returns
+            if (out != null) {
+                if (typeof out.value == "number")
+                    return cleanup(out.value);
+                return cleanup(0);
             }
             updateContents();
             updateFrames();
             updateLocals();
         };
 
-
         stepNextButton.on('press', stepNext);
         screen.key(['n'], stepNext);
+
+        // STEP INTO
+        const stepIntoButton = blessed.button({
+            parent: debugBox,
+            content: "Step Into [M]",
+            height: 1,
+            top: 0,
+            left: stepNextButton.content.length + 2,
+            mouse: true,
+            shrink: true,
+
+            style: {
+                fg: 'green',
+                focus: {
+                    fg: 'white'
+                }
+            }
+        });
+
+        const stepInto = function () {
+            const program = machine.program.program;
+            // stop returning here
+            if (program[machine.pointer].type == PlBytecodeType.DORETN)
+                return;
+
+            const oldLine = currentLineDebug.span.info.row;
+            let surround = 0;
+            let lastState = machine.saveState();
+            let first = true;
+            const out = machine.runProgram(machine.pointer, (lastPointer, thisPointer) => {
+                if (first) {
+                    first = false;
+                    return false;
+                }
+
+                const lastByte = program[lastPointer];
+
+                const thisByte = program[thisPointer];
+                if ([PlBytecodeType.JMPREL, PlBytecodeType.STKEXT, PlBytecodeType.STKENT].includes(thisByte.type)) {
+                    return false;
+                }
+                if (lastByte.type == PlBytecodeType.STKPOP || lastByte.type == PlBytecodeType.JMPICF) {
+                    if (surround <= 0) {
+                        let found = null;
+                        for (const debug of machine.program.debug) {
+                            if (thisPointer <= debug.endLine && (debug.endLine - debug.length) <= thisPointer) {
+                                if (debug.span.info.row != oldLine) {
+                                    if (found == null) {
+                                        found = debug;
+                                    } else if (debug.length < found.length) {
+                                        found = debug;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        if (found && found.name != "ASTCondition" && found.span.info.filename.length > 0) {
+                            currentLineDebug = found;
+                            line = thisPointer;
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+
+                lastState = machine.saveState();
+                return false;
+            }); // check for errors and such
+            if (machine.problems.length != 0) {
+                cleanup();
+                throw null;
+            }
+
+            // top level returns
+            if (out != null) {
+                if (typeof out.value == "number")
+                    return cleanup(out.value);
+                return cleanup(0);
+            }
+            updateContents();
+            updateFrames();
+            updateLocals();
+        };
+        stepIntoButton.on('press', stepInto);
+        screen.key(['m'], stepInto);
 
         const contentHeight = `100%-${headerHeight + 3}`;
 
@@ -416,10 +519,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             const item: any = Object.values(items)[index];
             const key = Object.keys(items)[index];
 
-            // https://stackoverflow.com/questions/16466220/limit-json-stringification-depth
-            const json = JSON.stringify(item.value, function (k, v) {
-                return k && v && typeof v !== "number" ? (Array.isArray(v) ? `[array ${v.length}]` : "" + v) : v;
-            }, 2);
+            const json = shallowJSON(item.value);
 
             const contentBuffer = [detailedHeader];
             contentBuffer.push(`Name: '${key}'`);
@@ -435,6 +535,145 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
 
         updateLocals();
 
+        // EVAL
+        const evalButton = blessed.button({
+            parent: debugBox,
+            height: 1,
+            left: stepNextButton.content.length + stepIntoButton.content.length + 4,
+            top: 0,
+            content: "Eval [E]",
+            shrink: true,
+            mouse: true,
+            style: {
+                fg: 'green',
+                focus: {
+                    fg: 'white'
+                }
+            }
+        });
+
+        const evalAlert = blessed.box({
+            parent: screen,
+            tags: true,
+            top: '25%',
+            left: '25%',
+            width: '50%',
+            height: '75%',
+            border: 'line',
+            draggable: true,
+            padding: {
+                left: 1,
+                right: 1,
+            }
+        });
+        evalAlert.key(['escape', 'x'], function () {
+            evalAlert.hide();
+        })
+        evalAlert.hide();
+        const evalHeader = blessed.text({
+            parent: evalAlert,
+            content: "{bold}Eval{/}{|}('esc' or 'x' to close)",
+            tags: true,
+            top: 0,
+            left: 0,
+            height: 1,
+            shrink: true,
+        });
+
+        const openEval = function () {
+            evalOutput.setContent('');
+            evalOutput.hide();
+            evalOutput.show();
+            evalAlert.show();
+            evalInput.focus();
+            evalAlert.render();
+        }
+        evalButton.on('click', openEval);
+        screen.key(['e'], openEval);
+
+
+        const evalInput = blessed.textbox({
+            parent: evalAlert,
+            inputOnFocus: true,
+            top: 1,
+            left: 0,
+            height: 3,
+            border: 'line',
+            padding: {
+                left: 1,
+                right: 1,
+            }
+        });
+        evalInput.key(['escape'], () => evalAlert.focus());
+
+        const evalOutput = blessed.box({
+            parent: evalAlert,
+            top: 4,
+            left: 0,
+            border: 'line',
+            height: '100%-6',
+            tags: true,
+            label: "{bold}Output{/}",
+            padding: {
+                left: 1,
+                right: 1,
+            }
+        });
+
+        evalInput.on('submit', function () {
+            const value = evalInput.value;
+            evalInput.clearValue();
+
+            const file = NewPlFile("debugger", value);
+            const lexer = new PlLexer(file);
+            const parser = new PlAstParser(lexer);
+            const ast = parser.parseAll();
+            if (ast == null) {
+                evalOutput.setContent('{red-fg}failed to parse input{/}');
+                evalOutput.hide();
+                evalOutput.show();
+
+                evalInput.focus();
+                evalOutput.render();
+                return;
+            }
+            // add to end of vm and run
+            const startPointer = machine.program.program.length;
+            const program = EmitProgram(ast, false);
+            program.program.pop();
+            program.debug = [];
+            machine.addProgram(program);
+            const oldPointer = machine.pointer;
+            machine.runProgram(startPointer);
+            machine.pointer = oldPointer;
+            if (machine.problems.length > 0) {
+                evalOutput.setContent('{red-fg}failed to interpret input{/}');
+                machine.problems = [];
+                evalOutput.hide();
+                evalOutput.show();
+
+                evalInput.focus();
+                evalOutput.render();
+                return;
+            }
+            const out = machine.stack.pop();
+
+            const json = shallowJSON(out.value);
+
+            const contentBuffer = [];
+            contentBuffer.push(`Type: {cyan-fg}${PlStuffGetType(out)}{/}`);
+            contentBuffer.push(`Str(input): {green-fg}${PlToString(out, machine, true)}{/}`);
+            contentBuffer.push(`Debug: {red-fg}${PlToDebugString(out)}{/}`);
+            contentBuffer.push(`Internals: {yellow-fg}${json}{/}`)
+            evalOutput.content = contentBuffer.join('\n');
+
+            evalOutput.hide();
+            evalOutput.show();
+
+            evalInput.focus();
+            evalOutput.render();
+        });
+
 
         /// ALERT
         const detailedHeader = "{bold}Detailed View{/}{|}('ESC' or 'x' to close)";
@@ -447,13 +686,12 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
             border: 'line',
             draggable: true,
             tags: true,
-            content: "{bold}Detailed View{/}{|}(ESC to close)",
             padding: {
                 left: 1,
                 right: 1,
             }
         });
-        screen.key(['escape', 'x'], function () {
+        detailed.key(['escape', 'x'], function () {
             detailed.hide();
         })
         detailed.hide();
@@ -501,11 +739,13 @@ export async function IACTDebugger(machine: StackMachine): Promise<number> {
         elements[0].data.label = `${FOCUSED} ` + elements[0].data.label;
 
         machine.pointer += 1;
-        const cleanup = function () {
+        const cleanup = function (code?: number) {
             isDebugging = false;
             screen.destroy();
             machine.pointer -= 1;
-            resolve(0);
+            if (code != undefined)
+                machine.returnCode = code;
+            resolve(null);
         }
 
         screen.key(['C-c', 'q'], cleanup);
