@@ -463,6 +463,12 @@ export async function IACTDebugger(machine: StackMachine): Promise<number | null
             keys: true,
         });
 
+        const additional = blessed.text({
+            parent: localsContainer,
+            bottom: 0,
+            height: 1,
+        });
+        additional.hide();
         let items = {};
         const updateLocals = () => {
             let newLabel = `${localsLabel} of '|frame|'`;
@@ -489,7 +495,7 @@ export async function IACTDebugger(machine: StackMachine): Promise<number | null
                 if (key.includes(METHOD_SEP)) {
                     const total = UnscrambleFunction(key);
                     if (total[1].length == 0) {
-                        localsBuffer.push(`{yellow-fg}H{/} {cyan-fg}${PlStuffTypeToString(value.type)}{/cyan-fg} ${total[0]}: ${v}`);
+                        localsBuffer.push(`{yellow-fg}[H]{/} {cyan-fg}${PlStuffTypeToString(value.type)}{/cyan-fg} ${total[0]}: ${v}`);
                     } else {
                         localsBuffer.push(`{cyan-fg}${total[0]}{/cyan-fg}.${total[1]}: ${v}`);
                     }
@@ -498,14 +504,11 @@ export async function IACTDebugger(machine: StackMachine): Promise<number | null
                 localsBuffer.push(`{cyan-fg}${PlStuffTypeToString(value.type)}{/cyan-fg} ${key}: ${v}`);
             }
             if (std > 0) {
-                const additional = blessed.text({
-                    parent: localsContainer,
-                    bottom: 0,
-                    content: `... and ${std} standard values`,
-                    height: 1,
-                });
+                additional.setContent( `... and ${std} standard values`);
+                additional.show();
                 localsBox.height = '100%-3';
             } else {
+                additional.hide();
                 localsBox.height = '100%-2';
             }
             localsBox.setItems(localsBuffer);

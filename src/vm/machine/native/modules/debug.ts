@@ -46,7 +46,7 @@ const debug = {
 
 if (isNode) {
     debug['debugger'] = GenerateGuardedFunction("debugger", [], function (this: StackMachine) {
-        if (this.inout.options['mode'] == 'release')
+        if (this.inout.options['mode'] == 'release' || this.inout.options["run"] == "repl")
             return null;
         IACTSync(IACTDebugger(this));
         throw "debugger";

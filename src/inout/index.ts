@@ -5,7 +5,7 @@ export const isNode =
     process.versions != null &&
     process.versions.node != null;
 
-export type OPTIONS = "mode";
+export type OPTIONS = "mode" | "run";
 
 export interface PlInout {
     print: (message: string) => void;

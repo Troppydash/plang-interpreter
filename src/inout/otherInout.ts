@@ -78,4 +78,5 @@ export function execute(code: string, vars: Record<string, any>): void {
 
 export let options = {
     mode: "debug",
+    run: "file",
 };

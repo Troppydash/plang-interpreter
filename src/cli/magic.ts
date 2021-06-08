@@ -36,7 +36,10 @@ mode-release    ~ Run [file] in release mode, have no detailed errors
     if (args.is("mode-release")) {
         // bad way, but it is a singleton so whatever
         inout.options["mode"] = "release";
-        return true;
+    }
+
+    if (args.is("run-demo") || args.is("run-repl") || args.raw.length == 0) {
+        inout.options["run"] = "repl";
     }
 
 
