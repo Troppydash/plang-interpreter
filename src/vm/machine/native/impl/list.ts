@@ -1,5 +1,14 @@
 import {ScrambleType} from "../../scrambler";
-import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType, PlStuffTypeAny} from "../../stuff";
+import {
+    NewPlStuff,
+    PlNativeFunction,
+    PlStuff,
+    PlStuffFalse,
+    PlStuffNull,
+    PlStuffTrue,
+    PlStuffType,
+    PlStuffTypeAny
+} from "../../stuff";
 import {AssertType, GenerateGuardedTypeFunction} from "../helpers";
 import {equals} from "../operators";
 import {MakeNoTypeFunctionMessage, MakeOutOfRangeMessage} from "../messeger";
@@ -31,17 +40,6 @@ export const jsList = {
     [ScrambleType("size", PlStuffType.List)]: GenerateGuardedTypeFunction("size", [], function (lst) {
         return lst.length;
     }),
-    [ScrambleType("iter", PlStuffType.List)]: GenerateGuardedTypeFunction("iter", [], function (self) {
-        let index = 0;
-        return {
-            next: () => {
-                if (index >= self.length) {
-                    return [null, false];
-                }
-                return [[self[index++], index], true];
-            }
-        }
-    }),
     [ScrambleType("map", PlStuffType.List)]: GenerateGuardedTypeFunction("map", [PlStuffType.Func], function (self, func) {
         const newList = [];
         for (let i = 0; i < self.length; i++) {
@@ -57,6 +55,25 @@ export const jsList = {
 };
 
 export const list = {
+    [ScrambleType("iter", PlStuffType.List)]: GenerateGuardedTypeFunction("iter", [], function (self: PlStuff) {
+        let index = 0;
+        return NewPlStuff(PlStuffType.Dict, {
+            next: NewPlStuff(PlStuffType.NFunc, {
+                parameters: [],
+                self: null,
+                name: "iter",
+                native: () => {
+                    if (index >= self.value.length) {
+                        return NewPlStuff(PlStuffType.List, [PlStuffNull, PlStuffFalse]);
+                    }
+                    return NewPlStuff(PlStuffType.List, [
+                        NewPlStuff(PlStuffType.List, [self.value[index++], NewPlStuff(PlStuffType.Num, index)]),
+                        PlStuffTrue
+                    ]);
+                }
+            } as PlNativeFunction)
+        });
+    }),
     [ScrambleType("get", PlStuffType.List)]: GenerateGuardedTypeFunction("get", [PlStuffTypeAny], function (self, index: PlStuff) {
         if (index.type != PlStuffType.List && index.type != PlStuffType.Num) {
             throw new Error("'get' requires a number or a list as argument");

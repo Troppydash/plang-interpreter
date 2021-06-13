@@ -26,5 +26,8 @@ export const func: ExportNative = {
         newFunc.value.self = newSelf;
         newFunc.value.name += '.bind()'
         return newFunc;
+    }),
+    [ScrambleType("param", PlStuffType.Func)]: GenerateGuardedTypeFunction("param", [], function(self) {
+        return NewPlStuff(PlStuffType.Num, (self.value).parameters.length);
     })
 }

@@ -147,6 +147,33 @@ class ProgramBuilder {
     }
 }
 
+/**
+ * Replaces the breaks and continues of in the block, assuming the block ends with a jmprel
+ * This is use to generate continues and jump in loops, it directly modifies the block
+ * @param block The block that have its program replaces
+ */
+function replaceBC(block: PlProgram) {
+    let surround = 0;
+    for ( let i = 0; i < block.program.length; ++i ) {
+        switch (block.program[i].type) {
+            case PlBytecodeType.DOBRAK: {
+                block.program[i] = NewBytecode( PlBytecodeType.DOBRAK, `${(block.program.length - i)},${surround}` );
+                break;
+            }
+            case PlBytecodeType.DOCONT: {
+                block.program[i] = NewBytecode( PlBytecodeType.DOCONT, `${(block.program.length - i - 1)},${surround}` );
+                break;
+            }
+            case PlBytecodeType.STKENT:
+                surround += 1;
+                break;
+            case PlBytecodeType.STKEXT:
+                surround -= 1;
+                break;
+        }
+    }
+}
+
 function traverseAST( node: ASTNode ): PlProgram {
     let programBuilder = new ProgramBuilder();
     if ( node instanceof ASTNumber ) {
@@ -453,14 +480,7 @@ function traverseAST( node: ASTNode ): PlProgram {
         let block = makePureBlock( node.block );
 
         // replace break and continue
-        for ( let i = 0; i < block.program.length; ++i ) {
-            let bc = block.program[i];
-            if ( bc.type == PlBytecodeType.DOBRAK ) {
-                block.program[i] = NewBytecode( PlBytecodeType.JMPREL, '' + (block.program.length - i + afterLength) );
-            } else if ( bc.type == PlBytecodeType.DOCONT ) {
-                block.program[i] = NewBytecode( PlBytecodeType.JMPREL, '' + (block.program.length - i - 1) );
-            }
-        }
+        replaceBC(block);
 
         // emit condition
         if ( cond ) {
@@ -499,14 +519,7 @@ function traverseAST( node: ASTNode ): PlProgram {
         let block = makePureBlock( node.block );
 
         // replace breaks and continues
-        for ( let i = 0; i < block.program.length; ++i ) {
-            if ( block.program[i].type == PlBytecodeType.DOBRAK ) {
-                // replace with jump
-                block.program[i] = NewBytecode( PlBytecodeType.JMPREL, '' + (block.program.length - i) );
-            } else if ( block.program[i].type == PlBytecodeType.DOCONT ) {
-                block.program[i] = NewBytecode( PlBytecodeType.JMPREL, '' + (block.program.length - i - 1) );
-            }
-        }
+        replaceBC(block);
 
         node.condition.attribute = ASTAttributes.ASTCondition;
         programBuilder
@@ -554,14 +567,7 @@ function traverseAST( node: ASTNode ): PlProgram {
             bodySize += out.program.length + 1;
         }
 
-        for ( let i = 0; i < block.program.length; ++i ) {
-            let bc = block.program[i];
-            if ( bc.type == PlBytecodeType.DOBRAK ) {
-                block.program[i] = NewBytecode( PlBytecodeType.JMPREL, '' + (block.program.length - i) );
-            } else if ( bc.type == PlBytecodeType.DOCONT ) {
-                block.program[i] = NewBytecode( PlBytecodeType.JMPREL, '' + (block.program.length - i - 1) );
-            }
-        }
+        replaceBC(block);
 
         programBuilder.addPWD( block )
             .addBytecode( NewBytecode( PlBytecodeType.JMPREL, '-' + (bodySize + 1) ) );
@@ -661,14 +667,7 @@ function traverseAST( node: ASTNode ): PlProgram {
         const block = makePureBlock( node.block );
 
         // replace breaks and continues
-        for ( let i = 0; i < block.program.length; ++i ) {
-            if ( block.program[i].type == PlBytecodeType.DOBRAK ) {
-                // replace with jump
-                block.program[i] = NewBytecode( PlBytecodeType.JMPREL, '' + (block.program.length - i) );
-            } else if ( block.program[i].type == PlBytecodeType.DOCONT ) {
-                block.program[i] = NewBytecode( PlBytecodeType.JMPREL, '' + (block.program.length - i - 1) );
-            }
-        }
+        replaceBC(block);
 
         return programBuilder
             .addPWD( cond )
