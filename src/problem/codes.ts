@@ -2,134 +2,134 @@ export type PlProblemCode = keyof typeof templates;
 
 const templates = {
     // lexer errors
-    LE0001: "found an unrecognized character '%0'",
-    LE0002: "reached newline with an unclosed double quote",
-    LE0003: "found an unrecognized escape sequence '%0'",
-    LE0004: "reached newline with an unclosed left parenthesis during string replacement",
+    LE0001: "unrecognized character '%0'",
+    LE0002: "reached newline with unclosed double quote",
+    LE0003: "unrecognized escape sequence '%0'",
+    LE0004: "reached newline with unclosed left parenthesis",
 
     // statement
     ET0001: "expected a newline after a statement",
 
     // assign
-    ET0002: "expected a variable or a dot expression on the left side of assignment",
+    ET0002: "expected a variable on the left side of assignment",
 
     // dot
     ET0003: "expected a variable after the dot",
 
     // expression
-    ET0004: "found an unexpected character '%0' when parsing expression",
+    ET0004: "unexpected character '%0' during expression",
 
     // postfix
-    ET0005: "expected a variable when using the postfix operators",
+    ET0005: "expected a variable before postfix operators",
 
     // list
-    ET0006: "expected commas ',' between list items",
-    ET0007: "expected left parenthesis '(' when creating a list",
+    ET0006: "expected ',' between list items",
+    ET0007: "expected '(' when creating a list",
 
     // call
-    ET0008: "expected commas ',' between function call arguments",
+    ET0008: "expected ',' between function arguments",
 
     // dictionary
-    ET0009: "expected a valid variable as the key in a dictionary",
-    ET0010: "expected left parenthesis '(' when creating a dictionary",
-    ET0011: "expected colons ':' between dictionary pairs",
-    ET0012: "expected commas ','  between dictionary pairs",
+    ET0009: "expected a variable as the key in a dictionary",
+    ET0010: "expected  '(' when creating a dictionary",
+    ET0011: "expected ':' between dictionary pairs",
+    ET0012: "expected ',' between dictionary pairs",
 
     // function
-    ET0013: "expected variable name in a function definition",
-    ET0014: "expected left parenthesis '(' around the function parameters",
-    ET0015: "expected function or impl parameter to be variables",
-    ET0016: "expected commas between function or impl parameters",
-    ET0017: "expected a left brace '{' after function parameters",
+    ET0013: "expected a name in a function definition",
+    ET0014: "expected '(' around the function parameters",
+    ET0015: "expected variables for function or impl parameters",
+    ET0016: "expected ':' between function or impl parameters",
+    ET0017: "expected '{' after function or impl parameters",
 
     // loop
-    ET0018: "expected a left brace after loop keyword or amount",
-    ET0019: "expected a left brace after while loop conditions",
+    ET0018: "expected '{' after loop keyword or amount",
+    ET0019: "expected '{' after while loop conditions",
 
     // export
     ET0020: "expected an expression after export",
 
     // if
-    ET0021: "expected a left brace '{' after if conditions",
-    ET0022: "expected a left brace '{' after elif conditions",
-    ET0023: "expected a left brace '{' after else",
+    ET0021: "expected '{' after if conditions",
+    ET0022: "expected '{' after elif conditions",
+    ET0023: "expected '{' after else",
 
     // each..of
-    ET0024: "expected the value or key in an each statement to be a variable",
-    ET0025: "expected the keyword 'of' after the each value and keys",
-    ET0026: "expected a left brace '{' after each..of statement",
+    ET0024: "expected variables for the value or key in each..of statement",
+    ET0025: "expected keyword 'of' in each..of statement",
+    ET0026: "expected '{' after each..of statement",
 
     // impl
-    ET0027: "expected a variable as the impl name",
-    ET0028: "expected left parenthesis '(' around impl parameters",
-    ET0029: "expected the keyword 'for' after the impl parameters",
-    ET0030: "expected a left brace '{' after impl definitions",
-    ET0043: "expected a type in an impl definition",
+    ET0027: "expected a variable as the imply name",
+    ET0028: "expected '(' around impl parameters",
+    ET0029: "expected keyword 'for' after impl parameters",
+    ET0030: "expected '{' after impl definitions",
+    ET0043: "expected a target type in an impl definition",
 
     // for loop
-    ET0031: "expected semicolons between for loop pre-condition-post expressions",
-    ET0032: "expected a left brace '{' after for loop expressions",
+    ET0031: "expected ';' between pre-condition-post expressions",
+    ET0032: "expected '{' after for-loop expressions",
 
     // match
-    ET0033: "expected a left brace '{' after match or match value",
-    ET0034: "expected commas between case expressions in a match",
-    ET0035: "expected a left brace '{' after a keyword default or a case expression",
-    ET0042: "expected the keyword case or default in a match statement",
+    ET0033: "expected '{' after match or match value",
+    ET0034: "expected ':' between case expressions in a match",
+    ET0035: "expected '{' after a keyword default or a case expression",
+    ET0042: "expected keyword 'case' or 'default' in a match statement",
 
     // import
     ET0036: "expected a correct path in an import statement",
     ET0037: "expected the keyword select, as, or newline after an import path",
-    ET0038: "expected a variable name for an import alias",
+    ET0038: "expected variable name for an import alias",
     ET0039: "expected commas between import select variables",
     ET0040: "expected variables for import select items",
     ET0041: "expected at least one select item in an import statement",
 
     // type
     ET0044: "expected a variable as the type name",
-    ET0045: "expected a left parenthesis '(' after the keyword 'type'",
-    ET0046: "expected commas between type members",
-    ET0047: "expected type members to be variables",
+    ET0045: "expected '(' after the keyword 'type'",
+    ET0046: "expected ',' between type members",
+    ET0047: "expected variables for type members",
 
 
-    CE0001: "reached newline with an unclosed '}'",
-    CE0002: "reached newline with an unclosed ')'",
-    CE0003: "reached newline with an unclosed ')'",
-    CE0004: "reached newline with an unclosed ')'",
-    CE0005: "reached newline with an unclosed ')'",
-    CE0006: "reached newline with an unclosed ')'",
-    CE0007: "reached newline with an unclosed '}'",
-    CE0008: "reached newline with an unclosed '\"\"\"'",
-    CE0009: "reached newline with an unclosed ')'",
+    CE0001: "reached newline with unclosed '}'",
+    CE0002: "reached newline with unclosed ')'",
+    CE0003: "reached newline with unclosed ')'",
+    CE0004: "reached newline with unclosed ')'",
+    CE0005: "reached newline with unclosed ')'",
+    CE0006: "reached newline with unclosed ')'",
+    CE0007: "reached newline with unclosed '}'",
+    CE0008: "reached newline with unclosed '\"\"\"'",
+    CE0009: "reached newline with unclosed ')'",
 
 
-    LP0001: "found two or more default cases in a match statement",
-    LP0002: "an impl type function must have at least one parameter",
-    LP0003: "a case statement must have at least one expression",
+    LP0001: "more than one default cases in a match statement",
+    LP0002: "zero parameters for an impl definition",
+    LP0003: "no conditions for a case statement",
 
-    DE0001: "an exception occurred during compiling\n%0",
-    DE0002: "an exception occurred during interpreting\n%0",
+    DE0001: "problem during compiling\n%0",
+    DE0002: "problem during interpreting\n%0",
 
-    RE0001: "found an unknown bytecode of type '%0'",
-    RE0002: "no debug information found for problem on line '%0'",
-    RE0003: "cannot find the variable named '%0' in the surrounding frame",
-    RE0004: "there exists no function '%0' on type '%1'",
-    RE0005: "expected a number to negate with, got type '%0'",
-    RE0006: "incorrect arity for a function call, needed %0 but got %1",
+    RE0001: "encountered unknown bytecode: '%0'",
+    RE0002: "problem on line '%0'",
+    RE0003: "no variable named '%0'",
+    RE0004: "no function '%0' on type '%1'",
+    RE0005: "cannot negate '%0'",
+    RE0006: "incorrect arity for a function call, needs %0 but got %1",
     RE0007: "%0",
-    RE0008: "attempted to call an uncallable value of type '%0'",
-    RE0009: "cannot use 'continue' or 'break' outside a loop",
-    RE0010: "top of the stack is not a boolean for a conditional jump, got type '%0'",
-    RE0011: "loop statements can only take numeral arguments, got type '%0'",
-    RE0012: "cannot find the key '%0' on the target of type '%1'",
-    RE0013: "cannot assign to a non dictionary target, got type '%0'",
+    RE0008: "calling an uncallable value of type '%0'",
+    RE0009: "'continue' or 'break' used outside a loop",
+    RE0010: "not a boolean needed for jump, got type '%0'",
+    RE0011: "non numeral loop iterations of type '%0'",
+    RE0012: "no key '%0' on target of type '%1'",
+    RE0013: "cannot assign to target of type '%0'",
 
-    RE0014: "expected a boolean value here, got type '%0'",
-    RE0015: "expected a numeral value here, got type '%0'",
-    RE0016: "expected the '.%0' type function on the value of type '%1'",
+    RE0014: "not a boolean, got type '%0'",
+    RE0015: "not a number, got type '%0'",
+    RE0016: "need '.%0' type function on value of type '%1'",
 
-    RE0017: "cannot use 'not' on a non-boolean value, got type '%0'",
+    RE0017: "use of 'not' on a non-boolean value of type '%0'",
 
-    RE0018: "function expected a type of '%0' for the '%1'th argument, got '%2'"
+    RE0018: "'%1' argument is not '%0', got '%2'"
 }
 
 // because I am lazy

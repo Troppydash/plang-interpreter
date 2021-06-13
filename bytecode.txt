@@ -30,8 +30,8 @@ doodec - Postfix decrement
 donegt - Negate operator
 dolnot - Logical not
 
-dobrak - Ghost break
-docont - Ghost continue
+dobrak - Break by jump
+docont - Continue by jump
 
 Stack:
 stkpop - Pop stack

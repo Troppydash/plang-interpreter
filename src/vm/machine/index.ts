@@ -1007,6 +1007,7 @@ export class PlStackMachine implements StackMachine {
                         if (address == null) {
                             return retVal;
                         }
+                        // THIS IS A MESS
                         // get old stack frame back
                         let outer = this.stackFrame;
                         while (outer.trace == null) { // reach function frame
@@ -1022,10 +1023,19 @@ export class PlStackMachine implements StackMachine {
                     }
 
                     // Do break and continue
-                    case PlBytecodeType.DOBRAK:
-                    case PlBytecodeType.DOCONT: {
-                        this.newProblem("RE0009", this.pointer);
-                        return null;
+                    case PlBytecodeType.DOCONT:
+                    case PlBytecodeType.DOBRAK: {
+                        const data = byte.value;
+                        if (data == null) {
+                            return this.newProblem("RE0009", this.pointer);
+                        }
+
+                        const [offset, pops] = data.split(',');
+                        for (let i = 0; i < +pops; i++) {
+                            this.stackFrame = this.stackFrame.outer;
+                        }
+                        this.pointer += +offset;
+                        break;
                     }
 
                     // do stack enter

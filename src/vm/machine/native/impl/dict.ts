@@ -1,5 +1,14 @@
 import {ScrambleType} from "../../scrambler";
-import {NewPlStuff, PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType, PlStuffTypeAny} from "../../stuff";
+import {
+    NewPlStuff,
+    PlNativeFunction,
+    PlStuff,
+    PlStuffFalse,
+    PlStuffNull,
+    PlStuffTrue,
+    PlStuffType,
+    PlStuffTypeAny
+} from "../../stuff";
 import {GenerateGuardedTypeFunction} from "../helpers";
 import {PlConverter} from "../converter";
 import {MakeNotFoundMessage} from "../messeger";
@@ -36,7 +45,28 @@ export const dict = {
             }
         }
         return PlStuffFalse;
-    })
+    }),
+    [ScrambleType("iter", PlStuffType.Dict)]: GenerateGuardedTypeFunction("iter", [], function (self: PlStuff) {
+        const keys = Object.keys(self.value);
+        let index = 0;
+        return NewPlStuff(PlStuffType.Dict, {
+            next: NewPlStuff(PlStuffType.NFunc, {
+                parameters: [],
+                self: null,
+                name: "iter",
+                native: () => {
+                    if (index >= keys.length) {
+                        return NewPlStuff(PlStuffType.List, [PlStuffNull, PlStuffFalse]);
+                    }
+                    const key = keys[index++];
+                    return NewPlStuff(PlStuffType.List, [
+                        NewPlStuff(PlStuffType.List, [self.value[key], NewPlStuff(PlStuffType.Str, key)]),
+                        PlStuffTrue
+                    ]);
+                }
+            } as PlNativeFunction)
+        });
+    }),
 }
 
 export const jsDict = {
