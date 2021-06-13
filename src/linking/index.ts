@@ -174,7 +174,7 @@ export function RunVM(file: PlFile, args: string[]): number {
 
         // fancy
         if (ok && inout.options["mode"] == "debug" && ok && trace.length > 2 && IACTPrepare()) {
-            IACTSync(IACTTrace(file.content, problems, trace));
+            // IACTSync(IACTTrace(file.content, problems, trace));
         }
 
         return 1;

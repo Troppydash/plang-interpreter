@@ -73,7 +73,7 @@ export namespace PlConverter {
             type: "Instance",
             value: {
                 type: instance.type,
-                value: instance.value
+                value: out
             }
         };
     }

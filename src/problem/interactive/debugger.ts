@@ -4,7 +4,7 @@ import {PlConverter} from "../../vm/machine/native/converter";
 import {dddString, shallowJSON} from "../../extension/text";
 import {EmitProgram, METHOD_SEP} from "../../vm/emitter";
 import {UnscrambleFunction} from "../../vm/machine/scrambler";
-import {PlStuff, PlStuffGetType, PlStuffType, PlStuffTypeToString} from "../../vm/machine/stuff";
+import {PlStuffGetType, PlStuffType, PlStuffTypeToString} from "../../vm/machine/stuff";
 import {PlBytecodeType} from "../../vm/emitter/bytecode";
 import {PlStackFrame} from "../../vm/machine/memory";
 import PlToString = PlConverter.PlToString;

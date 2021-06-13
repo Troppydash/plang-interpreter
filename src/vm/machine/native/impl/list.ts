@@ -85,7 +85,7 @@ export const list = {
     }),
     [ScrambleType("add", PlStuffType.List)]: GenerateGuardedTypeFunction("add", [PlStuffTypeAny], function (self: PlStuff, value: PlStuff) {
         self.value.push(value);
-        return self;
+        return NewPlStuff(PlStuffType.Num, self.value.length);
     }),
     [ScrambleType("insert", PlStuffType.List)]: GenerateGuardedTypeFunction("insert", [PlStuffType.Num, PlStuffTypeAny], function (self: PlStuff, index: PlStuff, value: PlStuff) {
         const idx = index.value - 1;
