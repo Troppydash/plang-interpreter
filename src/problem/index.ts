@@ -36,6 +36,7 @@ export function ReportProblems(content: string, problems: PlProblem[], trace?: P
     return true;
 }
 
+// DEPRECATED, unused when there is no content in the stack machine
 export function ReportCallbackProblems(problem: PlProblem, trace: PlTrace): boolean {
     inout.print(colors.red("Callback Problem(s) Occurred"));
     if (trace.length == 0) {

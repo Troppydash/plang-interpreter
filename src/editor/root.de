@@ -1,0 +1,90 @@
+### SET UP
+# find root elements
+rootId = "#de-editor"
+root = $(rootId)
+if not root.any() {
+    panic("no root element '\(rootId)' to attach the editor")
+}
+
+# create editor div
+editorRoot = $("div").new()
+editorRoot.setClass "editor-root"
+root.attach editorRoot
+
+### EDITOR AND STATE
+# changed is the optional lines change
+a = $("span").new().setText("A")
+editorRoot.attach a
+offset = a.attr("offsetWidth")
+
+func renderContent(cursor, content, rowsChanged) {
+    if rowsChanged /= null {
+        return
+    }
+
+    # full re-render
+    @maxLineNum = content.size().str().size()
+
+    if cursor.parent /= null {
+        cursor.parent.detach cursor.element
+    }
+
+    editorRoot.clear()
+    each line, index of content {
+        @lineNum = $("span").new()
+        lineNum.setHtml "\("&nbsp;" * (maxLineNum-index.str().size()))\(index)"
+
+        @lineDiv = $("div").new()
+        lineDiv.attach $("div").new().setClass("line-num").attach lineNum
+
+        @text = line.split(" ").map(func(w) {
+            if w.size() > 0 {
+                return "<span>\(w)</span>"
+            }
+            return ""
+        }).join("&nbsp;")
+        @lineText = $("div").new().setClass("line").setHtml(text)
+        lineDiv.attach lineText
+        editorRoot.attach lineDiv
+
+        if cursor.row == index {
+            lineText.attach cursor.element
+            cursor.element.setStyle("left", "\(offset * cursor.col)px")
+        }
+    }
+}
+
+
+# lines of text
+content = list("Hello World", "Yes You  And Me")
+
+# dom cursor
+type Cursor(
+    row, col,
+    element,
+    parent,
+)
+impl str(self) for Cursor {
+    return "\(self.row):\(self.col)"
+}
+
+cursor = Cursor(2, 2, $("span").new().setClass("cursor").setHtml("&nbsp;"), null)
+
+
+renderContent(cursor, content, null)
+
+
+
+
+
+textArea = $("textarea").new()
+$("body").attach textArea
+
+textArea.listen "input", func(event) {
+    content = textArea.attr("value").split("\n")
+    renderContent(cursor, content, null)
+}
+
+
+
+

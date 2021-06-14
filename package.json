@@ -11,6 +11,7 @@
     "run": "node out/index.js",
     "run-build": "npm run clean && npm run build && npm run run",
     "watch-build": "npm run clean && tsc --watch",
+    "watch-build-browser": "npm run clean && tsc --module AMD --outFile \"./out/index.js\" --watch",
     "clean": "tsc --build --clean",
     "browser-publish": "npm run build-browser && npm publish"
   },

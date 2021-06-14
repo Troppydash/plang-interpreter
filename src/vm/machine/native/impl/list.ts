@@ -39,18 +39,6 @@ function shuffle(array) {
 export const jsList = {
     [ScrambleType("size", PlStuffType.List)]: GenerateGuardedTypeFunction("size", [], function (lst) {
         return lst.length;
-    }),
-    [ScrambleType("map", PlStuffType.List)]: GenerateGuardedTypeFunction("map", [PlStuffType.Func], function (self, func) {
-        const newList = [];
-        for (let i = 0; i < self.length; i++) {
-            try {
-                const value = func(self[i], i+1);
-                newList.push(value);
-            } catch (e) {
-                throw null;
-            }
-        }
-        return newList;
     })
 };
 

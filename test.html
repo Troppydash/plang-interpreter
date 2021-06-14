@@ -19,16 +19,18 @@
 <!--INTERACTION SOURCE CODE-->
 
 <script type="application/plang">
+    # references
+    inputBox = $("#input")
+    inputButton = $("#input-button")
+    outputBox = $("#output")
+
+    outputBox.setText "Loading words..."
     # words
-    networkResult = fetch("https://raw.githubusercontent.com/dwyl/english-words/master/words.txt", dict())
+    networkResult = fetch("https://raw.githubusercontent.com/dwyl/english-words/master/words.txt")
     if not networkResult.ok {
         panic("Failed to get a list of words")
     }
     wordList = networkResult.text.split("\n")
-
-    inputBox = $("#input")
-    inputButton = $("#input-button")
-    outputBox = $("#output")
 
     height = 25 # height limit
     delay = 2000 # new word delay
@@ -50,6 +52,7 @@
         }
         outputBox.setText text
     }
+    renderWords()
 
     func lastWordIndex() {
         lastIndex = 0
@@ -102,7 +105,7 @@
     # inputs
     inputButton.listen("click", func(event) {
         event.preventDefault()
-        inputText = inputBox.attr("value").1
+        inputText = inputBox.attr("value")
         lastWord = lastWordIndex()
         if lastWord /= 0 and words.get(lastWord) == inputText {
             words.set(lastWord, null)
@@ -110,17 +113,12 @@
             renderWords()
         }
     })
-
 </script>
 
 <!--THESE ARE ALL FOR LOADING THE PROGRAMMING LANGUAGE-->
-
 <div id="pl-model" style="display:none;top:0;left:0;height: 100vh;width: 100vw;position: absolute;z-index: 99;align-items: center;justify-content: center;background-color: rgba(0, 0, 0, 0.8)"
      onclick="closeModel()">
-    <div id="pl-model-body" style="background-color: #393939;color:#cecece;font-family: monospace;font-size: 1.25rem;padding: 0.75rem;overflow-x: auto"
-    onclick="event.stopPropagation()">
-
-    </div>
+    <div id="pl-model-body" style="background-color: #393939;color:#cecece;font-family: monospace;font-size: 1.25rem;padding: 0.75rem;overflow-x: auto" onclick="event.stopPropagation()"></div>
 </div>
 <script>
     const model = document.getElementById('pl-model');
@@ -167,7 +165,6 @@
         }
     }
 </script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
 <script src="out/index.js"></script>
 <script>require(['inout/otherInout', 'browser/index']);</script>

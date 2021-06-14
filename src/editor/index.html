@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Editor</title>
+
+    <style>
+        .editor-root {
+            min-height: 500px;
+            max-height: 500px;
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            font-family: Consolas, monospace;
+            background: #262626;
+            color: #d7d7d7;
+
+            padding: 0.5rem;
+            user-select: none;
+        }
+        * {
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+        .editor-root > div {
+            width: 100%;
+            display: flex;
+        }
+        .editor-root .line-num {
+            width: auto;
+            padding: 0.25rem 1.5rem 0.25rem 1rem;
+            margin-right: 0.5rem;
+            background: #404040;
+            border-right: 2px solid #a3a3a3;
+        }
+        .editor-root .line {
+            padding: 0.25rem 0;
+            position: relative;
+        }
+        .editor-root .cursor {
+            position: absolute;
+            top: 0.25rem;
+            width: 0;
+            border-left: 2px solid white;
+
+            animation: blink 1.25s step-end 0.5s infinite;
+        }
+        @keyframes blink {
+            50% {
+                opacity: 0.0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="de-editor"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--Editor Scripts-->
+<script src="functional.de" type="application/plang"></script>
+<script src="root.de" type="application/plang"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--THESE ARE ALL FOR LOADING THE PROGRAMMING LANGUAGE-->
+<div id="pl-model" style="display:none;top:0;left:0;height: 100vh;width: 100vw;position: absolute;z-index: 99;align-items: center;justify-content: center;background-color: rgba(0, 0, 0, 0.8)"
+     onclick="closeModel()">
+  <div id="pl-model-body" style="background-color: #393939;color:#cecece;font-family: monospace;font-size: 1.25rem;padding: 0.75rem;overflow: auto" onclick="event.stopPropagation()"></div>
+</div>
+<script>
+  const model = document.getElementById('pl-model');
+  const body = document.getElementById('pl-model-body');
+  function openModel(text) {
+    body.innerHTML = text;
+    model.style.display = "flex";
+  }
+
+  function modelOpen() {
+    return model.style.display === 'flex';
+  }
+
+  function closeModel() {
+    model.style.display = "none";
+    if (buffer.length > 0) {
+      openModel(buffer.shift());
+    }
+  }
+
+  function replace(source, pick, repl) {
+    return source.split(pick).join(repl);
+  }
+
+  let content = [];
+  let buffer = [];
+  // js custom model
+  window.extern = {
+    print(message) {
+      // TODO: This have a scripting vulnerability
+      content.push(`<span>${replace(replace(message, ' ', '&nbsp;'), '<span\\', '<span ')}</span>`);
+    },
+    flush() {
+      if (content.length === 0) {
+        return;
+      }
+      const text = content.join('<br/>');
+      buffer.push(replace(text, '\n', '<br/>'));
+      content = [];
+      if (modelOpen()) {
+        return;
+      }
+      openModel(buffer.shift());
+    }
+  }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<script src="../../out/index.js"></script>
+<script>require(['inout/otherInout', 'browser/index']);</script>
+</body>
+</html>

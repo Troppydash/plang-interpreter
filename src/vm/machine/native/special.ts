@@ -1,5 +1,14 @@
 import {PlConverter} from "./converter";
-import {NewPlStuff, PlStuff, PlStuffNull, PlStuffType, PlStuffTypeAny, PlStuffTypeRest} from "../stuff";
+import {
+    NewPlStuff,
+    PlStuff,
+    PlStuffFalse,
+    PlStuffNull,
+    PlStuffTrue,
+    PlStuffType,
+    PlStuffTypeAny,
+    PlStuffTypeRest
+} from "../stuff";
 import {AssertTypeof, GenerateGuardedFunction} from "./helpers";
 import {StackMachine} from "../index"; // Hopefully this doesn't cause a circular dependency problem
 import {MakeNoTypeFunctionMessage} from "./messeger";
@@ -283,8 +292,8 @@ if (isNode) {
 
     })
 } else {
-    jsSpecial['fetch'] = GenerateGuardedFunction('fetch', [PlStuffType.Str, PlStuffType.Dict], function (this, url, options: FetchOptions) {
-        const opt = sanitizeOptions(options);
+    jsSpecial['fetch'] = GenerateGuardedFunction('fetch', [PlStuffType.Str, PlStuffTypeRest], function (this, url, options: FetchOptions) {
+        const opt = sanitizeOptions(options ? options : {});
 
         const request = new XMLHttpRequest();
         request.open(opt.method, url, false);
@@ -304,65 +313,203 @@ if (isNode) {
     /*
     $body = $("body")
      */
-    interface SelectorResult {
-        _native: () => any; // native results
-        text: () => string[];
-        html: () => string[];
-    }
 
     interface ListenCallbackEvent {
         preventDefault: () => void;
     }
 
-    jsSpecial["$"] = GenerateGuardedFunction("$", [PlStuffType.Str], function (this, selector) {
-        let result: HTMLElement[] = Array.from(document.querySelectorAll(selector)); // this closure might impact performance, but too bad
-        const obj = {
-            _native() {
-                return result;
-            },
-            limit: GenerateGuardedFunction("limit", [PlStuffType.Num], function (amount) {
-                if (amount >= result.length) {
-                    return obj; // we dont have this as it is the stack machine
-                }
-                result = result.slice(amount);
-                return obj;
+    function nf(fn) {
+        return NewPlStuff(PlStuffType.NFunc, fn);
+    }
+
+    // TODO: write this in instance instead of dict
+    special["$"] = GenerateGuardedFunction("$", [PlStuffType.Str], function (this: StackMachine, selector) {
+        let result: HTMLElement[] = Array.from(document.querySelectorAll(selector.value)); // this closure might impact performance, but too bad
+        let multi = false;
+        const sm = this;
+
+        function toPl(any) {
+            return PlConverter.JsToPl(any, sm);
+        }
+
+        let self = NewPlStuff(PlStuffType.Dict, {
+            '#native': () => ({
+                result,
+                multi
             }),
-            text() {
-                return result.map(node => node.innerText);
-            },
+            new: GenerateGuardedFunction("new", [], () => {
+                result = [document.createElement(selector.value)];
+                return self;
+            }),
+            attach: GenerateGuardedFunction("attach", [PlStuffType.Dict], function (node) {
+                const nf = node.value['#native'];
+                if (!nf) {
+                    throw new Error('cannot attach a none-node type');
+                }
+                const other = nf.value();
+                if (multi) {
+                    for (const element of (result as HTMLElement[])) {
+                        if (other.multi)
+                            element.append(other.result);
+                        else
+                            element.appendChild(other.result[0]);
+                    }
+                } else {
+                    if (other.multi)
+                        result[0].append(other.result);
+                    else {
+                        result[0].appendChild(other.result[0]);
+                    }
+                }
+                return self;
+            }),
+            detach: GenerateGuardedFunction("detach", [PlStuffType.Dict], (node) => {
+                const nf = node.value['#native'];
+                if (!nf) {
+                    throw new Error('cannot detach a none-node type');
+                }
+                const other = nf.value();
+                if (multi) {
+                    for (const element of (result as HTMLElement[])) {
+                        if (other.multi) {
+                            for (const oele of other.result) {
+                                element.removeChild(oele);
+                            }
+                        }
+                        else
+                            element.removeChild(other.result[0]);
+                    }
+                } else {
+                    if (other.multi) {
+                        for (const oele of other.result) {
+                            result[0].removeChild(oele);
+                        }
+                    }
+                    else {
+                        result[0].removeChild(other.result[0]);
+                    }
+                }
+                return self;
+            }),
+            clear: GenerateGuardedFunction("clear", [], () => {
+                if (multi) {
+                    for (const node of result) {
+                        while (node.firstChild) {
+                            node.firstChild.remove();
+                        }
+                    }
+                } else {
+                    while (result[0].firstChild) {
+                        result[0].firstChild.remove();
+                    }
+                }
+                return self;
+            }),
+            setStyle: GenerateGuardedFunction("setStyle", [PlStuffType.Str, PlStuffType.Str], (attr, text) => {
+                if (multi) {
+                    for (const node of result) {
+                        node.style[attr.value] = text.value;
+                    }
+                } else {
+                    result[0].style[attr.value] = text.value;
+                }
+                return self;
+            }),
+            class: GenerateGuardedFunction("class", [], () => {
+                if (multi) {
+                    const list = [];
+                    for (const node of result) {
+                        list.push(NewPlStuff(PlStuffType.Str, node.className));
+                    }
+                    return NewPlStuff(PlStuffType.List, list);
+                }
+                return NewPlStuff(PlStuffType.Str, result[0].className);
+            }),
+            setClass:  GenerateGuardedFunction("setClass", [PlStuffType.Str], (newClass) => {
+                if (multi) {
+                    for (const node of result) {
+                        node.className = newClass.value;
+                    }
+                } else {
+                    result[0].className = newClass.value;
+                }
+                return self;
+            }),
+            id: GenerateGuardedFunction("id", [], () => {
+                if (multi) {
+                    const list = [];
+                    for (const node of result) {
+                        list.push(NewPlStuff(PlStuffType.Str, node.id));
+                    }
+                    return NewPlStuff(PlStuffType.List, list);
+                }
+                return NewPlStuff(PlStuffType.Str, result[0].id);
+            }),
+            setId:  GenerateGuardedFunction("setId", [PlStuffType.Str], (newId) => {
+                if (multi) {
+                    for (const node of result) {
+                        node.id = newId.value;
+                    }
+                } else {
+                    result[0].id = newId.value;
+                }
+                return self;
+            }),
+            any: GenerateGuardedFunction("any", [], () => result.length > 0 ? PlStuffTrue : PlStuffFalse),
+            size: GenerateGuardedFunction("size", [], () => NewPlStuff(PlStuffType.Num, result.length)),
+            all: GenerateGuardedFunction("all", [], function () {
+                multi = true;
+                return self;
+            }),
+            text: GenerateGuardedFunction("text", [], function () {
+                if (multi)
+                    return toPl(result.map(node => node.innerText));
+                else
+                    return toPl(result[0].innerText);
+            }),
             setText: GenerateGuardedFunction("setText", [PlStuffType.Str], function (text) {
                 result.forEach(node => {
-                    node.innerText = text;
+                    node.innerText = text.value;
                 })
-                return obj;
+                return self;
             }),
-            html() {
-                return result.map(node => node.innerHTML);
-            },
-            setHTML: GenerateGuardedFunction("setHTML", [PlStuffType.Str], function (text) {
+            html: GenerateGuardedFunction("text", [], function () {
+                if (multi)
+                    return toPl(result.map(node => node.innerHTML));
+                else
+                    return toPl(result[0].innerHTML);
+            }),
+            setHtml: GenerateGuardedFunction("setHTML", [PlStuffType.Str], function (text) {
                 result.forEach(node => {
-                    node.innerHTML = text;
+                    node.innerHTML = text.value;
                 })
-                return obj;
+                return self;
             }),
-            attr: GenerateGuardedFunction("attr", [PlStuffType.Str], function(attr) {
-                return result.map(node => node[attr]);
+            attr: GenerateGuardedFunction("attr", [PlStuffType.Str], function (attr) {
+                if (multi)
+                    return toPl(result.map(node => node[attr.value]));
+                else
+                    return toPl(result[0][attr.value]);
             }),
-            setAttr: GenerateGuardedFunction("attr", [PlStuffType.Str, PlStuffTypeAny], function(attr, value) {
-                result.forEach(node => node[attr] = value);
-                return obj;
+            setAttr: GenerateGuardedFunction("attr", [PlStuffType.Str, PlStuffTypeAny], function (attr, value) {
+                result.forEach(node => node[attr.value] = value.value);
+                return self;
             }),
-            listen: GenerateGuardedFunction("listen", [PlStuffType.Str, PlStuffType.Func], function (this: StackMachine, event, callback) {
+            listen: GenerateGuardedFunction("listen", [PlStuffType.Str, PlStuffType.Func], function (event, callback) {
                 for (const node of result) {
-                    node.addEventListener(event, (event: Event) => {
+                    node.addEventListener(event.value, (event: Event) => {
                         const e = {
-                            preventDefault: event.preventDefault.bind(event),
+                            preventDefault: () => event.preventDefault(),
                         } as ListenCallbackEvent;
-                        callback(e);
+                        PlConverter.PlToJs(callback, sm)(e);
                     });
                 }
+                return self;
             })
-        } as SelectorResult;
-        return obj;
+        });
+        for (const key of Object.keys(self.value)) {
+            self.value[key] = nf(self.value[key]);
+        }
+        return self;
     })
 }

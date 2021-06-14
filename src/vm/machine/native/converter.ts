@@ -14,7 +14,7 @@ import {
     PlType
 } from "../stuff";
 import {StackMachine} from "../index";
-import {ReportCallbackProblems} from "../../../problem";
+import {ReportCallbackProblems, ReportProblems} from "../../../problem";
 
 /**
  * Protects a plang like function call
@@ -34,7 +34,7 @@ function protectPlangCall(callback: Function, sm: StackMachine) {
                 sm.restoreState(saved);
                 const problem = sm.problems.pop();
                 const trace = sm.getTrace();
-                ReportCallbackProblems(problem, trace);
+                ReportProblems(sm.file.content, [problem], trace);
                 return null;
             }
         }
@@ -47,7 +47,7 @@ function protectPlangCall(callback: Function, sm: StackMachine) {
  * Houses the conversion between devia and js types
  */
 export namespace PlConverter {
-    const VERSION = 1; // Converter version
+    export const VERSION = 1; // Converter version
 
     interface CustomValue {
         _version: number;
@@ -134,7 +134,6 @@ export namespace PlConverter {
             format: js.value.value
         } as PlType);
     }
-
 
     /**
      * Converts a devia object to js
@@ -391,7 +390,7 @@ export namespace PlConverter {
     export function PlToDebugString(object: PlStuff): string {
         switch (object.type) {
             case PlStuffType.Bool:
-                return object.value ? "true": 'false';
+                return object.value ? "true" : 'false';
             case PlStuffType.Dict:
                 return `Dict(${Object.entries(object.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToDebugString(value,)}`).join(', ')})`;
             case PlStuffType.Null:
@@ -423,7 +422,7 @@ export namespace PlConverter {
                 return `NFunc(${params.join(', ')}) -> Any`;
             }
             case PlStuffType.Num:
-                return ""+object.value;
+                return "" + object.value;
             case PlStuffType.Str:
                 return `"${object.value}"`;
             case PlStuffType.Type:

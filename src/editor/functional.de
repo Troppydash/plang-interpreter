@@ -1,0 +1,23 @@
+impl map(self, closure) for List {
+    @newList = list()
+    each item, index of self {
+        @arity = closure.arity()
+        @newItem = null
+        match arity {
+            case 1 {
+                newItem = closure(item)
+            }
+            case 2 {
+                newItem = closure(item, index)
+            }
+            case 3 {
+                newItem = closure(item, index, self)
+            }
+            default {
+                panic("List.map incorrect closure arity of \(arity)")
+            }
+        }
+        newList.add newItem
+    }
+    return newList
+}
