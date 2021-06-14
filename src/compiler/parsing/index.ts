@@ -307,7 +307,8 @@ export class PlAstParser implements Parser {
     // these all expect the first token being correct
 
     pBlock(): ASTBlock | null {
-        let tokens = [ this.nextToken() ];
+        this.nextToken();
+        let tokens = [  ];
         let statements = [];
         while ( true ) {
             this.clearLF();
@@ -326,7 +327,7 @@ export class PlAstParser implements Parser {
             }
             statements.push( statement );
         }
-        tokens.push( this.nextToken() );
+        this.nextToken();
 
         return new ASTBlock( tokens, statements );
     }
@@ -362,7 +363,7 @@ export class PlAstParser implements Parser {
             return null;
         }
 
-        return new ASTFunction( [ ...tokens, ...param[1] ], name, param[0], block );
+        return new ASTFunction( tokens, name, param[0], block );
     }
 
     pImpl(): ASTImpl | null {
@@ -419,7 +420,7 @@ export class PlAstParser implements Parser {
             return null;
         }
 
-        return new ASTImpl( [ ...tokens, ...param[1], forToken ], name, param[0], type, block );
+        return new ASTImpl( [ ...tokens, forToken ], name, param[0], type, block );
     }
 
     pType(): ASTType | null {
@@ -436,10 +437,8 @@ export class PlAstParser implements Parser {
         if ( nextToken == null ) {
             return null;
         }
-        tokens.push(nextToken);
 
         const param = this.pParam(nextToken, "ET0046", "ET0047", "CE0009");
-        tokens.push(...param[1]);
 
         const members = param[0];
 
@@ -601,7 +600,7 @@ export class PlAstParser implements Parser {
 
         let key = null;
         if ( this.peekToken().type == PlTokenType.COMMA ) {
-            tokens.push( this.nextToken() );
+            this.nextToken();
             if ( this.tryPeekToken( PlTokenType.VARIABLE, "ET0024", null ) == null ) {
                 return null;
             }
@@ -675,7 +674,7 @@ export class PlAstParser implements Parser {
         let post = null;
 
         if ( this.peekToken().type == PlTokenType.SEMICOLON ) {
-            tokens.push( this.nextToken() );
+            this.nextToken();
         } else {
             pre = this.pExpression();
             if ( pre == null ) {
@@ -685,11 +684,10 @@ export class PlAstParser implements Parser {
             if ( semi == null ) {
                 return null;
             }
-            tokens.push( semi );
         }
 
         if ( this.peekToken().type == PlTokenType.SEMICOLON ) {
-            tokens.push( this.nextToken() );
+            this.nextToken();
         } else {
             condition = this.pExpression();
             if ( condition == null ) {
@@ -699,7 +697,6 @@ export class PlAstParser implements Parser {
             if ( semi == null ) {
                 return null;
             }
-            tokens.push( semi );
         }
 
         if ( this.peekToken().type != PlTokenType.LBRACE ) {
@@ -738,7 +735,6 @@ export class PlAstParser implements Parser {
         if ( lbrace == null ) {
             return;
         }
-        tokens.push( lbrace );
 
         // case parsing
         while ( true ) {
@@ -765,7 +761,6 @@ export class PlAstParser implements Parser {
                     if ( block == null ) {
                         return null;
                     }
-                    tokens.push( ...args[1] );
                     expressions.push( args[0] );
                     blocks.push( block );
                     break;
@@ -789,7 +784,7 @@ export class PlAstParser implements Parser {
                     break;
                 }
                 case PlTokenType.RBRACE: {
-                    tokens.push( this.nextToken() );
+                    this.nextToken();
                     exitWhile = true;
                     break;
                 }
@@ -971,7 +966,7 @@ export class PlAstParser implements Parser {
                 if ( args == null ) {
                     return null;
                 }
-                left = new ASTCall( [ peekToken, ...args[1] ], left, args[0] );
+                left = new ASTCall( [ peekToken ], left, args[0] );
                 continue;
             }
             if ( peekToken.type == PlTokenType.DOT ) {
@@ -993,7 +988,7 @@ export class PlAstParser implements Parser {
                 return null;
             }
             if ( args[0].length > 0 ) {
-                left = new ASTCall( [ peekToken, ...args[1] ], left, args[0] );
+                left = new ASTCall( [ peekToken ], left, args[0] );
             }
             break;
         }
@@ -1061,6 +1056,7 @@ export class PlAstParser implements Parser {
             if (expression == null) {
                 return null;
             }
+
             block = new ASTBlock([], [
                 new ASTReturn([], expression)
             ]);
@@ -1070,7 +1066,7 @@ export class PlAstParser implements Parser {
                 return null;
             }
         }
-        return new ASTClosure( [ token, ...param[1] ], param[0], block );
+        return new ASTClosure( [ token ], param[0], block );
     }
 
     pVariable(): ASTVariable | null {
@@ -1110,7 +1106,6 @@ export class PlAstParser implements Parser {
         if ( result == null ) {
             return null;
         }
-        tokens.push( ...result[1] );
         return new ASTList( tokens, result[0] );
     }
 
@@ -1151,12 +1146,9 @@ export class PlAstParser implements Parser {
                 return null;
             }
             keys.push( result[0] );
-            tokens.push( result[1] )
             values.push( result[2] );
         }
-        // push the last rparen
-        tokens.push( this.nextToken() );
-
+        this.nextToken();
         return new ASTDict( tokens, keys, values );
     }
 

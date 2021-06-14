@@ -55,16 +55,10 @@ export function ASTProgramToColorRegions(ast: ASTProgram): PlColorRegion[] {
         if (node instanceof ASTString) {
             const info = node.getSpanToken().info;
             regions.push(NewPlColorRegion(info, HIGHLIGHT.sr));
-        } else if (node instanceof ASTType) {
-            const info = node.tokens[0].info;
-            regions.push(NewPlColorRegion(info, HIGHLIGHT.kw));
         } else if (node instanceof ASTImpl) {
             let info = node.tokens[0].info;
             regions.push(NewPlColorRegion(info, HIGHLIGHT.kw));
-            info = node.tokens[node.args.length + 2].info;
-            regions.push(NewPlColorRegion(info, HIGHLIGHT.kw));
-        } else if (node instanceof ASTFunction) {
-            const info = node.tokens[0].info;
+            info = node.tokens[1].info;
             regions.push(NewPlColorRegion(info, HIGHLIGHT.kw));
         } else if (node instanceof ASTIf) {
             for (let i = 0; i < node.conditions.length; i++) {
@@ -76,8 +70,10 @@ export function ASTProgramToColorRegions(ast: ASTProgram): PlColorRegion[] {
                 regions.push(NewPlColorRegion(info, HIGHLIGHT.kw));
             }
         } else if (node instanceof ASTReturn) {
-            const info = node.tokens[0].info;
-            regions.push(NewPlColorRegion(info, HIGHLIGHT.kw));
+            if (node.tokens.length > 0) {
+                const info = node.tokens[0].info;
+                regions.push(NewPlColorRegion(info, HIGHLIGHT.kw));
+            }
         } else if (node instanceof ASTBinary) {
             const info = node.operator.info;
             if (node.operator.type == PlTokenType.AND || node.operator.type == PlTokenType.OR) {
@@ -85,29 +81,26 @@ export function ASTProgramToColorRegions(ast: ASTProgram): PlColorRegion[] {
             } else {
                 regions.push(NewPlColorRegion(info, HIGHLIGHT.mt));
             }
-        } else if (node instanceof ASTDot) {
-            // const info = node.tokens[0].info;
-            // regions.push(NewPlColorRegion(info, HIGHLIGHT.mt));
         } else if (node instanceof ASTAssign || node instanceof ASTCreate) {
             const info = node.tokens[0].info;
             regions.push(NewPlColorRegion(info, HIGHLIGHT.mt));
         } else if (node instanceof ASTEach) {
             regions.push(NewPlColorRegion(node.tokens[0].info, HIGHLIGHT.kw));
-            if (node.key)
-                regions.push(NewPlColorRegion(node.tokens[2].info, HIGHLIGHT.kw));
-            else
-                regions.push(NewPlColorRegion(node.tokens[1].info, HIGHLIGHT.kw));
+            regions.push(NewPlColorRegion(node.tokens[1].info, HIGHLIGHT.kw));
         } else if (node instanceof ASTLoop) {
             regions.push(NewPlColorRegion(node.tokens[0].info, HIGHLIGHT.kw));
         } else if (node instanceof ASTCall) {
             regions.push(NewPlColorRegion(node.target.lastToken().info, HIGHLIGHT.mt));
         } else if (node instanceof ASTBreak || node instanceof ASTContinue
-            || node instanceof ASTBoolean || node instanceof ASTNull) {
+            || node instanceof ASTBoolean || node instanceof ASTNull
+            || node instanceof ASTFor || node instanceof ASTWhile || node instanceof ASTLoop
+            || node instanceof ASTFunction || node instanceof ASTType || node instanceof ASTClosure
+            || node instanceof ASTList || node instanceof ASTDict) {
             regions.push(NewPlColorRegion(node.tokens[0].info, HIGHLIGHT.kw));
         } else if (node instanceof ASTNumber) {
             regions.push(NewPlColorRegion(node.getSpanToken().info, HIGHLIGHT.nu));
-        } else if (node instanceof ASTFor || node instanceof ASTWhile) {
-            regions.push(NewPlColorRegion(node.tokens[0].info, HIGHLIGHT.kw));
+        } else if (node instanceof ASTUnary) {
+            regions.push(NewPlColorRegion(node.operator.info, HIGHLIGHT.mt));
         }
 
     }
