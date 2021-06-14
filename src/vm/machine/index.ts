@@ -19,7 +19,7 @@ import {
     PlType,
 } from "./stuff";
 import {jsModules, jsNatives, natives} from "./native";
-import {ScrambleImpl, ScrambleName} from "./scrambler";
+import {ScrambleImpl, ScrambleName, ScrambleType} from "./scrambler";
 import {PlProblemCode} from "../../problem/codes";
 import {PlActions, PlConverter} from "./native/converter";
 import {PlProgram} from "../emitter";
@@ -990,6 +990,17 @@ export class PlStackMachine implements StackMachine {
                             fn.value.self = bTarget;
                             this.pushStack(fn);
                             break;
+                        }
+
+                        // for inst, find inst. methods
+                        if (bTarget.type == PlStuffType.Inst) {
+                            const value = this.findValue(ScrambleType(name, bTarget.type));
+                            if (value != null) {
+                                const fn = PlActions.PlCopy(value);
+                                fn.value.self = bTarget;
+                                this.pushStack(fn);
+                                break;
+                            }
                         }
 
 
