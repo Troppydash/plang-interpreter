@@ -1055,15 +1055,20 @@ export class PlAstParser implements Parser {
             return null;
         }
 
-        const lastParen = param[1][param[1].length - 1];
-
-        if ( this.tryPeekToken( PlTokenType.LBRACE, "ET0017", lastParen ) == null ) {
-            return null;
-        }
-
-        const block = this.pBlock();
-        if ( block == null ) {
-            return null;
+        let block;
+        if (this.peekToken().type != PlTokenType.LBRACE) {
+            const expression = this.pExpression();
+            if (expression == null) {
+                return null;
+            }
+            block = new ASTBlock([], [
+                new ASTReturn([], expression)
+            ]);
+        } else {
+            block = this.pBlock();
+            if ( block == null ) {
+                return null;
+            }
         }
         return new ASTClosure( [ token, ...param[1] ], param[0], block );
     }

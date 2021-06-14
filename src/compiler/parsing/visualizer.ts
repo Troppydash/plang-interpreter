@@ -11,18 +11,31 @@ import {
     ASTUnary, ASTWhile
 } from "./ast";
 import { PlTokenType } from "../lexing/token";
-import { colors } from "../../inout/color";
+import {colors, PlColors} from "../../inout/color";
 import { IsPreLower } from "./ops";
 
 const PPINDENT = 4;
 
-let c = {
-    kw: colors.magenta,
-    sr: colors.green,
-    mt: colors.yellow,
-    nu: colors.cyan,
+const HIGHLIGHT_TYPES = ["kw", "sr", "mt", "nu"] as const;
+export const HIGHLIGHT: Record<typeof HIGHLIGHT_TYPES[number], PlColors> = {
+    kw: 'magenta',
+    sr: 'green',
+    mt: 'yellow',
+    nu: 'cyan',
 };
 
+let c = {
+    kw: colors[HIGHLIGHT.kw],
+    sr: colors[HIGHLIGHT.sr],
+    mt: colors[HIGHLIGHT.mt],
+    nu: colors[HIGHLIGHT.nu],
+};
+
+/**
+ * Return a colored **formatted** string of the ast tree
+ * @param program The AST Tree
+ * @constructor
+ */
 export function ASTProgramToString(program: ASTProgram ): string {
     return program.map( statement => ats( statement ) ).join( "\n\n" );
 }

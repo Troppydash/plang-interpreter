@@ -1,21 +1,22 @@
 import { CliError, NewCliError } from "./error";
-import { CLI_FLAGS, MatchFlag, MatchPrefix } from "./options";
+import {CLI_FLAGS, CLI_OPTIONS, MatchFlag, MatchOption, MatchPrefix} from "./options";
 
 type CliRaw = string;
 export type CliFlag = typeof CLI_FLAGS[number];
-type CliOption = {
-    key: string;
-    value: string;
-}
+export type CliOptionKey = typeof CLI_OPTIONS[number];
+type CliOptions = Record<
+    CliOptionKey | string,
+    string
+>;
 
 export class CliArguments {
     readonly raw: CliRaw[];
     readonly flags: CliFlag[];
-    readonly options: CliOption[];
+    readonly options: CliOptions;
 
     readonly error: CliError | null;
 
-    constructor(error: CliError | null, raw: CliRaw[] = [], flags: CliFlag[] = [], options: CliOption[] = []) {
+    constructor(error: CliError | null, raw: CliRaw[] = [], flags: CliFlag[] = [], options: CliOptions = {}) {
         this.raw = raw;
         this.flags = flags;
         this.options = options;
@@ -25,6 +26,10 @@ export class CliArguments {
 
     is(flag: CliFlag) {
         return this.flags.includes(flag);
+    }
+
+    option(key: CliOptionKey) {
+        return this.options[key];
     }
 
     getError(): CliError | null {
@@ -56,7 +61,7 @@ export class CliArguments {
          */
 
         let parsingRaw = false;
-        const raw = [], flags = [], options = [];
+        const raw = [], flags = [], options = {};
 
         for (let i = 0; i < args.length; i++) {
             let arg = args[i];
@@ -64,12 +69,6 @@ export class CliArguments {
                 raw.push(arg);
                 continue;
             }
-
-            // if (!arg.startsWith("--")) {
-            //     raw.push(arg);
-            //     parsingRaw = true;
-            //     continue;
-            // }
 
             const flag = MatchPrefix(arg);
             if (flag == null) {
@@ -83,14 +82,15 @@ export class CliArguments {
                 if (MatchFlag(flag)) {
                     flags.push(flag);
                 } else {
-                    return new CliArguments(NewCliError(i, `there is no flag called '${arg}'`));
+                    return new CliArguments(NewCliError(i, `no flag called '${arg}'`));
                 }
             } else {
-                const key = arg.substring(0, index);
-                const value = arg.substring(index);
-                options.push({
-                    key, value
-                });
+                const key = flag.substring(0, index);
+                if (!MatchOption(key)) {
+                    return new CliArguments(NewCliError(i, `no option called '${key}'`));
+                }
+                const value = flag.substring(index+1);
+                options[key] = value;
             }
         }
 

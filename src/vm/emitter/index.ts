@@ -155,13 +155,16 @@ class ProgramBuilder {
 function replaceBC(block: PlProgram) {
     let surround = 0;
     for ( let i = 0; i < block.program.length; ++i ) {
-        switch (block.program[i].type) {
+        const byte = block.program[i];
+        switch (byte.type) {
             case PlBytecodeType.DOBRAK: {
-                block.program[i] = NewBytecode( PlBytecodeType.DOBRAK, `${(block.program.length - i)},${surround}` );
+                if (byte.value == null)
+                    block.program[i] = NewBytecode( PlBytecodeType.DOBRAK, `${(block.program.length - i)},${surround}` );
                 break;
             }
             case PlBytecodeType.DOCONT: {
-                block.program[i] = NewBytecode( PlBytecodeType.DOCONT, `${(block.program.length - i - 1)},${surround}` );
+                if (byte.value == null)
+                    block.program[i] = NewBytecode( PlBytecodeType.DOCONT, `${(block.program.length - i - 1)},${surround}` );
                 break;
             }
             case PlBytecodeType.STKENT:
@@ -615,7 +618,6 @@ function traverseAST( node: ASTNode ): PlProgram {
         return programBuilder
             .addPWD( ifProgram )
             .popDebug() // remove the if debug token
-            .addEmpty()
             .addStretch( node )
             .toProgram();
     } else if ( node instanceof ASTEach ) {

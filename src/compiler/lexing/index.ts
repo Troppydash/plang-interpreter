@@ -535,14 +535,15 @@ class PlLexer implements Lexer {
                             // emit ("a" + str(b) + "c")
 
                             // emit "a" + str(
-                            this.addBuffer(NewPlToken(PlTokenType.STR, content.substring(0, content.length), this.currentFileInfo(this.currentCol - oldCol + 1)) );
+                            this.addBuffer(NewPlToken(PlTokenType.STR, content.substring(0, content.length), this.currentFileInfo(this.currentCol - lastCol + 1)) );
                             content = '';
 
-                            this.addBuffer(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(1)))
+                            this.advancePointer();
+
+                            this.addBuffer(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(2)))
                             this.addBuffer(NewPlToken(PlTokenType.VARIABLE, 'Str', this.currentFileInfo(1)));
                             this.addBuffer(NewPlToken(PlTokenType.LPAREN, '(', this.currentFileInfo(1)));
 
-                            this.advancePointer();
                             const lparen = this.currentFileInfo(2); // lparen token info
                             // used for counting parenthesis
                             let lparens = 0;
@@ -595,13 +596,15 @@ class PlLexer implements Lexer {
                 this.advancePointer();
             }
 
+            const hasMore = this.buffer.length - lastBuffer > 1;
+
             // add the final/first string segment
             this.addBuffer(
-                NewPlToken(PlTokenType.STR, content.substring(0, content.length - 1), this.currentFileInfo(this.currentCol - lastCol + 1))
+                NewPlToken(PlTokenType.STR, content.substring(0, content.length - 1), this.currentFileInfo(this.currentCol - lastCol + (hasMore ? 0 : 1)))
             );
 
             // if there is more than one emitted
-            if (this.buffer.length - lastBuffer > 1) {
+            if (hasMore) {
                 // add final )
                 this.addBuffer( NewPlToken(PlTokenType.RPAREN, ")", this.currentFileInfo(1)));
                 // return/add initial (

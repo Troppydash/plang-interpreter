@@ -3,14 +3,14 @@
 
 
 // Starting repl
-import { StartREPL } from "./repl";
-import inout, { isNode } from "./inout";
-import {ReadFile, RunEmitter, RunParser, RunVM, RunVmFast} from "./linking";
-import { CliArguments } from "./cli";
-import { CliHandleMagicFlags } from "./cli/magic";
-import { LogCliError } from "./cli/error";
-import { ASTProgramToString } from "./compiler/parsing/visualizer";
-import { PlProgramToString } from "./vm/emitter/printer";
+import {StartREPL} from "./repl";
+import inout, {isNode} from "./inout";
+import {ReadFile, RunEmitter, RunHighlighter, RunParser, RunVM, RunVmFast} from "./linking";
+import {CliArguments} from "./cli";
+import {CliHandleMagicFlags} from "./cli/magic";
+import {LogCliError} from "./cli/error";
+import {ASTProgramToString} from "./compiler/parsing/visualizer";
+import {PlProgramToString} from "./vm/emitter/printer";
 
 // Parse arguments
 const striped = process.argv.slice(2);
@@ -40,6 +40,19 @@ if (!isNode || args.getArgSize() == 0 || args.is("run-repl")) { // If running in
         process.exit(1);
     }
 
+    // read extras
+    const extras = args.option("lib");
+    if (extras) {
+        for (const fp of extras.split(',')) {
+            const f = ReadFile(fp);
+            if (f == null) {
+                process.exit(1);
+            }
+            file.content = f.content + '\n' + file.content;
+        }
+    }
+
+
     // Different modes
     if (args.is("run-compiler")) {
         const out = RunParser(file);
@@ -54,6 +67,10 @@ if (!isNode || args.getArgSize() == 0 || args.is("run-repl")) { // If running in
             inout.print(PlProgramToString(out));
             inout.print(`Emitted ${out.program.length} instructions, with ${out.debug.length} debug messages`);
         }
+        process.exit(0);
+    }
+    if (args.is('run-highlighter')) {
+        const out = RunHighlighter(file);
         process.exit(0);
     }
 

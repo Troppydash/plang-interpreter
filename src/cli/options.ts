@@ -8,6 +8,7 @@ export const CLI_FLAGS = [
     "run-repl",
     "run-compiler",
     "run-emitter",
+    "run-highlighter",
     "help",
     "mode-release",
     "mode-debug",
@@ -22,4 +23,12 @@ export function MatchPrefix(raw: string): string | null {
 
 export function MatchFlag(flag: string): boolean {
     return CLI_FLAGS.includes(flag as any);
+}
+
+export const CLI_OPTIONS = [
+    "lib"
+] as const;
+
+export function MatchOption(text: string): boolean {
+    return CLI_OPTIONS.includes(text as any);
 }

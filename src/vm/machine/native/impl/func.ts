@@ -24,10 +24,10 @@ export const func: ExportNative = {
     [ScrambleType("bind", PlStuffType.Func)]: GenerateGuardedTypeFunction("bind", [PlStuffTypeAny], function(this: StackMachine, self, newSelf) {
         const newFunc = PlActions.PlCopy(self);
         newFunc.value.self = newSelf;
-        newFunc.value.name += '.bind()'
+        (newFunc.value as any).name += '.bind'
         return newFunc;
     }),
-    [ScrambleType("param", PlStuffType.Func)]: GenerateGuardedTypeFunction("param", [], function(self) {
+    [ScrambleType("arity", PlStuffType.Func)]: GenerateGuardedTypeFunction("arity", [], function(self) {
         return NewPlStuff(PlStuffType.Num, (self.value).parameters.length);
     })
 }

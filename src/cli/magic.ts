@@ -2,19 +2,19 @@ import { CliArguments } from "./index";
 import {StartDemo} from "../repl";
 import inout from "../inout";
 import {colors} from "../inout/color";
+import {PNAME} from "./constants";
 
 export function CliHandleMagicFlags(args: CliArguments): boolean {
 
     if (args.is("help")) {
-        const exe = process.platform == "win32" ? "devia.exe" : "./devia";
-        inout.print(`Usage: ${exe} ...flags [file] ...program_arguments
+        inout.print(`Usage: ${PNAME} ...flags [file] ...program_arguments
 
 ${colors.cyan('Examples')}
-${exe} code.de                  ~ Run the file called [code.de]
-${exe}                          ~ Start the repl
-${exe} --run-emitter code.de    ~ Run the file called [code.de] with the emitter only 
+${PNAME} code.de                  ~ Run the file called [code.de]
+${PNAME}                          ~ Start the repl
+${PNAME} --run-emitter code.de    ~ Run the file called [code.de] with the emitter only 
 
-${colors.cyan('Flags')} (all flags begin with --)
+${colors.cyan('Flags')} (all flags begin with '--')
 help            ~ Show this message
 
 run-repl        ~ Start the repl (default method if no [file] is supplied

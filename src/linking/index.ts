@@ -9,6 +9,7 @@ import {EmitProgram, EmitStatement, PlProgram} from "../vm/emitter/";
 import {PlStackMachine} from "../vm/machine";
 import {IACTPrepare, IACTSync} from "../problem/interactive/index";
 import {IACTTrace} from "../problem/interactive/trace";
+import {ASTProgramHighlight, ASTProgramToColorRegions} from "../compiler/parsing/highligher";
 
 
 export function RunParser(file: PlFile): ASTProgram | null {
@@ -43,6 +44,22 @@ export function TryRunParser(file: PlFile): PlProblem[] | null {
         return parser.getProblems();
     }
     return null;
+}
+
+export function RunHighlighter(file: PlFile) {
+    const lexer = new PlLexer(file);
+    const parser = new PlAstParser(lexer);
+    const ast = parser.parseAll();
+
+    const problems = parser.getProblems();
+    if (problems.length != 0) {
+        ReportProblems(file.content, problems);
+        return;
+    }
+
+    const regions = ASTProgramToColorRegions(ast);
+    const out = ASTProgramHighlight(regions, file.content);
+    inout.print(out);
 }
 
 export function RunOnce(vm: PlStackMachine, file: PlFile) {
