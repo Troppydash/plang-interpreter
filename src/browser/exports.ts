@@ -41,6 +41,7 @@ export function Execute(text: string, std: PlInout): number {
 
     const program = EmitProgram(ast, true);
     const vm = new PlStackMachine({
+        ...inout,
         ...std,
         print: message => {
             std.print(message);

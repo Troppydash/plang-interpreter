@@ -15,6 +15,7 @@ import {MakeNoTypeFunctionMessage} from "./messeger";
 import {ExportNative} from "./types";
 import {isNode} from "../../../inout";
 import PlToString = PlConverter.PlToString;
+import VERSION = PlConverter.VERSION;
 
 export const jsSpecial = {
     "range": GenerateGuardedFunction("range", [PlStuffTypeRest], function (start, end, step) {
@@ -292,6 +293,14 @@ if (isNode) {
 
     })
 } else {
+    jsSpecial['sleep'] = GenerateGuardedFunction('sleep', [PlStuffType.Num], (duration) => {
+        const syncWait = ms => {
+            const end = Date.now() + ms
+            while (Date.now() < end) continue
+        }
+        syncWait(duration * 1000);
+    });
+
     jsSpecial['fetch'] = GenerateGuardedFunction('fetch', [PlStuffType.Str, PlStuffTypeRest], function (this, url, options: FetchOptions) {
         const opt = sanitizeOptions(options ? options : {});
 
@@ -318,6 +327,7 @@ if (isNode) {
         preventDefault: () => void;
         location?: { x: number, y: number };
         key?: string;
+        "#raw": any;
     }
 
     function nf(fn) {
@@ -335,7 +345,7 @@ if (isNode) {
         }
 
         let self = NewPlStuff(PlStuffType.Dict, {
-            '#native': () => ({
+            '#raw': () => ({
                 result,
                 multi
             }),
@@ -345,7 +355,7 @@ if (isNode) {
                 return self;
             }),
             attach: GenerateGuardedFunction("attach", [PlStuffType.Dict], function (node) {
-                const nf = node.value['#native'];
+                const nf = node.value['#raw'];
                 if (!nf) {
                     throw new Error('cannot attach a none-node type');
                 }
@@ -367,7 +377,7 @@ if (isNode) {
                 return self;
             }),
             detach: GenerateGuardedFunction("detach", [PlStuffType.Dict], (node) => {
-                const nf = node.value['#native'];
+                const nf = node.value['#raw'];
                 if (!nf) {
                     throw new Error('cannot detach a none-node type');
                 }
@@ -415,6 +425,16 @@ if (isNode) {
                     }
                 } else {
                     result[0].style[attr.value] = text.value;
+                }
+                return self;
+            }),
+            removeStyle: GenerateGuardedFunction("removeStyle", [PlStuffType.Str], (attr) => {
+                if (multi) {
+                    for (const node of result) {
+                        node.style[attr.value] = null;
+                    }
+                } else {
+                    result[0].style[attr.value] = null;
                 }
                 return self;
             }),
@@ -512,7 +532,12 @@ if (isNode) {
                 for (const node of result) {
                     node.addEventListener(event.value, (event: any) => {
                         const e = {
-                            preventDefault: () => event.preventDefault()
+                            preventDefault: () => event.preventDefault(),
+                            "#raw": {
+                                _version: VERSION,
+                                type: "Raw",
+                                value: event
+                            },
                         } as ListenCallbackEvent;
                         if (event.currentTarget) {
                             e.location = {

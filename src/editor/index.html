@@ -5,6 +5,15 @@
     <title>Editor</title>
 
     <style>
+        @font-face{
+            font-family: 'JetBrainsMono';
+            src: url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff2/JetBrainsMono-Regular.woff2') format('woff2'),
+            url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/web/woff/JetBrainsMono-Regular.woff') format('woff'),
+            url('https://cdn.jsdelivr.net/gh/JetBrains/JetBrainsMono/ttf/JetBrainsMono-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+
         #de-editor {
             background: #636363;
             padding: 0.5rem;
@@ -16,12 +25,11 @@
         }
 
         .editor-textarea {
-            min-height: 500px;
-            max-height: 500px;
+            height: 65vh;
             overflow-x: hidden;
             overflow-y: auto;
 
-            font-family: Hack, monospace;
+            font-family: JetBrainsMono;
             font-size: 18px;
             background: #262626;
             color: #d7d7d7;
@@ -62,7 +70,7 @@
             position: absolute;
             top: 0.3rem;
             width: 0;
-            margin-left: -2px;
+            margin-left: -1px;
             border-left: 2px solid white;
 
             animation: blink 1.25s step-end 0.25s infinite;
@@ -74,13 +82,14 @@
         }
 
         .editor-output {
+            height: 25vh;
             border-top: 4px solid #a3a3a3;
-            min-height: 200px;
             background: #393939;
             color: #c6c6c6;
-            font-family: Hack, monospace;
+            font-family: JetBrainsMono;
             font-size: 18px;
             padding: 0.5rem;
+            overflow: auto;
         }
     </style>
 </head>

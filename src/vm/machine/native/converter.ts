@@ -1,5 +1,5 @@
 import {
-    NewPlStuff, PlFunction,
+    NewPlStuff,
     PlInstance,
     PlNativeFunction,
     PlStuff,
@@ -14,7 +14,7 @@ import {
     PlType
 } from "../stuff";
 import {StackMachine} from "../index";
-import {ReportCallbackProblems, ReportProblems} from "../../../problem";
+import {ReportProblems} from "../../../problem";
 
 /**
  * Protects a plang like function call
@@ -51,7 +51,7 @@ export namespace PlConverter {
 
     interface CustomValue {
         _version: number;
-        type: "Instance" | "Type";
+        type: "Instance" | "Type" | "Raw";
         value: any
     }
 
@@ -88,7 +88,7 @@ export namespace PlConverter {
             switch (js["_version"]) {
                 case 1:
                     if ("type" in js && typeof js["type"] == "string") {
-                        if ("value" in js && typeof js["value"] === 'object' && js["value"] !== null) {
+                        if ("value" in js && js["value"] !== null) {
                             return true;
                         }
                     }
@@ -133,6 +133,18 @@ export namespace PlConverter {
             type: js.value.type,
             format: js.value.value
         } as PlType);
+    }
+
+    function jsToRaw(js: CustomValue): PlStuff {
+        return NewPlStuff(PlStuffType.RAW, js.value);
+    }
+
+    function rawToJs(raw: PlStuff): CustomValue {
+        return {
+            _version: VERSION,
+            type: "Raw",
+            value: raw.value
+        };
     }
 
     /**
@@ -183,6 +195,8 @@ export namespace PlConverter {
                     return PlToJs(sm.runFunction(object, args.map(arg => JsToPl(arg, sm)), callPointer), sm);
                 }, sm);
             }
+            case PlStuffType.RAW:
+                return rawToJs(object);
         }
         throw new Error(`PlConvert.PlToJs failed to match object of type ${PlStuffTypeToString(object.type)}`);
     }
@@ -234,6 +248,8 @@ export namespace PlConverter {
                             return jsToInstance(object, sm);
                         case "Type":
                             return jsToType(object);
+                        case "Raw":
+                            return jsToRaw(object);
                     }
                 }
 
@@ -369,6 +385,8 @@ export namespace PlConverter {
                 return object.value;
             case PlStuffType.Type:
                 return object.value.type;
+            case PlStuffType.RAW:
+                return "[raw]"
             case PlStuffType.Inst: {
                 let fn;
                 if ((fn = sm.findFunction("str", object))) {
@@ -399,6 +417,8 @@ export namespace PlConverter {
                 return `${(object.value as PlInstance).type}(${Object.entries(object.value.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToDebugString(value)}`).join(',\n')}\n)`;
             case PlStuffType.List:
                 return `List(${object.value.map(v => PlToDebugString(v)).join(', ')})`;
+            case PlStuffType.RAW:
+                return '[raw]'
             case PlStuffType.Func: {
                 const params = [];
                 if (object.value.self)
@@ -452,6 +472,7 @@ export namespace PlActions {
             case PlStuffType.Dict:
                 return NewPlStuff(type, value);
 
+            case PlStuffType.RAW:
             case PlStuffType.Inst:
             case PlStuffType.Type:
             case PlStuffType.Bool:
@@ -501,6 +522,7 @@ export namespace PlActions {
                 });
                 return NewPlStuff(type, newObj);
             }
+            case PlStuffType.RAW:
             case PlStuffType.Type:
             case PlStuffType.Null:
             case PlStuffType.Bool:

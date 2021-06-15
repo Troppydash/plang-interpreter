@@ -15,6 +15,7 @@ export enum PlStuffType {
     List,
     Dict,
     Inst,
+    RAW, // shouldn't be accessed
 }
 
 // For parameters types

@@ -117,11 +117,8 @@ func renderContent(content, rowsChanged) {
     references.clear()
     editorTextArea.clear()
 
-    @regionIndex = 1
+    @regionIndex = 0
     @state = null
-    if regions /= null and regions.size() /= 0 {
-        state = regions.1.color
-    }
     each line, index of content {
         @lineNum = $("span").new()
         lineNum.setHtml "\("&nbsp;" * (maxLineNum-index.str().size()))\(index)"
@@ -138,7 +135,7 @@ func renderContent(content, rowsChanged) {
             if regions /= null {
                 @thisRegion = null
                 @nextRegion = null
-                if regions.size() /= 0 {
+                if regionIndex > 0 and regions.size() /= 0 {
                     thisRegion = regions.get(regionIndex)
                 }
                 if regionIndex+1 <= regions.size() {
@@ -175,9 +172,9 @@ func renderContent(content, rowsChanged) {
 ### EDITOR AND STATE
 
 # get the width of a single character
-a = $("span").new().setText("A")
+a = $("span").new().setStyle("font-family", "JetBrainsMono").setText("A")
 editorTextArea.attach a
-CHARACTER_WIDTH = a.key("offsetWidth") - 0.15
+CHARACTER_WIDTH = a.key("offsetWidth") - 0.1
 editorTextArea.detach a
 
 # STATE
@@ -206,7 +203,7 @@ run.listen("click", func(event) {
     @buffer = list()
     @std = dict(
         print: func(msg) {
-            @text = msg.replace("<span\\", "<span ")
+            @text = msg.replace("<span\\", "<span ").replace(" ", "&nbsp;")
             output.setHtml(output.html() + text + "<br/>")
         },
         input: func(msg) {
@@ -330,8 +327,8 @@ func handleKey(event) {
 
             content.set(cursor.row, line.substring(1, cursor.col-1))
             @newLine = " " * ws + line.substring(cursor.col, line.size())
-            if cursor.rowStatus(content) /= 0 {
-               content.add newLine
+            if cursor.row == content.size() {
+                content.add newLine
             } else {
                 content.insert(cursor.row+1, newLine)
             }
@@ -406,5 +403,40 @@ editorTextArea.listen("keydown", handleKey)
 
 output = $("div").new().setClass("editor-output")
 root.attach output
+
+editorTextArea.listen("dragover", func(event) {
+    event.preventDefault()
+})
+editorTextArea.listen("dragenter", func(event) {
+    editorTextArea.setStyle("border", "2px solid white")
+})
+editorTextArea.listen("dragleave", func(_) {
+    editorTextArea.removeStyle("border")
+})
+editorTextArea.listen("drop", func(e) {
+    e.preventDefault()
+    editorTextArea.setStyle("border", "2px solid yellow")
+
+    func setContent(newContent) {
+        content = newContent.split("\n")
+        editorTextArea.removeStyle("border")
+        renderContent(content, null)
+        cursor.move(1, 1)
+        cursor.render()
+    }
+
+    # hand it to js
+    javascript """
+    const sc = pl.import("setContent");
+    const de = pl.import("e");
+    const event = de["#raw"].value;
+    const file = event.dataTransfer.files[0];
+    const reader = new window.FileReader();
+    reader.onload = (e) => {
+        sc(e.target.result);
+    }
+    reader.readAsText(file);
+    """
+})
 
 
