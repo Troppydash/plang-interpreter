@@ -26,7 +26,7 @@ function protectPlangCall(callback: Function, sm: StackMachine) {
         // if the caller is a js callback
         const caller = (new Error()).stack.split("\n")[2].trim().split(" ")[1];
         // This is very hacky, but js had forced myhand
-        if (!caller.includes("PlStackMachine")) {
+        if (caller == undefined || !caller.includes("PlStackMachine")) {
             const saved = sm.saveState();
             try {
                 return callback(...args);

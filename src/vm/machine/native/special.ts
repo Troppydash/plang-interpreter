@@ -316,6 +316,8 @@ if (isNode) {
 
     interface ListenCallbackEvent {
         preventDefault: () => void;
+        location?: { x: number, y: number };
+        key?: string;
     }
 
     function nf(fn) {
@@ -337,6 +339,7 @@ if (isNode) {
                 result,
                 multi
             }),
+            selector: selector,
             new: GenerateGuardedFunction("new", [], () => {
                 result = [document.createElement(selector.value)];
                 return self;
@@ -485,22 +488,41 @@ if (isNode) {
                 })
                 return self;
             }),
-            attr: GenerateGuardedFunction("attr", [PlStuffType.Str], function (attr) {
+            key: GenerateGuardedFunction("key", [PlStuffType.Str], function (attr) {
                 if (multi)
                     return toPl(result.map(node => node[attr.value]));
                 else
                     return toPl(result[0][attr.value]);
             }),
-            setAttr: GenerateGuardedFunction("attr", [PlStuffType.Str, PlStuffTypeAny], function (attr, value) {
+            setKey: GenerateGuardedFunction("setKey", [PlStuffType.Str, PlStuffTypeAny], function (attr, value) {
                 result.forEach(node => node[attr.value] = value.value);
+                return self;
+            }),
+            attr: GenerateGuardedFunction("attr", [PlStuffType.Str], function (attr) {
+                if (multi)
+                    return toPl(result.map(node => node.getAttribute(attr.value)));
+                else
+                    return toPl(result[0].getAttribute(attr.value));
+            }),
+            setAttr: GenerateGuardedFunction("setAttr", [PlStuffType.Str, PlStuffTypeAny], function (attr, value) {
+                result.forEach(node => node.setAttribute(attr.value, value.value));
                 return self;
             }),
             listen: GenerateGuardedFunction("listen", [PlStuffType.Str, PlStuffType.Func], function (event, callback) {
                 for (const node of result) {
-                    node.addEventListener(event.value, (event: Event) => {
+                    node.addEventListener(event.value, (event: any) => {
                         const e = {
-                            preventDefault: () => event.preventDefault(),
+                            preventDefault: () => event.preventDefault()
                         } as ListenCallbackEvent;
+                        if (event.currentTarget) {
+                            e.location = {
+                                x: event.clientX - event.currentTarget.getBoundingClientRect().left,
+                                y: event.clientY - event.currentTarget.getBoundingClientRect().top,
+                            }
+                        }
+                        if (event.key) {
+                            e.key = event.key;
+                        }
                         PlConverter.PlToJs(callback, sm)(e);
                     });
                 }

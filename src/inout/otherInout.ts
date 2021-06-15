@@ -72,6 +72,7 @@ export function execute(code: string, vars: Record<string, any>): void {
         Promise,
         document,
         window,
+        navigator,
         ...vars,
     });
 }

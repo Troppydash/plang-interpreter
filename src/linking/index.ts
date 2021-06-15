@@ -9,7 +9,7 @@ import {EmitProgram, EmitStatement, PlProgram} from "../vm/emitter/";
 import {PlStackMachine} from "../vm/machine";
 import {IACTPrepare, IACTSync} from "../problem/interactive/index";
 import {IACTTrace} from "../problem/interactive/trace";
-import {ASTProgramHighlight, ASTProgramToColorRegions} from "../compiler/parsing/highligher";
+import {ASTProgramHighlight, ASTProgramToColorRegions} from "../compiler/parsing/highlighter";
 
 
 export function RunParser(file: PlFile): ASTProgram | null {

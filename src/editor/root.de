@@ -6,30 +6,122 @@ if not root.any() {
     panic("no root element '\(rootId)' to attach the editor")
 }
 
+# navbar
+navbar = $("div").new().setClass("editor-navbar")
+root.attach navbar
+
 # create editor div
-editorRoot = $("div").new()
-editorRoot.setClass "editor-root"
-root.attach editorRoot
+editorTextArea = $("div").new()
+editorTextArea.setClass "editor-textarea"
+editorTextArea.setAttr("tabindex", "-1")
+root.attach editorTextArea
 
-### EDITOR AND STATE
-# changed is the optional lines change
-a = $("span").new().setText("A")
-editorRoot.attach a
-offset = a.attr("offsetWidth")
 
-func renderContent(cursor, content, rowsChanged) {
+# dom cursor
+type Cursor(
+    row, col,
+    element,
+    parent
+)
+
+impl str(self) for Cursor {
+    return "\(self.row):\(self.col)"
+}
+
+impl render(self) for Cursor {
+    if self.parent /= null {
+        self.parent.setClass("line")
+        self.parent.detach self.element
+    }
+    @line = references.get(self.row)
+    line.attach self.element
+    line.setClass("line selected")
+    self.parent = line
+    self.element.setStyle("left", "\(CHARACTER_WIDTH * (self.col-1) + 12)px")
+}
+
+impl move(self, row, col) for Cursor {
+    if row /= null {
+        cursor.row = row
+    }
+    if col /= null {
+        cursor.col = col
+    }
+    return cursor
+}
+
+impl shift(self, row, col) for Cursor {
+    if row == null {
+        row = 0
+    }
+    if col == null {
+        col = 0
+    }
+    return self.move(self.row + row, self.col + col)
+}
+
+impl snap(self, content) for Cursor {
+    self.col = content.get(self.row).size()+1
+    return self
+}
+
+impl rowStatus(self, content) for Cursor {
+    @rows = content.size()
+    if self.row <= 1 {
+        return -1
+    }
+    if self.row >= rows {
+        return 1
+    }
+    return 0
+}
+
+impl colStatus(self, content) for Cursor {
+    @cols = content.get(self.row).size()
+    if self.col <= 1 {
+        return -1
+    }
+    if self.col >= cols {
+        return 1
+    }
+    return 0
+}
+
+func handleClick(content, cursor, row) {
+    return func(event) {
+        @col = (event.location.x / CHARACTER_WIDTH).int(0.5) + 1
+        if col > content.get(row).size() {
+            col = content.get(row).size() + 1
+        }
+        cursor.move(row, col)
+        cursor.render()
+    }
+}
+
+func regionFits(row, col, region) {
+    row--
+    col--
+    return row == region.info.row and (col >= (region.info.col - region.info.length) and col < region.info.col)
+}
+
+func renderContent(content, rowsChanged) {
     if rowsChanged /= null {
         return
     }
 
+    @regions = highlight(content.join("\n"))
+
     # full re-render
     @maxLineNum = content.size().str().size()
 
-    if cursor.parent /= null {
-        cursor.parent.detach cursor.element
-    }
+    references.clear()
+    editorTextArea.clear()
 
-    editorRoot.clear()
+    @regionIndex = 1
+    @state = null
+    if regions /= null and regions.size() /= 0 {
+        state = regions.1.color
+    }
     each line, index of content {
         @lineNum = $("span").new()
         lineNum.setHtml "\("&nbsp;" * (maxLineNum-index.str().size()))\(index)"
@@ -37,54 +129,282 @@ func renderContent(cursor, content, rowsChanged) {
         @lineDiv = $("div").new()
         lineDiv.attach $("div").new().setClass("line-num").attach lineNum
 
-        @text = line.split(" ").map(func(w) {
-            if w.size() > 0 {
-                return "<span>\(w)</span>"
+        @out = list()
+        each c, col of line {
+            if c == " " {
+                out.add("&nbsp;")
+                continue
             }
-            return ""
-        }).join("&nbsp;")
+            if regions /= null {
+                @thisRegion = null
+                @nextRegion = null
+                if regions.size() /= 0 {
+                    thisRegion = regions.get(regionIndex)
+                }
+                if regionIndex+1 <= regions.size() {
+                    nextRegion = regions.get(regionIndex+1)
+                }
+                if nextRegion /= null and regionFits(index, col, nextRegion) {
+                    state = nextRegion.color
+                    regionIndex++
+                } elif thisRegion /= null and not regionFits(index, col, thisRegion) {
+                    state = null
+                }
+            }
+            @text = null
+            if state == null {
+                text = "<span>\(c)</span>"
+            } else {
+                text = "<span style=\"color: \(state);\">\(c)</span>"
+            }
+            out.add text
+        }
+        @text = out.join("")
         @lineText = $("div").new().setClass("line").setHtml(text)
         lineDiv.attach lineText
-        editorRoot.attach lineDiv
+        editorTextArea.attach lineDiv
 
-        if cursor.row == index {
-            lineText.attach cursor.element
-            cursor.element.setStyle("left", "\(offset * cursor.col)px")
-        }
+        references.add lineText
+
+        # handle moving cursor
+        lineText.listen("click", handleClick(content, cursor, index))
     }
 }
 
 
-# lines of text
-content = list("Hello World", "Yes You  And Me")
+### EDITOR AND STATE
 
-# dom cursor
-type Cursor(
-    row, col,
-    element,
-    parent,
-)
-impl str(self) for Cursor {
-    return "\(self.row):\(self.col)"
+# get the width of a single character
+a = $("span").new().setText("A")
+editorTextArea.attach a
+CHARACTER_WIDTH = a.key("offsetWidth") - 0.15
+editorTextArea.detach a
+
+# STATE
+content = list("say(\"Hello World\")")
+references = list()
+cursor = Cursor(1, 1, $("span").new().setClass("cursor").setHtml("&nbsp;"), null)
+
+# highlighter
+javascript """
+const hl = window.data.exports.Highlight;
+const exe = window.data.exports.Execute;
+pl.export("highlight", hl);
+pl.export("execute", exe);
+"""
+
+# initial render
+renderContent(content, null)
+cursor.render()
+
+# executing
+run = $("button").new().setText("Run")
+navbar.attach run
+run.listen("click", func(event) {
+    output.setHtml("./devia browser.de<br/><br/>")
+    @text = content.join("\n")
+    @buffer = list()
+    @std = dict(
+        print: func(msg) {
+            @text = msg.replace("<span\\", "<span ")
+            output.setHtml(output.html() + text + "<br/>")
+        },
+        input: func(msg) {
+            javascript """
+            pl.export("t", window.prompt(pl.import("msg")));
+            """
+            return t
+        },
+        flush: func() {}
+    )
+    @out = execute(text, std)
+    output.setHtml(output.html() + "<br/>program exited with code \(out)")
+})
+copy = $("button").new().setText("Export")
+navbar.attach copy
+copy.listen("click", func(_) {
+    @content = content.join("\n")
+    javascript """
+    const content = pl.import("content");
+    const cb = navigator.clipboard;
+    cb.writeText(content);
+    """
+})
+
+
+
+# keys
+func handleKey(event) {
+    @pairedSymbols = list("{}", "()", "\"\"")
+    match event.key {
+        case "ArrowUp" {
+            if cursor.rowStatus(content) /= -1 {
+                cursor.shift(-1, null)
+                if cursor.colStatus(content) == 1 {
+                    cursor.snap(content)
+                }
+                cursor.render()
+            }
+        }
+        case "ArrowDown" {
+            if cursor.rowStatus(content) /= 1 {
+                cursor.shift(1, null)
+                if cursor.colStatus(content) == 1 {
+                    cursor.snap(content)
+                }
+                cursor.render()
+            }
+        }
+        case "ArrowLeft" {
+            if cursor.colStatus(content) /= -1 {
+                cursor.shift(0, -1)
+                cursor.render()
+            }
+        }
+        case "ArrowRight" {
+            # allows one more
+            if cursor.col /= content.get(cursor.row).size()+1 {
+                cursor.shift(0, 1)
+                cursor.render()
+            }
+        }
+        case "Backspace" {
+            if cursor.colStatus(content) == -1 and cursor.rowStatus(content) == -1 {
+                return
+            }
+
+            @line = content.get(cursor.row)
+            if content.get(cursor.row).size() >= cursor.col and cursor.col > 1 {
+                @left = content.get(cursor.row).get(cursor.col-1)
+                @right = content.get(cursor.row).get(cursor.col)
+                @pair = left + right
+                if pairedSymbols.have(pair) {
+                     content.set(cursor.row, line.remove(cursor.col).remove(cursor.col-1))
+                     cursor.shift(0, -1)
+                     renderContent(content, null)
+                     cursor.render()
+                     return
+                }
+            }
+
+            if cursor.colStatus(content) == -1 {
+                content.remove(cursor.row)
+                cursor.move(cursor.row-1, content.get(cursor.row-1).size()+1)
+                content.set(cursor.row, content.get(cursor.row)+line)
+            } else {
+                content.set(cursor.row, line.remove(cursor.col-1))
+                cursor.shift(0, -1)
+            }
+            renderContent(content, null)
+            cursor.render()
+        }
+        case "Enter" {
+            @line = content.get(cursor.row)
+            @ws = 0
+            each c of line {
+                if c /= " " {
+                    break
+                }
+                ws++
+            }
+            if content.get(cursor.row).size() >= cursor.col and cursor.col > 1 {
+                @left = content.get(cursor.row).get(cursor.col-1)
+                @right = content.get(cursor.row).get(cursor.col)
+                @pair = left + right
+                if pairedSymbols.have(pair) {
+                    content.set(cursor.row, line.substring(1, cursor.col-1))
+                    @last = " " * ws + line.substring(cursor.col, line.size())
+                    if content.size() == cursor.row {
+                        content.add last
+                    } else {
+                        content.insert(cursor.row+1, last)
+                    }
+
+                    content.insert(cursor.row+1, " " * (ws+4))
+                    cursor.move(cursor.row+1, ws+4+1)
+                    renderContent(content, null)
+                    cursor.render()
+                    return
+                }
+            }
+
+            content.set(cursor.row, line.substring(1, cursor.col-1))
+            @newLine = " " * ws + line.substring(cursor.col, line.size())
+            if cursor.rowStatus(content) /= 0 {
+               content.add newLine
+            } else {
+                content.insert(cursor.row+1, newLine)
+            }
+            cursor.move(cursor.row+1, ws+1)
+            renderContent(content, null)
+            cursor.render()
+        }
+        case "End" {
+            cursor.move(null, content.get(cursor.row).size()+1)
+            cursor.render()
+        }
+        case "Home" {
+            @ws = 0
+            each c of content.get(cursor.row) {
+                if c /= " " {
+                    break
+                }
+                ws++
+            }
+            cursor.move(null, ws+1)
+            cursor.render()
+        }
+        case "Tab" {
+            @line = content.get(cursor.row)
+            if cursor.col > line.size() {
+                content.set(cursor.row, line + " " * 4)
+            } else {
+                content.set(cursor.row, line.insert(cursor.col, " " * 4))
+            }
+            renderContent(content, null)
+            cursor.shift(null, 4)
+            cursor.render()
+        }
+        default {
+            if event.key.size() /= 1 {
+                return
+            }
+
+            each pair of pairedSymbols {
+                if event.key == pair.get 1 {
+                    @line = content.get(cursor.row)
+                    if cursor.col > line.size() {
+                        content.set(cursor.row, line + pair)
+                    } else {
+                        content.set(cursor.row, line.insert(cursor.col, pair))
+                    }
+                    renderContent(content, null)
+                    cursor.shift(null, 1)
+                    cursor.render()
+                    return
+                }
+            }
+
+            if cursor.row > content.size() {
+                content.add event.key
+            } else {
+                @line = content.get(cursor.row)
+                if cursor.col > line.size() {
+                    content.set(cursor.row, line + event.key)
+                } else {
+                    content.set(cursor.row, line.insert(cursor.col, event.key))
+                }
+            }
+            renderContent(content, null)
+            cursor.shift(null, 1)
+            cursor.render()
+        }
+    }
+    event.preventDefault()
 }
+editorTextArea.listen("keydown", handleKey)
 
-cursor = Cursor(2, 2, $("span").new().setClass("cursor").setHtml("&nbsp;"), null)
-
-
-renderContent(cursor, content, null)
-
-
-
-
-
-textArea = $("textarea").new()
-$("body").attach textArea
-
-textArea.listen "input", func(event) {
-    content = textArea.attr("value").split("\n")
-    renderContent(cursor, content, null)
-}
-
-
+output = $("div").new().setClass("editor-output")
+root.attach output
 
 

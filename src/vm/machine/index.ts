@@ -463,12 +463,15 @@ export class PlStackMachine implements StackMachine {
     seedFrame(args: string[]) {
         // Javascript Natives
         for (const [key, entry] of Object.entries(jsNatives)) {
-            entry.native = PlConverter.JsToPl(entry.native, this).value.native;
+            const fn = {
+                ...entry,
+                native: PlConverter.JsToPl(entry.native, this).value.native,
+            };
             this.stackFrame.createValue(
                 key,
                 NewPlStuff(
                     PlStuffType.NFunc,
-                    entry
+                    fn
                 ),
             );
             this.standard.push(key);
@@ -476,10 +479,13 @@ export class PlStackMachine implements StackMachine {
 
         // Plang Natives
         for (const [key, entry] of Object.entries(natives)) {
-            entry.native = entry.native.bind(this);
+            const fn = {
+                ...entry,
+                native: entry.native.bind(this),
+            };
             this.stackFrame.createValue(
                 key,
-                NewPlStuff(PlStuffType.NFunc, entry)
+                NewPlStuff(PlStuffType.NFunc, fn)
             );
             this.standard.push(key);
         }

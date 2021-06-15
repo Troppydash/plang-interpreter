@@ -1,6 +1,6 @@
 import {ScrambleType} from "../../scrambler";
 import {NewPlStuff, PlStuff, PlStuffType} from "../../stuff";
-import {GenerateGuardedFunction, GenerateGuardedTypeFunction} from "../helpers";
+import {GenerateGuardedTypeFunction} from "../helpers";
 import {ExportJs, ExportNative} from "../types";
 import {MakeOutOfRangeMessage} from "../messeger";
 import {StackMachine} from "../../index";
@@ -15,21 +15,22 @@ export const jsStr: ExportJs = {
     [ScrambleType("get", PlStuffType.Str)]: GenerateGuardedTypeFunction("get", [PlStuffType.Num], function (self: string, index: number) {
         index--;
         if (index < 0 || index >= self.length) {
-            throw new Error(MakeOutOfRangeMessage("get", PlStuffType.Str, self.length, index+1));
+            throw new Error(MakeOutOfRangeMessage("get", PlStuffType.Str, self.length, index + 1));
         }
         return self[index];
     }),
-    [ScrambleType("replace", PlStuffType.Str)]: GenerateGuardedTypeFunction("replace", [PlStuffType.Num, PlStuffType.Str], function (self, index, value) {
-        index--;
-        if (index < 0 || index >= self.length) {
-            throw new Error(MakeOutOfRangeMessage("replace", PlStuffType.Str, self.length, index+1));
-        }
-        return self.substring(0, index) + value + self.substring(index + 1);
+    [ScrambleType("replace", PlStuffType.Str)]: GenerateGuardedTypeFunction("replace", [PlStuffType.Str, PlStuffType.Str], function (self, source, target) {
+        return self.split(source).join(target);
+        // index--;
+        // if (index < 0 || index >= self.length) {
+        //     throw new Error(MakeOutOfRangeMessage("replace", PlStuffType.Str, self.length, index + 1));
+        // }
+        // return self.substring(0, index) + value + self.substring(index + 1);
     }),
     [ScrambleType("insert", PlStuffType.Str)]: GenerateGuardedTypeFunction("insert", [PlStuffType.Num, PlStuffType.Str], function (self, index, value) {
         index--;
         if (index < 0 || index >= self.length) {
-            throw new Error(MakeOutOfRangeMessage("insert", PlStuffType.Str, self.length, index+1));
+            throw new Error(MakeOutOfRangeMessage("insert", PlStuffType.Str, self.length, index + 1));
         }
         return self.substring(0, index) + value + self.substring(index)
     }),
@@ -57,8 +58,21 @@ export const jsStr: ExportJs = {
 };
 
 export const str: ExportNative = {
-    [ScrambleType("split", PlStuffType.Str)]: GenerateGuardedTypeFunction("split", [PlStuffType.Str], function ( this: StackMachine, self: PlStuff, sep: PlStuff ) {
+    [ScrambleType("split", PlStuffType.Str)]: GenerateGuardedTypeFunction("split", [PlStuffType.Str], function (this: StackMachine, self: PlStuff, sep: PlStuff) {
         const list = self.value.split(sep.value).map(value => NewPlStuff(PlStuffType.Str, value));
         return NewPlStuff(PlStuffType.List, list);
     }),
+    [ScrambleType("remove", PlStuffType.Str)]: GenerateGuardedTypeFunction("remove", [PlStuffType.Num], (self, index) => {
+        const value: string = self.value;
+        const idx = index.value - 1;
+        if (idx < 0 || idx >= value.length) {
+            throw new Error(MakeOutOfRangeMessage("remove", PlStuffType.Str, value.length, index.value));
+        }
+
+        const out = value.substring(0, idx) + value.substring(idx+1);
+        return NewPlStuff(PlStuffType.Str, out);
+    }),
+    [ScrambleType("substring", PlStuffType.Str)]: GenerateGuardedTypeFunction("substring", [PlStuffType.Num, PlStuffType.Num], (self, start, end) => {
+        return NewPlStuff(PlStuffType.Str, self.value.substring(start.value-1, end.value));
+    })
 }

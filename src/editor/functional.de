@@ -21,3 +21,9 @@ impl map(self, closure) for List {
     }
     return newList
 }
+
+impl clear(self) for List {
+    while self.size() > 0 {
+        self.pop()
+    }
+}

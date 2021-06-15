@@ -143,8 +143,8 @@ export const list = {
             throw new Error(MakeOutOfRangeMessage("remove", PlStuffType.List, list.length, index.value));
         }
 
-        list.splice(idx, 1);
-        return list;
+        const [out] = list.splice(idx, 1);
+        return out;
     }),
     [ScrambleType("join", PlStuffType.List)]: GenerateGuardedTypeFunction("join", [PlStuffType.Str], function (this: StackMachine, self: PlStuff, sep: PlStuff) {
         const strs = self.value.map(item => {
