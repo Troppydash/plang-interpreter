@@ -227,6 +227,14 @@ copy.listen("click", func(_) {
     cb.writeText(content);
     """
 })
+clear = $("button").new().setText("Clear")
+navbar.attach clear
+clear.listen("click", func(_) {
+    content = list("")
+    renderContent(content, null)
+    cursor.move(1, 1)
+    cursor.render()
+})
 
 
 
@@ -417,14 +425,6 @@ editorTextArea.listen("drop", func(e) {
     e.preventDefault()
     editorTextArea.setStyle("border", "2px solid yellow")
 
-    func setContent(newContent) {
-        content = newContent.split("\n")
-        editorTextArea.removeStyle("border")
-        renderContent(content, null)
-        cursor.move(1, 1)
-        cursor.render()
-    }
-
     # hand it to js
     javascript """
     const sc = pl.import("setContent");
@@ -438,5 +438,31 @@ editorTextArea.listen("drop", func(e) {
     reader.readAsText(file);
     """
 })
+func setContent(newContent) {
+    content = newContent.split("\n")
+    editorTextArea.removeStyle("border")
+    renderContent(content, null)
+    cursor.move(1, 1)
+    cursor.render()
+}
 
+# autosave and autoload
+javascript """
+let initial = window.localStorage.getItem("content");
+if (initial == null) {
+    initial = 'say("Hello World!")';
+}
+const sc = pl.import("setContent");
+sc(initial);
+let lastContent = initial;
+window.setInterval(() => {
+    const content = pl.import("content").join("\n");
+    if (content == lastContent) {
+        return;
+    }
+    lastContent = content;
+    window.localStorage.setItem("content", content);
+}, 3000);
+
+"""
 
