@@ -102,15 +102,33 @@ export const TOKEN_OPERATORS = [
     PlTokenType.NEQ,
 ];
 
+export const TOKEN_VAR_BLACKLIST = [
+    PlTokenType.COLON,
+    PlTokenType.LBRACE,
+    PlTokenType.RBRACE,
+    PlTokenType.LPAREN,
+    PlTokenType.RPAREN,
+    PlTokenType.COMMA,
+    PlTokenType.DOT,
+    PlTokenType.LF,
+    PlTokenType.EOF,
+    PlTokenType.SEMICOLON,
+]
+
 interface PlToken {
     type: PlTokenType;
     content: string;
     info: PlFileInfo;
 }
 
-export function PlTokenToPlVariable(token: PlToken) {
+
+
+export function PlTokenToPlVariable(token: PlToken): PlToken | null {
     if (token.type == PlTokenType.VARIABLE) {
         return token;
+    }
+    if (TOKEN_VAR_BLACKLIST.includes(token.type)) {
+        return null;
     }
     return NewPlToken(PlTokenType.VARIABLE, token.content, token.info);
 }

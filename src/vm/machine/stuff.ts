@@ -69,6 +69,7 @@ export interface PlFunction {
     closure: PlStackFrame; // closure stack frame
     parameters: string[]; // parameter names
     self: PlStuff | null; // self for overloading
+    guards: (PlStuff|null)[];
 }
 
 export interface PlNativeFunction {

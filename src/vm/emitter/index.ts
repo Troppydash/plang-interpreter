@@ -329,11 +329,18 @@ function traverseAST( node: ASTNode ): PlProgram {
             .toProgram();
     } else if ( node instanceof ASTFunction ) {
         const block = makePureBlock( node.block );
+        node.guards.reverse()
+        for ( const guard of node.guards ) {
+            if (guard == null)
+                programBuilder.addEmpty();
+            else
+                programBuilder.addBytecode( makeVariable( guard ) )
+                    .addStretch(guard, 1);
+        }
         node.args.reverse();
         for ( const param of node.args ) {
             programBuilder.addBytecode( makeVariable( param ) );
         }
-
         let extraReturn = false;
         if (block.program.length == 0 || block.program[block.program.length - 1].type != PlBytecodeType.DORETN) {
             extraReturn = true;
@@ -354,6 +361,14 @@ function traverseAST( node: ASTNode ): PlProgram {
             .toProgram();
     } else if ( node instanceof ASTClosure ) {
         const block = makePureBlock( node.block );
+        node.guards.reverse()
+        for ( const guard of node.guards ) {
+            if (guard == null)
+                programBuilder.addEmpty();
+            else
+                programBuilder.addBytecode( makeVariable( guard ) )
+                    .addStretch(guard, 1);
+        }
         node.args.reverse();
         for ( const param of node.args ) {
             programBuilder.addBytecode( makeVariable( param ) );
@@ -380,6 +395,14 @@ function traverseAST( node: ASTNode ): PlProgram {
             .addStretch(node.target);
 
         const block = makePureBlock( node.block );
+        node.guards.reverse()
+        for ( const guard of node.guards ) {
+            if (guard == null)
+                programBuilder.addEmpty();
+            else
+                programBuilder.addBytecode( makeVariable( guard ) )
+                    .addStretch(guard, 1);
+        }
         node.args.reverse();
         for ( const param of node.args ) {
             programBuilder.addBytecode( makeVariable( param ) );

@@ -83,12 +83,14 @@ export class ASTBlock extends ASTStatement {
 export class ASTFunction extends ASTStatement {
     name: ASTVariable;
     args: ASTVariable[];
+    guards: (ASTVariable|null)[];
     block: ASTBlock;
 
-    constructor( tokens: PlToken[], name: ASTVariable, args: ASTVariable[], block: ASTBlock ) {
-        super( tokens );
+    constructor(tokens: PlToken[], name: ASTVariable, args: ASTVariable[], guards: (ASTVariable|null)[], block: ASTBlock) {
+        super(tokens);
         this.name = name;
         this.args = args;
+        this.guards = guards;
         this.block = block;
     }
 
@@ -101,13 +103,16 @@ export class ASTFunction extends ASTStatement {
 export class ASTImpl extends ASTStatement {
     name: ASTVariable;
     args: ASTVariable[];
+    guards: (ASTVariable|null)[];
     target: ASTVariable;
     block: ASTBlock;
 
-    constructor( tokens: PlToken[], name: ASTVariable, args: ASTVariable[], target: ASTVariable, block: ASTBlock ) {
-        super( tokens );
+
+    constructor(tokens: PlToken[], name: ASTVariable, args: ASTVariable[], guards: (ASTVariable | null)[], target: ASTVariable, block: ASTBlock) {
+        super(tokens);
         this.name = name;
         this.args = args;
+        this.guards = guards;
         this.target = target;
         this.block = block;
     }
@@ -417,11 +422,14 @@ export class ASTDict extends ASTExpression {
 
 export class ASTClosure extends ASTExpression {
     args: ASTVariable[];
+    guards: (ASTVariable|null)[];
     block: ASTBlock;
 
-    constructor( tokens: PlToken[], args: ASTVariable[], block: ASTBlock ) {
-        super( tokens );
+
+    constructor(tokens: PlToken[], args: ASTVariable[], guards: (ASTVariable | null)[], block: ASTBlock) {
+        super(tokens);
         this.args = args;
+        this.guards = guards;
         this.block = block;
     }
 }

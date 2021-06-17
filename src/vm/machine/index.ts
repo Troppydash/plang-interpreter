@@ -214,17 +214,79 @@ export class PlStackMachine implements StackMachine {
         return null;
     }
 
+    runNFunction(func: PlStuff, args: PlStuff[], callDebug: PlDebug | null = null): PlStuff {
+        const value = func.value as PlNativeFunction;
+        const parameters = value.parameters;
+        // check for function arity
+        let hasRest = false;
+        for (let i = 0; i < parameters.length; i++) {
+            const param = parameters[i];
+            if (param == PlStuffTypeRest) {
+                hasRest = true;
+                break;
+            }
+            if (i >= args.length) {
+                break;
+            }
+            if (param == PlStuffTypeAny) {
+                continue;
+            }
+            if (PlStuffTypeToString(args[i].type) != PlStuffTypeToString(param)) {
+                this.newProblem("RE0018", this.pointer, PlStuffTypeToString(param), "" + (i + 1), PlStuffTypeToString(args[i].type));
+                throw null;
+            }
+        }
+        if (!hasRest) {
+            if (args.length != value.parameters.length) {
+                this.newProblem("RE0006", this.pointer, '' + value.parameters.length, '' + args.length);
+                throw null;
+            }
+        }
+
+        const stackFrame = this.stackFrame;
+        try {
+            const out = value.native(...args);
+            return out;
+        } catch (e) {
+            if (e == "debugger") {
+                return null;
+            }
+            // insert stackFrame
+            const info = callDebug == null ? null : callDebug.span.info;
+            if (stackFrame == this.stackFrame) {
+                this.stackFrame = new PlStackFrame(this.stackFrame, NewPlTraceFrame(value.name, info));
+            } else {
+                let sf = this.stackFrame;
+                while (sf.outer != stackFrame) {
+                    sf = sf.outer;
+                }
+                sf.outer = new PlStackFrame(stackFrame, NewPlTraceFrame(value.name, info))
+            }
+
+            if (e != null) {
+                this.newProblem("RE0007", this.pointer, e.message);
+            }
+            throw null;
+        }
+    }
+
     runFunction(func: PlStuff, args: PlStuff[], callPointer?: number): PlStuff {
         const oldPointer = this.pointer;
         if (callPointer) {
             this.pointer = callPointer;
         }
 
+        const callDebug = this.getCallDebug(this.pointer);
         // native functions
         if (func.type == PlStuffType.NFunc) {
-            const out = func.value.native(...args);
-            this.pointer = oldPointer;
-            return out;
+            try {
+                const out = this.runNFunction(func, args, callDebug);
+                this.pointer = oldPointer;
+                return out;
+            } catch (e) {
+                this.pointer = oldPointer;
+                throw null;
+            }
         }
 
         // check arity
@@ -240,7 +302,6 @@ export class PlStackMachine implements StackMachine {
         this.closureFrames.push(value.closure);
         this.stackFrame = new PlStackFrame(this.stackFrame, value.closure.trace);
 
-        const callDebug = this.getCallDebug(this.pointer);
         if (callDebug != null) {
             this.stackFrame.setTraceInfo(callDebug.span.info);
         }
@@ -375,62 +436,109 @@ export class PlStackMachine implements StackMachine {
                 break;
             }
             case PlStuffType.NFunc: {
-                const value = func.value as PlNativeFunction;
-                const parameters = value.parameters;
-                // check for function arity
-                let hasRest = false;
-                for (let i = 0; i < parameters.length; i++) {
-                    const param = parameters[i];
-                    if (param == PlStuffTypeRest) {
-                        hasRest = true;
-                        break;
-                    }
-                    if (i >= args.length) {
-                        break;
-                    }
-                    if (param == PlStuffTypeAny) {
-                        continue;
-                    }
-                    if (PlStuffTypeToString(args[i].type) != PlStuffTypeToString(param)) {
-                        this.newProblem("RE0018", this.pointer, PlStuffTypeToString(param), "" + (i + 1), PlStuffTypeToString(args[i].type));
-                        return false;
-                    }
-                }
-                if (!hasRest) {
-                    if (args.length != value.parameters.length) {
-                        this.newProblem("RE0006", this.pointer, '' + value.parameters.length, '' + args.length);
-                        return false;
-                    }
-                }
-
-                const stackFrame = this.stackFrame;
                 try {
-                    const out = value.native(...args);
-                    this.pushStack(out);
+                    this.pushStack(this.runNFunction(func, args, callDebug));
                 } catch (e) {
-                    if (e == "debugger") {
-                        break;
-                    }
-                    // insert stackFrame
-                    const info = callDebug == null ? null : callDebug.span.info;
-                    if (stackFrame == this.stackFrame) {
-                        this.stackFrame = new PlStackFrame(this.stackFrame, NewPlTraceFrame(value.name, info));
-                    } else {
-                        let sf = this.stackFrame;
-                        while (sf.outer != stackFrame) {
-                            sf = sf.outer;
-                        }
-                        sf.outer = new PlStackFrame(stackFrame, NewPlTraceFrame(value.name, info))
-                    }
-
-                    if (e != null) {
-                        this.newProblem("RE0007", this.pointer, e.message);
-                    }
                     return false;
                 }
                 break;
+                // const value = func.value as PlNativeFunction;
+                // const parameters = value.parameters;
+                // // check for function arity
+                // let hasRest = false;
+                // for (let i = 0; i < parameters.length; i++) {
+                //     const param = parameters[i];
+                //     if (param == PlStuffTypeRest) {
+                //         hasRest = true;
+                //         break;
+                //     }
+                //     if (i >= args.length) {
+                //         break;
+                //     }
+                //     if (param == PlStuffTypeAny) {
+                //         continue;
+                //     }
+                //     if (PlStuffTypeToString(args[i].type) != PlStuffTypeToString(param)) {
+                //         this.newProblem("RE0018", this.pointer, PlStuffTypeToString(param), "" + (i + 1), PlStuffTypeToString(args[i].type));
+                //         return false;
+                //     }
+                // }
+                // if (!hasRest) {
+                //     if (args.length != value.parameters.length) {
+                //         this.newProblem("RE0006", this.pointer, '' + value.parameters.length, '' + args.length);
+                //         return false;
+                //     }
+                // }
+                //
+                // const stackFrame = this.stackFrame;
+                // try {
+                //     const out = value.native(...args);
+                //     this.pushStack(out);
+                // } catch (e) {
+                //     if (e == "debugger") {
+                //         break;
+                //     }
+                //     // insert stackFrame
+                //     const info = callDebug == null ? null : callDebug.span.info;
+                //     if (stackFrame == this.stackFrame) {
+                //         this.stackFrame = new PlStackFrame(this.stackFrame, NewPlTraceFrame(value.name, info));
+                //     } else {
+                //         let sf = this.stackFrame;
+                //         while (sf.outer != stackFrame) {
+                //             sf = sf.outer;
+                //         }
+                //         sf.outer = new PlStackFrame(stackFrame, NewPlTraceFrame(value.name, info))
+                //     }
+                //
+                //     if (e != null) {
+                //         this.newProblem("RE0007", this.pointer, e.message);
+                //     }
+                //     return false;
+                // }
+                // break;
             }
             case PlStuffType.Func: {
+                const value = func.value as PlFunction;
+                // run guard functions
+                for (let i = 0; i < args.length; i++) {
+                    const guard = value.guards[i];
+                    if (guard == null) {
+                        continue;
+                    }
+                    switch (guard.type) {
+                        case PlStuffType.NFunc:
+                        case PlStuffType.Func: {
+                            let supplied = [];
+                            const need = guard.value.parameters.length;
+                            switch (need) {
+                                case 0:
+                                    break;
+                                case 1:
+                                    supplied = [args[i]];
+                                    break;
+                                case 2:
+                                    supplied = [func, args[i]];
+                                    break;
+                                case 3:
+                                    supplied = [func, args[i], i];
+                                default:
+                                    for (let i = 3; i < need; i++)
+                                        supplied.push(PlStuffNull);
+                                    break;
+                            }
+                            const oldStack = this.stackFrame;
+                            try {
+                                const out = this.runFunction(guard, supplied);
+                                args[i] = out;
+                            } catch (e) {
+                                this.stackFrame = oldStack;
+                                return false;
+                            }
+                        }
+                    }
+                    // on default let through
+                }
+
                 if (!this.jumpFunction(func, args, callDebug))
                     return false;
                 break;
@@ -551,7 +659,8 @@ export class PlStackMachine implements StackMachine {
                     },
                     name: "new",
                     self: null,
-                    parameters: [PlStuffTypeAny]
+                    parameters: [PlStuffTypeAny],
+                    guards: [null],
                 } as PlNativeFunction)
             );
             this.standard.push(key, newName);
@@ -807,6 +916,42 @@ export class PlStackMachine implements StackMachine {
                         for (let i = 0; i < arity.value; ++i) {
                             parameters.push(this.popStack().value as string);
                         }
+                        // find guards
+                        const guards: PlStuff[] = [];
+                        for (let i = 0; i < arity.value; ++i) {
+                            const g = this.popStack();
+                            if (g == null) {
+                                guards.push(null);
+                                continue;
+                            }
+                            const name = g.value as string;
+                            let guard = this.findValue(name);
+                            if (guard == null) {
+                                return this.newProblem("RE0019", this.pointer-1-arity.value*2-i, name);
+                            }
+                            if (guard.type == PlStuffType.Type) {
+                                const gtf = this.findValue(ScrambleName("guard", guard.value.type));
+                                if (gtf != null) {
+                                    guard = gtf;
+                                } else {
+                                    const type = guard;
+                                    const sm = this;
+                                    guard = NewPlStuff(PlStuffType.NFunc, {
+                                        native: (fn, arg, i) => {
+                                            if (PlStuffGetType(arg) != type.value.type) {
+                                                this.newProblem("RE0018", sm.pointer, type.value.type, ''+(i + 1), PlStuffGetType(arg));
+                                                throw null;
+                                            }
+                                            return arg;
+                                        },
+                                        name: "guard",
+                                        parameters: [PlStuffTypeAny, PlStuffTypeAny, PlStuffTypeAny],
+                                        self: null
+                                    } as PlNativeFunction);
+                                }
+                            }
+                            guards.push(guard);
+                        }
                         // block
                         const length = +byte.value;
 
@@ -814,6 +959,8 @@ export class PlStackMachine implements StackMachine {
                             closure: new PlStackFrame(this.stackFrame, NewPlTraceFrame("|closure|")),
                             parameters,
                             index: this.pointer,
+                            self: null,
+                            guards,
                         } as PlFunction));
                         this.pointer += length;
                         break;

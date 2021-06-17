@@ -39,7 +39,7 @@ const templates = {
     ET0013: "expected a name in a function definition",
     ET0014: "expected '(' around the function parameters",
     ET0015: "expected variables for function or impl parameters",
-    ET0016: "expected ':' between function or impl parameters",
+    ET0016: "expected ',' between function or impl parameters",
     ET0017: "expected '{' after function or impl parameters",
 
     // loop
@@ -90,6 +90,9 @@ const templates = {
     ET0046: "expected ',' between type members",
     ET0047: "expected variables for type members",
 
+    ET0048: "expected a variable",
+
+
 
     CE0001: "reached newline with unclosed '}'",
     CE0002: "reached newline with unclosed ')'",
@@ -111,7 +114,7 @@ const templates = {
 
     RE0001: "encountered unknown bytecode: '%0'",
     RE0002: "problem on line '%0'",
-    RE0003: "no variable named '%0'",
+    RE0003: "no variable named '%0' found",
     RE0004: "no function '%0' on type '%1'",
     RE0005: "cannot negate '%0'",
     RE0006: "incorrect arity for a function call, needs %0 but got %1",
@@ -129,7 +132,8 @@ const templates = {
 
     RE0017: "use of 'not' on a non-boolean value of type '%0'",
 
-    RE0018: "'%1' argument is not '%0', got '%2'"
+    RE0018: "'%1' argument failed to satisfy '%0', got '%2' instead",
+    RE0019: "no parameter guard named '%0' found",
 }
 
 // because I am lazy
@@ -225,7 +229,7 @@ const hints: Record<PlProblemCode, string> = {
     ET0045: simplyPutA("left parenthesis '('"),
     ET0046: tryPutting("type members are separated with ','"),
     ET0047: INeedA("valid variable name for the type members"),
-
+    ET0048: "",
 
     CE0001: haveYouClosed("blocks", "a closing '}'"),
     CE0002: haveYouClosed("groups", "a closing ')'"),
@@ -264,6 +268,8 @@ const hints: Record<PlProblemCode, string> = {
     RE0016: "only a value that contain the '.iter' type function can be used in a each..of loop",
     RE0017: "I can only 'not' booleans, this language does not like implicit truthy conditions",
     RE0018: "",
+    RE0019: "",
+
 }
 
 const problemFullName = {
