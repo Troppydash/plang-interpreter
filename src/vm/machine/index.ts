@@ -378,6 +378,58 @@ export class PlStackMachine implements StackMachine {
         return PlConverter.PlToPl(got, value, this);
     }
 
+    verifyGuards(func: PlStuff, args: PlStuff[]): PlStuff[] | null {
+        const value = func.value;
+        for (let i = 0; i < args.length; i++) {
+            const guard = value.guards[i];
+            if (guard == null) {
+                continue;
+            }
+            switch (guard.type) {
+                case PlStuffType.NFunc:
+                case PlStuffType.Func: {
+                    let supplied = [];
+                    const need = guard.value.parameters.length;
+                    switch (need) {
+                        case 0:
+                            break;
+                        case 1:
+                            supplied = [args[i]];
+                            break;
+                        case 2:
+                            supplied = [func, args[i]];
+                            break;
+                        case 3:
+                            supplied = [func, args[i], i];
+                            break;
+                        default:
+                            supplied = [func, args[i], i];
+                            for (let i = 3; i < need; i++)
+                                supplied.push(PlStuffNull);
+                            break;
+                    }
+
+                    if (guard.type == PlStuffType.Func) {
+                        supplied = this.verifyGuards(guard, supplied);
+                        if (supplied == null)
+                            return null;
+                    }
+
+
+                    const oldStack = this.stackFrame;
+                    try {
+                        args[i] = this.runFunction(guard, supplied);
+                    } catch (e) {
+                        this.stackFrame = oldStack;
+                        return null;
+                    }
+                }
+            }
+            // on default let through
+        }
+        return args;
+    }
+
     /**
      * Takes the func and tries to call it with the arguments, returns true if successful
      * @param func
@@ -500,43 +552,9 @@ export class PlStackMachine implements StackMachine {
             case PlStuffType.Func: {
                 const value = func.value as PlFunction;
                 // run guard functions
-                for (let i = 0; i < args.length; i++) {
-                    const guard = value.guards[i];
-                    if (guard == null) {
-                        continue;
-                    }
-                    switch (guard.type) {
-                        case PlStuffType.NFunc:
-                        case PlStuffType.Func: {
-                            let supplied = [];
-                            const need = guard.value.parameters.length;
-                            switch (need) {
-                                case 0:
-                                    break;
-                                case 1:
-                                    supplied = [args[i]];
-                                    break;
-                                case 2:
-                                    supplied = [func, args[i]];
-                                    break;
-                                case 3:
-                                    supplied = [func, args[i], i];
-                                default:
-                                    for (let i = 3; i < need; i++)
-                                        supplied.push(PlStuffNull);
-                                    break;
-                            }
-                            const oldStack = this.stackFrame;
-                            try {
-                                const out = this.runFunction(guard, supplied);
-                                args[i] = out;
-                            } catch (e) {
-                                this.stackFrame = oldStack;
-                                return false;
-                            }
-                        }
-                    }
-                    // on default let through
+                args = this.verifyGuards(func, args);
+                if (args == null) {
+                    return false;
                 }
 
                 if (!this.jumpFunction(func, args, callDebug))
@@ -927,7 +945,7 @@ export class PlStackMachine implements StackMachine {
                             const name = g.value as string;
                             let guard = this.findValue(name);
                             if (guard == null) {
-                                return this.newProblem("RE0019", this.pointer-1-arity.value*2-i, name);
+                                return this.newProblem("RE0019", this.pointer-2-arity.value-i, name);
                             }
                             if (guard.type == PlStuffType.Type) {
                                 const gtf = this.findValue(ScrambleName("guard", guard.value.type));

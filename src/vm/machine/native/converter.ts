@@ -136,7 +136,7 @@ export namespace PlConverter {
     }
 
     function jsToRaw(js: CustomValue): PlStuff {
-        return NewPlStuff(PlStuffType.RAW, js.value);
+        return NewPlStuff(PlStuffType.Raw, js.value);
     }
 
     function rawToJs(raw: PlStuff): CustomValue {
@@ -195,7 +195,7 @@ export namespace PlConverter {
                     return PlToJs(sm.runFunction(object, args.map(arg => JsToPl(arg, sm)), callPointer), sm);
                 }, sm);
             }
-            case PlStuffType.RAW:
+            case PlStuffType.Raw:
                 return rawToJs(object);
         }
         throw new Error(`PlConvert.PlToJs failed to match object of type ${PlStuffTypeToString(object.type)}`);
@@ -385,7 +385,7 @@ export namespace PlConverter {
                 return object.value;
             case PlStuffType.Type:
                 return object.value.type;
-            case PlStuffType.RAW:
+            case PlStuffType.Raw:
                 return "[raw]"
             case PlStuffType.Inst: {
                 let fn;
@@ -417,7 +417,7 @@ export namespace PlConverter {
                 return `${(object.value as PlInstance).type}(${Object.entries(object.value.value).map(([key, value]: [string, PlStuff]) => `${key}: ${PlToDebugString(value)}`).join(',\n')}\n)`;
             case PlStuffType.List:
                 return `List(${object.value.map(v => PlToDebugString(v)).join(', ')})`;
-            case PlStuffType.RAW:
+            case PlStuffType.Raw:
                 return '[raw]'
             case PlStuffType.Func: {
                 const params = [];
@@ -472,7 +472,7 @@ export namespace PlActions {
             case PlStuffType.Dict:
                 return NewPlStuff(type, value);
 
-            case PlStuffType.RAW:
+            case PlStuffType.Raw:
             case PlStuffType.Inst:
             case PlStuffType.Type:
             case PlStuffType.Bool:
@@ -522,7 +522,7 @@ export namespace PlActions {
                 });
                 return NewPlStuff(type, newObj);
             }
-            case PlStuffType.RAW:
+            case PlStuffType.Raw:
             case PlStuffType.Type:
             case PlStuffType.Null:
             case PlStuffType.Bool:
