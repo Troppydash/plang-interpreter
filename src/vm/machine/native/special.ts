@@ -290,8 +290,16 @@ if (isNode) {
                 data: `cannot import js file '${p}'`
             };
         }
+    });
 
-    })
+    jsSpecial['sleep'] = GenerateGuardedFunction("sleep", [PlStuffType.Num], (duration) => {
+        deasync((callback) => {
+            setTimeout(() => {
+                callback();
+            }, duration*1000);
+        })();
+        return null;
+    });
 } else {
     jsSpecial['sleep'] = GenerateGuardedFunction('sleep', [PlStuffType.Num], (duration) => {
         const syncWait = ms => {
@@ -388,8 +396,7 @@ if (isNode) {
                             for (const oele of other.result) {
                                 element.removeChild(oele);
                             }
-                        }
-                        else
+                        } else
                             element.removeChild(other.result[0]);
                     }
                 } else {
@@ -397,8 +404,7 @@ if (isNode) {
                         for (const oele of other.result) {
                             result[0].removeChild(oele);
                         }
-                    }
-                    else {
+                    } else {
                         result[0].removeChild(other.result[0]);
                     }
                 }
@@ -448,7 +454,7 @@ if (isNode) {
                 }
                 return NewPlStuff(PlStuffType.Str, result[0].className);
             }),
-            setClass:  GenerateGuardedFunction("setClass", [PlStuffType.Str], (newClass) => {
+            setClass: GenerateGuardedFunction("setClass", [PlStuffType.Str], (newClass) => {
                 if (multi) {
                     for (const node of result) {
                         node.className = newClass.value;
@@ -468,7 +474,7 @@ if (isNode) {
                 }
                 return NewPlStuff(PlStuffType.Str, result[0].id);
             }),
-            setId:  GenerateGuardedFunction("setId", [PlStuffType.Str], (newId) => {
+            setId: GenerateGuardedFunction("setId", [PlStuffType.Str], (newId) => {
                 if (multi) {
                     for (const node of result) {
                         node.id = newId.value;

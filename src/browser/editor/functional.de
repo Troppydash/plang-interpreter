@@ -1,0 +1,173 @@
+# functional programming type functions
+impl map(self, closure) for List {
+    @newList = list()
+    each item, index of self {
+        @arity = closure.arity()
+        @newItem = null
+        match arity {
+            case 0 {
+                newItem = closure()
+            }
+            case 1 {
+                newItem = closure(item)
+            }
+            case 2 {
+                newItem = closure(item, index)
+            }
+            case 3 {
+                newItem = closure(item, index, self)
+            }
+            default {
+                panic("List.map incorrect closure arity of \(arity)")
+            }
+        }
+        newList.add newItem
+    }
+    return newList
+}
+
+impl clear(self) for List {
+    while self.size() > 0 {
+        self.pop()
+    }
+}
+
+impl where(self, closure) for List {
+    @newList = list()
+    each item, index of self {
+        @keep = false
+        match closure.arity() {
+            case 0 {
+                keep = closure()
+            }
+            case 1 {
+                keep = closure(item)
+            }
+            case 2 {
+                keep = closure(item, index)
+            }
+            case 3 {
+                keep = closure(item, index, self)
+            }
+            default {
+                panic("List.where closure incorrect arity")
+            }
+        }
+        if keep {
+            newList.add(item)
+        }
+    }
+    return newList
+}
+
+impl any(self, closure) for List {
+    each item, index of self {
+        @found = false
+        match closure.arity() {
+            case 0 {
+                found = closure()
+            }
+            case 1 {
+                found = closure(item)
+            }
+            case 2 {
+                found = closure(item, index)
+            }
+            case 3 {
+                found = closure(item, index, self)
+            }
+            default {
+                panic("List.any closure incorrect arity")
+            }
+        }
+        if found {
+            return true
+        }
+    }
+    return false
+}
+
+impl all(self, closure) for List {
+    each item, index of self {
+        @found = false
+        match closure.arity() {
+            case 0 {
+                found = closure()
+            }
+            case 1 {
+                found = closure(item)
+            }
+            case 2 {
+                found = closure(item, index)
+            }
+            case 3 {
+                found = closure(item, index, self)
+            }
+            default {
+                panic("List.any closure incorrect arity")
+            }
+        }
+        if not found {
+            return false
+        }
+    }
+    return true
+}
+
+impl reduce(self, init, closure) for List {
+    @out = init
+    each item, index of self {
+        match closure.arity() {
+            case 1 {
+                out = closure(out)
+            }
+            case 2 {
+                out = closure(out, item)
+            }
+            case 3 {
+                out = closure(out, item, index)
+            }
+            case 4 {
+                out = closure(out, item, index, self)
+            }
+            default {
+                panic("List.reduce closure incorrect arity")
+            }
+        }
+    }
+    return out
+}
+
+impl head(self) for List {
+    if self.size() == 0 {
+        return null
+    }
+    return self.get 1
+}
+
+impl last(self) for List {
+    if self.size() == 0 {
+        return null
+    }
+    return self.get(self.size())
+}
+
+impl tail(self) for List {
+
+}
+
+impl every(self, closure) for List {
+
+}
+
+impl sum(self, closure) for List {
+
+}
+
+impl find(self, indexes: List, ) for List {
+    @newList = list()
+    each index of indexes {
+        newList.add(self.get(index))
+    }
+    return newList
+}

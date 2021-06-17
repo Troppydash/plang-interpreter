@@ -498,8 +498,12 @@ export class PlStackMachine implements StackMachine {
                     obj[methodName] = PlConverter.JsToPl(method, this);
                     continue;
                 }
-                (method as any).native = PlConverter.JsToPl((method as any).native, this).value.native;
-                obj[methodName] = NewPlStuff(PlStuffType.NFunc, method);
+                const fn = {
+                    ...method,
+                    native: PlConverter.JsToPl((method as any).native, this).value.native
+                };
+                // (method as any).native = PlConverter.JsToPl((method as any).native, this).value.native;
+                obj[methodName] = NewPlStuff(PlStuffType.NFunc, fn);
             }
             this.stackFrame.createValue(
                 moduleName,
@@ -514,10 +518,11 @@ export class PlStackMachine implements StackMachine {
             PlConverter.JsToPl({
                 arguments: args,
                 exit: code => {
-                    if (process) {
-                        process.exit(code);
-                    }
-                    this.pointer = this.program.program.length;
+                    this.returnCode = +code;
+                    // if (process) {
+                    //     process.exit(code);
+                    // }
+                    // this.pointer = this.program.program.length;
                     return null;
                 }
             }, this)
