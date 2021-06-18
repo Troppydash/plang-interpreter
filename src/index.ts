@@ -70,7 +70,7 @@ if (!isNode || args.getArgSize() == 0 || args.is("run-repl")) { // If running in
         process.exit(0);
     }
     if (args.is('run-highlighter')) {
-        const out = RunHighlighter(file);
+        RunHighlighter(file);
         process.exit(0);
     }
 

@@ -95,3 +95,7 @@ export function shallowJSON(object: any): string {
         return k && v && typeof v !== "number" ? (Array.isArray(v) ? `[array ${v.length}]` : "" + v) : v;
     }, 2);
 }
+
+export function capitalize(str: string): string {
+    return str[0].toUpperCase() + str.slice(1);
+}

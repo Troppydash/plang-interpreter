@@ -12,6 +12,7 @@ export const CLI_FLAGS = [
     "help",
     "mode-release",
     "mode-debug",
+    "view-problems"
 ] as const;
 
 export function MatchPrefix(raw: string): string | null {

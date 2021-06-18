@@ -294,8 +294,10 @@ export class PlAstParser implements Parser {
 
         const peekToken = this.peekToken();
         if ( peekToken.type != PlTokenType.LF ) {
-            if ( peekToken.type != PlTokenType.EOF ) {
-                this.newProblemAt( statement.getSpanToken(), "ET0001", "after" );
+            if (peekToken.type == PlTokenType.SEMICOLON) {
+                this.nextToken();
+            } else if ( peekToken.type != PlTokenType.EOF ) {
+                this.newProblemAt( peekToken, "ET0001", "before" );
                 return null;
             }
         } else {
@@ -307,8 +309,7 @@ export class PlAstParser implements Parser {
     // these all expect the first token being correct
 
     pBlock(): ASTBlock | null {
-        this.nextToken();
-        let tokens = [  ];
+        const tokens = [this.nextToken()];
         let statements = [];
         while ( true ) {
             this.clearLF();
@@ -327,7 +328,7 @@ export class PlAstParser implements Parser {
             }
             statements.push( statement );
         }
-        this.nextToken();
+        tokens.push(this.nextToken());
 
         return new ASTBlock( tokens, statements );
     }
@@ -392,11 +393,6 @@ export class PlAstParser implements Parser {
         if ( param == null ) {
             return null;
         }
-
-        // if ( param.params.length == 0 ) {
-        //     this.newProblem( CreateSpanToken( param.tokens[0], param.tokens[param.tokens.length - 1] ), "LP0002" );
-        //     return null;
-        // }
 
         const lastParen = param.tokens[param.tokens.length - 1];
         const forToken = this.expectedPeekToken( PlTokenType.FOR, "ET0029", lastParen );

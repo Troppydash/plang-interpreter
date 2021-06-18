@@ -48,6 +48,10 @@ export class CliArguments {
         return this.raw.slice(1);
     }
 
+    getArgs(): CliRaw[] {
+        return this.raw;
+    }
+
     /**
      * Takes process.args as parameter, return a structure containing flags, options, and raw values
      * @param args List of string arguments

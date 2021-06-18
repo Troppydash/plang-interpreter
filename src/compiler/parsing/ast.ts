@@ -328,11 +328,12 @@ export class ASTCall extends ASTExpression {
     }
 
     lastToken(): PlToken {
-        const last = this.tokens[this.tokens.length - 1];
-        if ( last && last.info.row == this.target.getSpanToken().info.row) {
-            return last;
-        }
         return this.target.getSpanToken();
+        // const last = this.tokens[this.tokens.length - 1];
+        // if ( last && last.info.row == this.target.getSpanToken().info.row) {
+        //     return last;
+        // }
+        // return this.target.getSpanToken();
     }
 }
 
@@ -394,6 +395,14 @@ export class ASTType extends ASTExpression {
         super( tokens );
         this.name = name;
         this.members = members;
+    }
+
+    firstToken(): PlToken {
+        return this.name.getSpanToken();
+    }
+
+    lastToken(): PlToken {
+        return this.name.getSpanToken();
     }
 }
 

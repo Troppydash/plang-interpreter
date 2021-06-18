@@ -1,9 +1,9 @@
 import {HTMessage, PlHereType, PlProblem} from "./problem";
-import {PCFullName, PCHint, PlProblemCode} from "./codes";
+import templates, {PCFullName, PCHint, PlProblemCode} from "./codes";
 import {colors} from "../inout/color";
 import {PlTrace} from "./trace";
 import {PlFileInfo} from "../compiler/lexing/info";
-import { dddString, lineWrap, replaceForAll} from "../extension/text";
+import {capitalize, dddString, lineWrap, replaceForAll} from "../extension/text";
 
 const NLINESUP = 1; // Lines above
 const NLINESDOWN = 2; // Lines below
@@ -22,7 +22,7 @@ type Line = string;
  * @param offset The line offset
  */
 function multiLine(line: string, prefix: string, offset: number) {
-    return replaceForAll(lineWrap(line, CHARWRAP-offset), '\n', '\n'+prefix);
+    return replaceForAll(lineWrap(line, CHARWRAP - offset), '\n', '\n' + prefix);
 }
 
 function getLine(lines: string[], targetRow: number): Line | null {
@@ -96,10 +96,10 @@ export function CreateProblemMessage(code: PlProblemCode, message: string) {
     const buffer = [];
     // hints
     const hint = PCHint(code);
-    buffer.push(`${colors.yellow("Hint")}: ${multiLine(hint, `    ${NEWLINE_SYMBOL} `, 6)}`);
+    buffer.push(`${colors.yellow("Hint")}: ${multiLine(capitalize(hint), `    ${NEWLINE_SYMBOL} `, 6)}`);
     // error
     const fullname = PCFullName(code);
-    buffer.push(`${colors.cyan(fullname)}: ${multiLine(message, ' '.repeat(fullname.length) + `${NEWLINE_SYMBOL} `, fullname.length+2)}`);
+    buffer.push(`${colors.cyan(fullname)}: ${multiLine(capitalize(message), ' '.repeat(fullname.length) + `${NEWLINE_SYMBOL} `, fullname.length + 2)}`);
     return buffer;
 }
 
@@ -128,7 +128,7 @@ export function LogCallbackProblem(problem: PlProblem): string {
 }
 
 export function LogProblemShort(problem: PlProblem) {
-    return `${colors.cyan(PCFullName(problem.code))}: ${problem.message}`;
+    return `${colors.cyan(PCFullName(problem.code))}: ${capitalize(problem.message)}`;
 }
 
 export function CreateFrame(name: string, info: PlFileInfo) {
@@ -153,4 +153,33 @@ export function LogTrace(trace: PlTrace) {
 
     buffer.reverse();
     return buffer.join('\n');
+}
+
+
+function ShowProblem(code: PlProblemCode | string): string {
+    const message = templates[code];
+    if (message == undefined) {
+        return `[${code}]\nNo entry found for ${code}`;
+    }
+    const hint = PCHint(code as PlProblemCode);
+    const name = PCFullName(code as PlProblemCode);
+    return `[${code}]
+Type: ${colors.cyan(name)}
+Hint: ${colors.yellow(lineWrap(hint, 80))}
+Template: ${lineWrap(message, 80)}`;
+}
+
+export function LogProblemList(filters: string[]): string {
+    const problemCodes = Object.keys(templates) as PlProblemCode[];
+    const out = [];
+    if (filters.length == 0) {
+        for (const key of problemCodes) {
+            out.push(ShowProblem(key as PlProblemCode));
+        }
+    } else {
+        for (const code of filters) {
+            out.push(ShowProblem(code));
+        }
+    }
+    return out.join('\n\n');
 }

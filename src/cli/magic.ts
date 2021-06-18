@@ -3,6 +3,7 @@ import {StartDemo} from "../repl";
 import inout from "../inout";
 import {colors} from "../inout/color";
 import {PNAME} from "./constants";
+import {LogProblemList} from "../problem/printer";
 
 export function CliHandleMagicFlags(args: CliArguments): boolean {
 
@@ -23,9 +24,16 @@ run-compiler    ~ Run [file] with the compiler only
 run-emitter     ~ Run [file] with the emitter only
 run-highlighter ~ Display [file] contents with a syntax highlighter
 
+view-problems   ~ View problems in detail. View all problems if there is no arguments.
+
 mode-debug      ~ Run [file] in debug mode, will show more detailed errors
 mode-release    ~ Run [file] in release mode, have no detailed errors
 `);
+        return false;
+    }
+
+    if (args.is("view-problems")) {
+        inout.print(LogProblemList(args.getArgs()));
         return false;
     }
 
@@ -42,6 +50,7 @@ mode-release    ~ Run [file] in release mode, have no detailed errors
     if (args.is("run-demo") || args.is("run-repl") || args.raw.length == 0) {
         inout.options["run"] = "repl";
     }
+
 
 
 

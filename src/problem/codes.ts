@@ -8,7 +8,7 @@ const templates = {
     LE0004: "reached newline with unclosed left parenthesis",
 
     // statement
-    ET0001: "expected a newline after a statement",
+    ET0001: "expected a newline or ';' after a statement",
 
     // assign
     ET0002: "expected a variable on the left side of assignment",
@@ -129,7 +129,6 @@ const templates = {
     RE0014: "not a boolean, got type '%0'",
     RE0015: "not a number, got type '%0'",
     RE0016: "need '.%0' type function on value of type '%1'",
-
     RE0017: "use of 'not' on a non-boolean value of type '%0'",
 
     RE0018: "'%1' argument failed to satisfy '%0', got '%2' instead",
@@ -154,21 +153,19 @@ function followingSyntax(statement: string, syntax: string, need: string) {
 }
 
 function haveYouClosed(type: string, w: string) {
-    return `${type}(s) need to be closed with ${w}, have you closed this ${type}?`;
+    return `${type}(s) not closed, try adding ${w}`;
 }
 
 const hints: Record<PlProblemCode, string> = {
-    LE0001: 'I do not understand this character, are you sure that it belongs here?',
-    LE0002: haveYouClosed("strings", "a closing '\"'"),
+    LE0001: 'I do not understand this character, try removing it',
+    LE0002: haveYouClosed("string", "a closing '\"'"),
     LE0003: "if you intended to type '\\', write two forward-slashes '\\\\' to escape the first slash",
-    LE0004: "a string replacement looks like this: \"Hello \\(name)\", have you added a ')' to close this replacement?",
+    LE0004: "string replacement parens not closed, try adding a closing ')'",
 
-    ET0001: "this often occurs when there is a syntax problem, but if you intend to write multiple statements on one line, well, you can't",
+    ET0001: "a newline or ';' is needed between statements - this might also be a syntax error",
+    ET0002: "the left side of '=' must be a variable",
 
-    ET0002: "I cannot assign to this value, the left side of the assigment must not be an expression",
-
-    ET0003: "you cannot access a field that contains symbols using the dot syntax, if you wish so, try using the '.get(key)' type function",
-
+    ET0003: "to access field(s) that contain symbols, try '<t>.get(<key>)'",
     ET0004: "this expression have the wrong syntax, take a look at the documentation to see what is the valid syntax for Deviation",
 
     ET0005: "'++' and '--' cannot be used on expressions, I can only increase or decrease variables",
@@ -245,16 +242,16 @@ const hints: Record<PlProblemCode, string> = {
     LP0002: "the first parameter in an impl statement is by convention 'self'",
     LP0003: "a case statement with no expressions will match nothing, if matching nothing is intended, try the 'default {}' syntax",
 
-    DE0001: "the developer made a mistake, please show him how to reproduce this",
-    DE0002: "the developer made a mistake, please show him how to reproduce this",
+    DE0001: "the developer made a mistake, please report this",
+    DE0002: "the developer made a mistake, please report this",
 
-    RE0001: "there is an unknown bytecode in the program, it might be a developer mistake",
-    RE0002: "try running the interpreter with debug on, it also might be a developer mistake",
+    RE0001: "there is an unknown bytecode in the program, please report this",
+    RE0002: "try running the interpreter with '--mode-debug' flag",
     RE0003: "this variable is not defined anywhere that I've looked",
     RE0004: "I cannot do this operation with these types",
     RE0005: "I can only negate numbers",
     RE0006: "check the number of arguments for the function call, there might be a few missing or a few extras",
-    RE0007: "a function panicked, try reading the message below",
+    RE0007: "a function panicked, the message is below",
     RE0008: "I can only call a function, what the value that is stored in this variable?",
     RE0009: "the keywords 'continue' and 'break' needs to be used inside a loop",
     RE0010: "I saw a jump instruction but the value is not a boolean",
@@ -263,12 +260,12 @@ const hints: Record<PlProblemCode, string> = {
     RE0012: "I cannot find this key in the value, maybe check your spelling?",
     RE0013: "I cannot assign to a non dictionary or type target, if you are trying to make a new type function, try the 'impl' statement",
 
-    RE0014: "I want a boolean here, this language does not like implicit truthy conditions",
-    RE0015: "I can only increment or decrement numbers, nothing else",
-    RE0016: "only a value that contain the '.iter' type function can be used in a each..of loop",
-    RE0017: "I can only 'not' booleans, this language does not like implicit truthy conditions",
-    RE0018: "",
-    RE0019: "",
+    RE0014: "I want a boolean here",
+    RE0015: "I can only increment or decrement numbers",
+    RE0016: "only a value with the '.iter' type function can be used for an each..of loop",
+    RE0017: "I can only 'negate' booleans",
+    RE0018: "is the type what you expected?",
+    RE0019: "this guard is not defined anywhere that I've looked",
 
 }
 
