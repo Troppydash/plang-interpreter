@@ -1,0 +1,3 @@
+javascript """
+pl.export("bindings", window.data.exports);
+"""

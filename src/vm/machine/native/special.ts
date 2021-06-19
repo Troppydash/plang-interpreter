@@ -342,24 +342,18 @@ if (isNode) {
         return NewPlStuff(PlStuffType.NFunc, fn);
     }
 
-    // TODO: write this in instance instead of dict
-    special["$"] = GenerateGuardedFunction("$", [PlStuffType.Str], function (this: StackMachine, selector) {
-        let result: HTMLElement[] = Array.from(document.querySelectorAll(selector.value)); // this closure might impact performance, but too bad
-        let multi = false;
-        const sm = this;
 
+    function makeElement(items: HTMLElement[], selector: string, sm: StackMachine) {
+        let result: HTMLElement[] = items;
+        let multi = false;
         function toPl(any) {
             return PlConverter.JsToPl(any, sm);
         }
 
         let self = NewPlStuff(PlStuffType.Dict, {
-            '#raw': () => ({
-                result,
-                multi
-            }),
             selector: selector,
             new: GenerateGuardedFunction("new", [], () => {
-                result = [document.createElement(selector.value)];
+                result = [document.createElement(selector)];
                 return self;
             }),
             attach: GenerateGuardedFunction("attach", [PlStuffType.Dict], function (node) {
@@ -367,7 +361,7 @@ if (isNode) {
                 if (!nf) {
                     throw new Error('cannot attach a none-node type');
                 }
-                const other = nf.value();
+                const other = nf.value.get();
                 if (multi) {
                     for (const element of (result as HTMLElement[])) {
                         if (other.multi)
@@ -389,7 +383,7 @@ if (isNode) {
                 if (!nf) {
                     throw new Error('cannot detach a none-node type');
                 }
-                const other = nf.value();
+                const other = nf.value.get();
                 if (multi) {
                     for (const element of (result as HTMLElement[])) {
                         if (other.multi) {
@@ -558,11 +552,36 @@ if (isNode) {
                     });
                 }
                 return self;
-            })
+            }),
+            children: GenerateGuardedFunction("children", [], () => {
+                if (multi)
+                    return null;
+                else {
+                    const out = [];
+                    for (const child of result[0].children) {
+                        out.push(makeElement([child as HTMLElement], '', sm));
+                    }
+                    return NewPlStuff(PlStuffType.List, out);
+                }
+            }),
         });
         for (const key of Object.keys(self.value)) {
             self.value[key] = nf(self.value[key]);
         }
+        self.value["#raw"] = NewPlStuff(PlStuffType.Raw, {
+            get() {
+                return {
+                    result,
+                    multi
+                }
+            }
+        })
         return self;
+    }
+
+    // TODO: write this in instance instead of dict
+    special["$"] = GenerateGuardedFunction("$", [PlStuffType.Str], function (this: StackMachine, selector) {
+        const sm = this;
+        return makeElement(Array.from(document.querySelectorAll(selector.value)), selector.value, sm);
     })
 }

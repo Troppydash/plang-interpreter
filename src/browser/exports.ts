@@ -8,6 +8,7 @@ import {PlStackMachine} from "../vm/machine";
 import inout, {PlInout} from "../inout";
 import {IACTPrepare} from "../problem/interactive";
 import {LogProblem, LogProblemShort} from "../problem/printer";
+import {isvariablefirst, isvariablerest} from "../extension/types";
 
 export function Highlight(text: string): any[] | null {
     const file = NewPlFile("highlighter", text);
@@ -66,4 +67,13 @@ export function Execute(text: string, std: PlInout): number {
     if (typeof out.value == "number")
         return out.value;
     return 0;
+}
+
+
+export function IsVariableHead(c: string): boolean {
+    return isvariablefirst(c);
+}
+
+export function IsVariableRest(c: string): boolean {
+    return isvariablerest(c);
 }

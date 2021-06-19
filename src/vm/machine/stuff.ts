@@ -173,6 +173,8 @@ export function PlStuffTypeToString(stuffType: PlStuffType): PlStuffTypeStrings 
             return "Inst";
         case PlStuffType.Dict:
             return "Dict";
+        case PlStuffType.Raw:
+            return "Raw" as any;
     }
     throw new Error(`PlStuffTypeToString failed to match with value ${stuffType}`);
 }

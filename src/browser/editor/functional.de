@@ -1,5 +1,5 @@
 # functional programming type functions
-impl map(self, closure) for List {
+impl map(self, closure: Func) for List {
     @newList = list()
     each item, index of self {
         @arity = closure.arity()
@@ -32,7 +32,7 @@ impl clear(self) for List {
     }
 }
 
-impl where(self, closure) for List {
+impl where(self, closure: Func) for List {
     @newList = list()
     each item, index of self {
         @keep = false
@@ -60,7 +60,7 @@ impl where(self, closure) for List {
     return newList
 }
 
-impl any(self, closure) for List {
+impl any(self, closure: Func) for List {
     each item, index of self {
         @found = false
         match closure.arity() {
@@ -87,7 +87,7 @@ impl any(self, closure) for List {
     return false
 }
 
-impl all(self, closure) for List {
+impl all(self, closure: Func) for List {
     each item, index of self {
         @found = false
         match closure.arity() {
@@ -114,7 +114,7 @@ impl all(self, closure) for List {
     return true
 }
 
-impl reduce(self, init, closure) for List {
+impl reduce(self, init, closure: Func) for List {
     @out = init
     each item, index of self {
         match closure.arity() {
@@ -164,7 +164,7 @@ impl sum(self, closure) for List {
 
 }
 
-impl find(self, indexes: List, ) for List {
+impl find(self, indexes: List) for List {
     @newList = list()
     each index of indexes {
         newList.add(self.get(index))

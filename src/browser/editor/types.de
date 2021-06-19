@@ -1,0 +1,10 @@
+func ListOf(t: Type) {
+    return func(fn, arg: List, idx) {
+        each i of arg {
+            if not i.is(t) {
+                panic("\(fn.name()) needs a list of \(t) for \(idx) argument")
+            }
+        }
+        return arg
+    }
+}

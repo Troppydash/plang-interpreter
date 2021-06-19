@@ -314,6 +314,8 @@ export class PlStackMachine implements StackMachine {
 
         this.pushStack(null);
         const out = this.runProgram(value.index + 1);
+        this.stackFrame = this.stackFrame.outer;
+        this.closureFrames.pop();
         this.pointer = oldPointer;
 
         if (out == null) {

@@ -14,9 +14,15 @@
             font-style: normal;
         }
 
+
+        * {
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+
         #de-editor {
             background: #636363;
-            padding: 0.5rem;
         }
 
         .editor-navbar {
@@ -24,42 +30,44 @@
             padding: 0.5rem 0;
         }
 
-        .editor-textarea {
+
+        .editor-area {
+            display: flex;
             height: 65vh;
             overflow-x: hidden;
             overflow-y: auto;
+            align-items: baseline;
 
-            font-family: JetBrainsMono;
+            font-family: monospace;
             font-size: 18px;
             background: #262626;
             color: #d7d7d7;
+        }
 
+        .editor-textarea {
+            flex: 1;
             user-select: none;
         }
 
-        * {
-            -moz-box-sizing: border-box;
-            box-sizing: border-box;
-        }
-
-        .editor-textarea > div {
-            width: 100%;
-            display: flex;
-        }
-
-        .editor-textarea .line-num {
-            width: auto;
-            padding: 0.3rem 1.5rem 0.3rem 1rem;
+        .editor-linenum {
+            padding: 0 1.5rem 0 1rem;
             background: #404040;
-            border-right: 2px solid #a3a3a3;
+            border-right: 1px solid #a3a3a3;
+            min-height: 100%;
         }
+
+        .editor-linenum > div {
+            padding: 0.2rem 0;
+        }
+
 
         .editor-textarea .line {
-            padding: 0.3rem 0;
+            padding: 0.2rem 0;
             padding-left: 12px;
             position: relative;
             cursor: text;
             width: 100%;
+            display: flex;
         }
 
         .editor-textarea .line.selected {
@@ -68,9 +76,9 @@
 
         .editor-textarea .cursor {
             position: absolute;
-            top: 0.3rem;
+            top: 0.2rem;
             width: 0;
-            margin-left: -1px;
+            margin-left: 1px;
             border-left: 2px solid white;
 
             animation: blink 1.25s step-end 0.25s infinite;
@@ -86,7 +94,7 @@
             border-top: 4px solid #a3a3a3;
             background: #393939;
             color: #c6c6c6;
-            font-family: JetBrainsMono;
+            font-family: monospace;
             font-size: 18px;
             padding: 0.5rem;
             overflow: auto;
@@ -101,7 +109,10 @@
 <!--Editor Scripts-->
 
 <script src="functional.de" type="application/plang"></script>
-<script src="root.de" type="application/plang"></script>
+<script src="bindings.de" type="application/plang"></script>
+<script src="types.de" type="application/plang"></script>
+<script src="editor.de" type="application/plang"></script>
+<script src="main.de" type="application/plang"></script>
 
 
 <!--THESE ARE ALL FOR LOADING THE PROGRAMMING LANGUAGE-->

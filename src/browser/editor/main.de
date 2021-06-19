@@ -1,0 +1,212 @@
+### SET UP
+# find root elements
+$root = $("#de-editor")
+if not $root.any() {
+    panic("no root element '\(rootId)' to attach the editor")
+}
+
+type Editor(root, cursor, textArea)
+impl new(self, root) for Editor {
+    self.root = root
+    self.cursor = Cursor()
+    self.textArea = TextArea(root)
+
+    self.textArea.updateContent(list("say(\"Hello \\(ME)\")"))
+    self.cursor.render(self.textArea.references)
+
+    self.bind()
+}
+
+PAIRED_SYMBOLS = list("{}", "()", "\"\"")
+impl handleKeys(self, event) for Editor {
+    @cursor = self.cursor
+    @content = self.textArea.content
+    @references = self.textArea.references
+    @key = event.key
+
+    match key {
+        case "ArrowUp" {
+            # moves the cursor up
+            if not cursor.rowStatus(content).have(STATUS_LESS) {
+                cursor.shift(-1, null)
+                if cursor.colStatus(content).have(STATUS_MORE) {
+                    cursor.snap(content)
+                }
+                cursor.render(references)
+            }
+        }
+        case "ArrowDown" {
+            # moves the cursor down
+            if not cursor.rowStatus(content).have(STATUS_MORE) {
+                cursor.shift(1, null)
+                if cursor.colStatus(content).have(STATUS_MORE) {
+                    cursor.snap(content)
+                }
+                cursor.render(references)
+            }
+        }
+        case "ArrowLeft" {
+            # moves the cursor left
+            if not cursor.colStatus(content).have(STATUS_LESS) {
+                cursor.shift(0, -1)
+                cursor.render(references)
+            }
+        }
+        case "ArrowRight" {
+            # moves the cursor right
+            # allows one more
+            if cursor.col /= content.get(cursor.row).size()+1 {
+                cursor.shift(0, 1)
+                cursor.render(references)
+            }
+        }
+        case "Backspace" {
+            if cursor.colStatus(content) == -1 and cursor.rowStatus(content) == -1 {
+                return
+            }
+
+            @line = content.get(cursor.row)
+            if content.get(cursor.row).size() >= cursor.col and cursor.col > 1 {
+                @left = content.get(cursor.row).get(cursor.col-1)
+                @right = content.get(cursor.row).get(cursor.col)
+                @pair = left + right
+                if pairedSymbols.have(pair) {
+                     content.set(cursor.row, line.remove(cursor.col).remove(cursor.col-1))
+                     cursor.shift(0, -1)
+                     renderContent(content, null)
+                     cursor.render()
+                     return
+                }
+            }
+
+            if cursor.colStatus(content) == -1 {
+                content.remove(cursor.row)
+                cursor.move(cursor.row-1, content.get(cursor.row-1).size()+1)
+                content.set(cursor.row, content.get(cursor.row)+line)
+            } else {
+                content.set(cursor.row, line.remove(cursor.col-1))
+                cursor.shift(0, -1)
+            }
+            renderContent(content, null)
+            cursor.render()
+        }
+        case "Enter" {
+            @line = content.get(cursor.row)
+            @ws = 0
+            each c of line {
+                if c /= " " {
+                    break
+                }
+                ws++
+            }
+            if content.get(cursor.row).size() >= cursor.col and cursor.col > 1 {
+                @left = content.get(cursor.row).get(cursor.col-1)
+                @right = content.get(cursor.row).get(cursor.col)
+                @pair = left + right
+                if pairedSymbols.have(pair) {
+                    content.set(cursor.row, line.substring(1, cursor.col-1))
+                    @last = " " * ws + line.substring(cursor.col, line.size())
+                    if content.size() == cursor.row {
+                        content.add last
+                    } else {
+                        content.insert(cursor.row+1, last)
+                    }
+
+                    content.insert(cursor.row+1, " " * (ws+4))
+                    cursor.move(cursor.row+1, ws+4+1)
+                    renderContent(content, null)
+                    cursor.render()
+                    return
+                }
+            }
+
+            content.set(cursor.row, line.substring(1, cursor.col-1))
+            @newLine = " " * ws + line.substring(cursor.col, line.size())
+            if cursor.row == content.size() {
+                content.add newLine
+            } else {
+                content.insert(cursor.row+1, newLine)
+            }
+            cursor.move(cursor.row+1, ws+1)
+            renderContent(content, null)
+            cursor.render()
+        }
+        case "End" {
+            cursor.move(null, content.get(cursor.row).size()+1)
+            cursor.render()
+        }
+        case "Home" {
+            @ws = 0
+            each c of content.get(cursor.row) {
+                if c /= " " {
+                    break
+                }
+                ws++
+            }
+            cursor.move(null, ws+1)
+            cursor.render()
+        }
+        case "Tab" {
+            @line = content.get(cursor.row)
+            if cursor.col > line.size() {
+                content.set(cursor.row, line + " " * 4)
+            } else {
+                content.set(cursor.row, line.insert(cursor.col, " " * 4))
+            }
+            renderContent(content, null)
+            cursor.shift(null, 4)
+            cursor.render()
+        }
+        default {
+            if key.size() /= 1 {
+                return
+            }
+
+            each pair of PAIRED_SYMBOLS {
+                if key == pair.get(1) {
+                    @line = content.get(cursor.row)
+                    if cursor.col > line.size() {
+                        content.set(cursor.row, line + pair)
+                    } else {
+                        content.set(cursor.row, line.insert(cursor.col, pair))
+                    }
+                    renderContent(content, null)
+                    cursor.shift(null, 1)
+                    cursor.render()
+                    return
+                }
+            }
+
+            @line = content.get(cursor.row)
+            content.set(cursor.row, line
+            if cursor.row > content.size() {
+                content.add event.key
+            } else {
+                @line = content.get(cursor.row)
+                if cursor.col > line.size() {
+                    content.set(cursor.row, line + event.key)
+                } else {
+                    content.set(cursor.row, line.insert(cursor.col, event.key))
+                }
+            }
+            renderContent(content, null)
+            cursor.shift(null, 1)
+            cursor.render()
+        }
+    }
+    event.preventDefault()
+}
+
+impl bind(self) for Editor {
+
+    # bind keys
+    self.textArea.root.listen("keydown", func(event) self.handleKeys(event))
+
+}
+
+
+# navbar
+#$navbar = $("div").new().setClass("editor-navbar")
+#$root.attach $navbar
+
+e = Editor($root)

@@ -1,0 +1,244 @@
+# dom cursor
+type Cursor(
+    row, col,
+    element,
+    parent
+)
+
+impl new(self) for Cursor {
+    self.row = self.col = 1
+    self.element = $("span").new().setClass("cursor").setHtml("&nbsp;")
+    self.parent = null
+}
+
+impl str(self) for Cursor {
+    return "\(self.row):\(self.col)"
+}
+
+impl render(self, references) for Cursor {
+    if self.parent /= null {
+        self.parent.setClass("line")
+        self.parent.detach(self.element)
+    }
+    @line = references.get(self.row)
+    line.attach(self.element)
+    line.setClass("line selected")
+    self.parent = line
+    self.element.setStyle("left", "\(9.906 * self.col)px")
+
+}
+
+impl move(self, row, col) for Cursor {
+    if row /= null {
+        cursor.row = row
+    }
+    if col /= null {
+        cursor.col = col
+    }
+    return cursor
+}
+
+impl shift(self, row, col) for Cursor {
+    if row == null {
+        row = 0
+    }
+    if col == null {
+        col = 0
+    }
+    return self.move(self.row + row, self.col + col)
+}
+
+impl snap(self, content) for Cursor {
+    self.col = content.get(self.row).size()+1
+    return self
+}
+
+
+STATUS_LESS = -1
+STATUS_OK = 0
+STATUS_MORE = 1
+impl rowStatus(self, content) for Cursor {
+    @rows = content.size()
+    @status = list()
+    if self.row <= 1 {
+        status.add(STATUS_LESS)
+    }
+    if self.row >= rows {
+        status.add(STATUS_MORE)
+    }
+    status.add(STATUS_OK)
+    return status
+}
+
+impl colStatus(self, content) for Cursor {
+    @cols = content.get(self.row).size()
+    @status = list()
+    if self.col <= 1 {
+        status.add(STATUS_LESS)
+    }
+    if self.col >= cols {
+        status.add(STATUS_MORE)
+    }
+    status.add(STATUS_OK)
+    return status
+}
+
+type TextArea(root, content, references, _lineNumbers, _lines)
+
+impl new(self, root) for TextArea {
+    $textArea = $("div").new()
+    $textArea.setClass("editor-area").setAttr("tabindex", "-1")
+    root.attach $textArea
+    self.root = $textArea
+
+    self.content = list("")
+    self.references = list(null)
+
+    $lineNumbers = $("div").new()
+    $lineNumbers.setClass("editor-linenum")
+    $textArea.attach($lineNumbers)
+    self._lineNumbers = $lineNumbers
+
+    $lines = $("div").new()
+    $lines.setClass "editor-textarea"
+    $textArea.attach($lines)
+    self._lines = $lines
+
+    # drag and drop stuff
+    $textArea.listen("dragover", func(event) event.preventDefault())
+    $textArea.listen("dragenter", func(_) $textArea.setStyle("border", "2px solid white"))
+    $textArea.listen("dragleave", func(_) $textArea.removeStyle("border"))
+    $textArea.listen("drop", func(event) {
+        event.preventDefault()
+        $textArea.setStyle("border", "2px solid yellow")
+
+        # hand it to js
+        javascript """
+        const callback = pl.import("callback");
+        const event = pl.import("event")["#raw"].value;
+        const file = event.dataTransfer.files[0];
+        const reader = new window.FileReader();
+        reader.onload = (e) => {
+            callback(e.target.result);
+        }
+        reader.readAsText(file);
+        """
+    })
+    func callback(text) {
+        $textArea.removeStyle("border")
+        self.updateContent(text.split("\n"))
+    }
+}
+
+impl render(self, changed) for TextArea {
+    self.renderNumbers(changed)
+
+    self.references = list()
+    self._lines.clear()
+
+    each row of range(self.content.size()) {
+        @lineText = self.renderLine(row)
+        self.references.add(lineText)
+    }
+}
+
+impl renderNumbers(self, changed) for TextArea {
+    if changed /= null {
+        return
+    }
+
+    self._lineNumbers.clear()
+    @lastLine = self.content.size().str().size()
+    each row of range(self.content.size()) {
+        @lineBox = $("div").new()
+        lineBox.setText("\(" " * (lastLine-row.str().size()))\(row)")
+        self._lineNumbers.attach(lineBox)
+    }
+}
+
+impl renderLine(self, lineNumber: Num) for TextArea {
+    @line = self.content.get(lineNumber)
+    @lineText = $("div").new().setClass("line")
+    for @i = 1; i <= line.size(); {
+        @c = line.get(i)
+        if c == " " {
+            @count = 0
+            while c == " " {
+                count++
+                c = line.get(i++)
+            }
+            lineText.attach($("span").new().setHtml("&nbsp;" * count))
+            continue
+        }
+
+        if bindings.IsVariableHead(c) {
+            @word = c
+            while (bindings.IsVariableRest(c = line.get(i++))) {
+                word = word + c
+            }
+            lineText.attach($("span").new().setText(word))
+            continue
+        }
+
+        lineText.attach($("span").new().setText(c))
+        i++
+    }
+    self._lines.attach(lineText)
+    return lineText
+}
+
+impl highlight(self) for TextArea {
+    @regions = bindings.Highlight(self.content.join("\n"))
+    if regions == null {
+        return
+    }
+    each region of regions {
+        @row = self.references.get(region.info.row+1)
+        @children = row.children()
+        @count = 0
+        each child of children {
+            @size = child.text().size()
+            count = count + size
+            if region.info.col == count {
+                 child.setStyle("color", region.color)
+                 break
+            }
+            if region.info.col > count and region.info.col - region.info.length <= count - size {
+                 child.setStyle("color", region.color)
+            }
+        }
+    }
+}
+
+impl updateLine(self, row, newLine) for TextArea {
+    if row > self.content.size() {
+        self.content.add(newLine)
+    } else {
+        self.content.set(row, newLine)
+    }
+    self.update(list(row))
+}
+
+impl updateContent(self, newContent) for TextArea {
+    self.content = newContent
+    self.update(null)
+}
+
+impl update(self, changed) for TextArea {
+    @time = time.measure func() {
+        self.render(changed)
+        self.highlight()
+    }
+    log("update took \(time) ms")
+}
+
+func handleClick(content, cursor, row) {
+    return func(event) {
+        @col = (event.location.x / CHARACTER_WIDTH).int(0.5) + 1
+        if col > content.get(row).size() {
+            col = content.get(row).size() + 1
+        }
+        cursor.move(row, col)
+        cursor.render()
+    }
+}
