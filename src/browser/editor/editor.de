@@ -15,27 +15,29 @@ impl str(self) for Cursor {
     return "\(self.row):\(self.col)"
 }
 
+impl detach(self) for Cursor {
+     if self.parent /= null {
+         self.parent.setClass("line")
+         self.parent.detach(self.element)
+     }
+}
+
 impl render(self, references) for Cursor {
-    if self.parent /= null {
-        self.parent.setClass("line")
-        self.parent.detach(self.element)
-    }
     @line = references.get(self.row)
     line.attach(self.element)
     line.setClass("line selected")
     self.parent = line
     self.element.setStyle("left", "\(9.906 * self.col)px")
-
 }
 
 impl move(self, row, col) for Cursor {
     if row /= null {
-        cursor.row = row
+        self.row = row
     }
     if col /= null {
-        cursor.col = col
+        self.col = col
     }
-    return cursor
+    return self
 }
 
 impl shift(self, row, col) for Cursor {
@@ -103,92 +105,150 @@ impl new(self, root) for TextArea {
     $lines.setClass "editor-textarea"
     $textArea.attach($lines)
     self._lines = $lines
-
-    # drag and drop stuff
-    $textArea.listen("dragover", func(event) event.preventDefault())
-    $textArea.listen("dragenter", func(_) $textArea.setStyle("border", "2px solid white"))
-    $textArea.listen("dragleave", func(_) $textArea.removeStyle("border"))
-    $textArea.listen("drop", func(event) {
-        event.preventDefault()
-        $textArea.setStyle("border", "2px solid yellow")
-
-        # hand it to js
-        javascript """
-        const callback = pl.import("callback");
-        const event = pl.import("event")["#raw"].value;
-        const file = event.dataTransfer.files[0];
-        const reader = new window.FileReader();
-        reader.onload = (e) => {
-            callback(e.target.result);
-        }
-        reader.readAsText(file);
-        """
-    })
-    func callback(text) {
-        $textArea.removeStyle("border")
-        self.updateContent(text.split("\n"))
-    }
 }
 
-impl render(self, changed) for TextArea {
-    self.renderNumbers(changed)
+ADD = 0
+REPLACE = 1
+REMOVE = 2
+type Change(line, way)
 
-    self.references = list()
+impl render(self, change) for TextArea {
+    self.renderNumbers(change)
+
+    if change /= null {
+        match change.way {
+            case ADD {
+                @newLine = $("div").new()
+                newLine.setHtml(self.renderLine(change.line))
+                self._lines.insert(change.line, newLine)
+                self.references.insert(change.line, newLine)
+            }
+            case REPLACE {
+                @line = self.references.get(change.line)
+                line.clear()
+                line.setHtml(self.renderLine(change.line))
+                self._lines.set(change.line, newLine)
+            }
+            case REMOVE {
+                self.references.remove(change.line)
+                self._lines.remove(change.line)
+            }
+        }
+        return
+    }
+
     self._lines.clear()
 
-    each row of range(self.content.size()) {
-        @lineText = self.renderLine(row)
-        self.references.add(lineText)
+    @html = list()
+    @size = self.content.size()
+    for @row = 1; row <= size; row++ {
+        html.add("<div>\(self.renderLine(row))</div>")
     }
+    self._lines.setHtml(html.join(""))
+    self.references = self._lines.children()
 }
 
-impl renderNumbers(self, changed) for TextArea {
-    if changed /= null {
+impl renderNumbers(self, change) for TextArea {
+    @lastLine = self.content.size().str().size()
+    if change /= null {
+        match change.way {
+            case ADD {
+                @row = change.line
+                @lineNumber = $("div").new().setHtml(" " * (lastLine-row.str().size()) + row.str())
+                self._lineNumbers.insert(row, lineNumber)
+            }
+            case REPLACE {
+            }
+            case REMOVE {
+                self._lineNumbers.remove(change.line)
+            }
+        }
         return
     }
 
     self._lineNumbers.clear()
-    @lastLine = self.content.size().str().size()
-    each row of range(self.content.size()) {
-        @lineBox = $("div").new()
-        lineBox.setText("\(" " * (lastLine-row.str().size()))\(row)")
-        self._lineNumbers.attach(lineBox)
+
+    @size = self.content.size()
+    @out = list()
+    for @row = 1; row <= size; row++ {
+        out.add("<div>\(" " * (lastLine-row.str().size()))\(row)</div>")
     }
+    self._lineNumbers.setHtml(out.join(""))
 }
 
 impl renderLine(self, lineNumber: Num) for TextArea {
     @line = self.content.get(lineNumber)
-    @lineText = $("div").new().setClass("line")
-    for @i = 1; i <= line.size(); {
+    @out = list()
+    @size = line.size()
+    for @i = 1; i <= size; {
         @c = line.get(i)
         if c == " " {
-            @count = 0
-            while c == " " {
+            @count = 1
+            i++
+            while i <= size {
+                if line.get(i) /= " " {
+                    break
+                }
                 count++
-                c = line.get(i++)
+                i++
             }
-            lineText.attach($("span").new().setHtml("&nbsp;" * count))
+            out.add("<span>\("&nbsp;" * count)</span>")
             continue
         }
 
         if bindings.IsVariableHead(c) {
             @word = c
-            while (bindings.IsVariableRest(c = line.get(i++))) {
+            i++
+            while i <= size {
+                c = line.get(i)
+                if not bindings.IsVariableRest(c) {
+                    break
+                }
                 word = word + c
+                i++
             }
-            lineText.attach($("span").new().setText(word))
+            out.add("<span>\(word)</span>")
             continue
         }
 
-        lineText.attach($("span").new().setText(c))
+        out.add("<span>\(c)</span>")
         i++
     }
-    self._lines.attach(lineText)
-    return lineText
+    return out.join("")
 }
 
 impl highlight(self) for TextArea {
+    # in js because performance
     @regions = bindings.Highlight(self.content.join("\n"))
+    @root = self.root
+    javascript """
+    const regions = pl.import("regions");
+    const root = pl.import("root")["#raw"].value.get().result[0].children[1];
+    if (regions == null) {
+        return;
+    }
+
+    const lines = root.children;
+    for (const region of regions) {
+        let count = 0;
+        for (const child of lines[region.info.row].children) {
+            const size = child.innerText.length;
+            count += size;
+            if (region.info.col < count) {
+                break;
+            }
+            if (region.info.col == count) {
+                child.style.color = region.color;
+                break;
+            }
+            if (region.info.col > count && region.info.col - region.info.length <= count - size) {
+                child.style.color = region.color;
+            }
+        }
+    }
+    """
+
+    """
     if regions == null {
         return
     }
@@ -208,15 +268,27 @@ impl highlight(self) for TextArea {
             }
         }
     }
+    """
 }
 
 impl updateLine(self, row, newLine) for TextArea {
     if row > self.content.size() {
         self.content.add(newLine)
+        self.update(Change(row, ADD))
     } else {
         self.content.set(row, newLine)
+        self.update(Change(row, REPLACE))
     }
-    self.update(list(row))
+}
+
+impl insertLine(self, row, newLine) for TextArea {
+    self.content.insert(row, newLine)
+    self.update(Change(row, ADD))
+}
+
+impl removeLine(self, row) for TextArea {
+    self.content.remove(row)
+    self.update(Change(row, REMOVE))
 }
 
 impl updateContent(self, newContent) for TextArea {
@@ -224,21 +296,28 @@ impl updateContent(self, newContent) for TextArea {
     self.update(null)
 }
 
-impl update(self, changed) for TextArea {
+impl update(self, change) for TextArea {
     @time = time.measure func() {
-        self.render(changed)
+        self.render(change)
         self.highlight()
     }
     log("update took \(time) ms")
 }
 
-func handleClick(content, cursor, row) {
+impl setListener(self, cursor) for TextArea {
+    each line, row of self.references {
+        line.listen("click", handleClick(self, cursor, row))
+    }
+}
+
+func handleClick(textArea, cursor, row) {
     return func(event) {
-        @col = (event.location.x / CHARACTER_WIDTH).int(0.5) + 1
-        if col > content.get(row).size() {
-            col = content.get(row).size() + 1
+        @col = (event.location.x / 9.906).int(0.5)
+        if col > self.content.get(row).size() {
+            col = self.content.get(row).size() + 1
         }
+        cursor.detach()
         cursor.move(row, col)
-        cursor.render()
+        cursor.render(self.references)
     }
 }

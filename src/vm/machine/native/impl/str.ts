@@ -28,6 +28,9 @@ export const jsStr: ExportJs = {
         // return self.substring(0, index) + value + self.substring(index + 1);
     }),
     [ScrambleType("insert", PlStuffType.Str)]: GenerateGuardedTypeFunction("insert", [PlStuffType.Num, PlStuffType.Str], function (self, index, value) {
+        if (index == self.length+1) {
+            return self + value;
+        }
         index--;
         if (index < 0 || index >= self.length) {
             throw new Error(MakeOutOfRangeMessage("insert", PlStuffType.Str, self.length, index + 1));

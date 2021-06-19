@@ -203,9 +203,15 @@ export class PlStackMachine implements StackMachine {
     }
 
     findFunction(name: string, target?: PlStuff): PlStuff | null {
-        const value = this.findValue(ScrambleImpl(name, target));
+        let value = this.findValue(ScrambleImpl(name, target));
         if (value == null) {
-            return null;
+            if (target.type == PlStuffType.Inst)  {
+                value = this.findValue(ScrambleType(name, target.type));
+                if (value == null)
+                    return null;
+            } else {
+                return null;
+            }
         }
 
         if (value.type == PlStuffType.NFunc || value.type == PlStuffType.Func) {
@@ -238,6 +244,7 @@ export class PlStackMachine implements StackMachine {
         }
         if (!hasRest) {
             if (args.length != value.parameters.length) {
+                debugger;
                 this.newProblem("RE0006", this.pointer, '' + value.parameters.length, '' + args.length);
                 throw null;
             }
@@ -293,6 +300,8 @@ export class PlStackMachine implements StackMachine {
         const value = func.value as PlFunction;
         const parameters = value.parameters;
         if (parameters.length != args.length) {
+            console.log(parameters);
+
             this.newProblem("RE0006", this.pointer, '' + parameters.length, '' + args.length);
             this.pointer = oldPointer;
             throw null;
@@ -336,6 +345,7 @@ export class PlStackMachine implements StackMachine {
 
         const parameters = value.parameters;
         if (parameters.length != args.length) {
+            console.log(parameters);
             this.newProblem("RE0006", this.pointer, '' + parameters.length, '' + args.length);
             return false;
         }
@@ -647,10 +657,6 @@ export class PlStackMachine implements StackMachine {
                 arguments: args,
                 exit: code => {
                     this.returnCode = +code;
-                    // if (process) {
-                    //     process.exit(code);
-                    // }
-                    // this.pointer = this.program.program.length;
                     return null;
                 }
             }, this)
@@ -660,6 +666,8 @@ export class PlStackMachine implements StackMachine {
 
         // Basic types
         for (const key of PlStuffTypes) {
+            if (key == "Inst")
+                continue;
             const value = NewPlStuff(PlStuffType.Type, {
                 type: key,
                 format: null

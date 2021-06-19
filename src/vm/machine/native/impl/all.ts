@@ -1,4 +1,9 @@
-import {GenerateForAll, GenerateForSome, GenerateGuardedTypeFunction} from "../helpers";
+import {
+        GenerateExceptInst,
+    GenerateForAll,
+    GenerateForSome,
+    GenerateGuardedTypeFunction
+} from "../helpers";
 import {PlActions, PlConverter} from "../converter";
 import {
     NewPlStuff,
@@ -35,10 +40,10 @@ export const all: ExportNative = {
         return PlConverter.PlToPl(self, type.value, this);
     })),
     /// TYPES
-    ...GenerateForAll("bool", GenerateGuardedTypeFunction("bool", [], function(self) {
+    ...GenerateExceptInst("bool", GenerateGuardedTypeFunction("bool", [], function(self) {
         return PlConverter.PlToPl(self, {format: null, type: "Bool"}, this)
     })),
-    ...GenerateForAll("str", GenerateGuardedTypeFunction("str", [], function(self) {
+    ...GenerateExceptInst("str", GenerateGuardedTypeFunction("str", [], function(self) {
         return PlConverter.PlToPl(self, {format: null, type: "Str"}, this)
     })),
     ...GenerateForSome("num", [PlStuffType.Bool, PlStuffType.Str, PlStuffType.Null, PlStuffType.Num], GenerateGuardedTypeFunction("num", [], function(self) {

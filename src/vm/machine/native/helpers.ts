@@ -98,6 +98,16 @@ export function GenerateForAll(name: string, func: PlNativeFunction) {
     return out;
 }
 
+export function GenerateExceptInst(name: string,  func: PlNativeFunction) {
+    const out = {};
+    for (const item of PlStuffTypes) {
+        if (item == "Inst")
+            continue;
+        out[ScrambleName(name, item)] = func;
+    }
+    return out;
+}
+
 export function GenerateForSome(name: string, types: PlStuffType[], func: PlNativeFunction) {
     const strs = types.map(t => PlStuffTypeToString(t));
     const out = {};

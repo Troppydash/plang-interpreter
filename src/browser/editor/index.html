@@ -20,6 +20,10 @@
             box-sizing: border-box;
         }
 
+        body {
+            margin: 0;
+        }
+
 
         #de-editor {
             background: #636363;
@@ -33,10 +37,10 @@
 
         .editor-area {
             display: flex;
-            height: 65vh;
+            height: 100vh;
             overflow-x: hidden;
             overflow-y: auto;
-            align-items: baseline;
+            align-items: flex-start;
 
             font-family: monospace;
             font-size: 18px;
@@ -47,6 +51,8 @@
         .editor-textarea {
             flex: 1;
             user-select: none;
+            cursor: text;
+            min-height: 100%;
         }
 
         .editor-linenum {
@@ -61,16 +67,16 @@
         }
 
 
-        .editor-textarea .line {
+        .editor-textarea > div {
+            min-height: 28.38px;
             padding: 0.2rem 0;
             padding-left: 12px;
             position: relative;
-            cursor: text;
             width: 100%;
             display: flex;
         }
 
-        .editor-textarea .line.selected {
+        .editor-textarea > div.selected {
             background: #3b3b3b;
         }
 

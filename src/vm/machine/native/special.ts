@@ -296,7 +296,7 @@ if (isNode) {
         deasync((callback) => {
             setTimeout(() => {
                 callback();
-            }, duration*1000);
+            }, duration * 1000);
         })();
         return null;
     });
@@ -346,6 +346,7 @@ if (isNode) {
     function makeElement(items: HTMLElement[], selector: string, sm: StackMachine) {
         let result: HTMLElement[] = items;
         let multi = false;
+
         function toPl(any) {
             return PlConverter.JsToPl(any, sm);
         }
@@ -564,6 +565,46 @@ if (isNode) {
                     return NewPlStuff(PlStuffType.List, out);
                 }
             }),
+            remove: GenerateGuardedFunction("remove", [PlStuffType.Num], (index) => {
+                const idx = index.value - 1;
+                // todo: make out of bound error
+                if (multi) {
+                    for (const node of result)
+                        node.removeChild(node.children[idx]);
+                } else {
+                    result[0].removeChild(result[0].children[idx]);
+                }
+                return self;
+            }),
+            insert: GenerateGuardedFunction("insert", [PlStuffType.Num, PlStuffTypeAny], (index, node) => {
+                const nf = node.value['#raw'];
+                if (!nf) {
+                    throw new Error('cannot detach a none-node type');
+                }
+                const idx = index.value - 1;
+                if (idx == result[0].children.length) {
+                    return self.value["attach"].value.native(node);
+                }
+
+                const other = nf.value.get();
+                if (multi) {
+                    for (const element of (result as HTMLElement[])) {
+                        if (other.multi) {
+                            for (const node of other.result)
+                                element.insertBefore(node, element.children[idx]);
+                        } else
+                            element.insertBefore(other.result[0], element.children[idx]);
+                    }
+                } else {
+                    if (other.multi)
+                        for (const node of other.result)
+                            result[0].insertBefore(node, result[0].children[idx]);
+                    else {
+                        result[0].insertBefore( other.result[0], result[0].children[idx]);
+                    }
+                }
+                return self;
+            })
         });
         for (const key of Object.keys(self.value)) {
             self.value[key] = nf(self.value[key]);

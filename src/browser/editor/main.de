@@ -11,7 +11,7 @@ impl new(self, root) for Editor {
     self.cursor = Cursor()
     self.textArea = TextArea(root)
 
-    self.textArea.updateContent(list("say(\"Hello \\(ME)\")"))
+    self.textArea.updateContent(list(""))
     self.cursor.render(self.textArea.references)
 
     self.bind()
@@ -20,6 +20,7 @@ impl new(self, root) for Editor {
 PAIRED_SYMBOLS = list("{}", "()", "\"\"")
 impl handleKeys(self, event) for Editor {
     @cursor = self.cursor
+    @textArea = self.textArea
     @content = self.textArea.content
     @references = self.textArea.references
     @key = event.key
@@ -28,6 +29,7 @@ impl handleKeys(self, event) for Editor {
         case "ArrowUp" {
             # moves the cursor up
             if not cursor.rowStatus(content).have(STATUS_LESS) {
+                cursor.detach()
                 cursor.shift(-1, null)
                 if cursor.colStatus(content).have(STATUS_MORE) {
                     cursor.snap(content)
@@ -38,6 +40,7 @@ impl handleKeys(self, event) for Editor {
         case "ArrowDown" {
             # moves the cursor down
             if not cursor.rowStatus(content).have(STATUS_MORE) {
+                cursor.detach()
                 cursor.shift(1, null)
                 if cursor.colStatus(content).have(STATUS_MORE) {
                     cursor.snap(content)
@@ -48,6 +51,7 @@ impl handleKeys(self, event) for Editor {
         case "ArrowLeft" {
             # moves the cursor left
             if not cursor.colStatus(content).have(STATUS_LESS) {
+                cursor.detach()
                 cursor.shift(0, -1)
                 cursor.render(references)
             }
@@ -56,39 +60,52 @@ impl handleKeys(self, event) for Editor {
             # moves the cursor right
             # allows one more
             if cursor.col /= content.get(cursor.row).size()+1 {
+                cursor.detach()
                 cursor.shift(0, 1)
                 cursor.render(references)
             }
         }
         case "Backspace" {
-            if cursor.colStatus(content) == -1 and cursor.rowStatus(content) == -1 {
+            if cursor.colStatus(content).have(STATUS_LESS) and cursor.rowStatus(content).have(STATUS_LESS) {
                 return
             }
 
+            cursor.detach()
             @line = content.get(cursor.row)
             if content.get(cursor.row).size() >= cursor.col and cursor.col > 1 {
                 @left = content.get(cursor.row).get(cursor.col-1)
                 @right = content.get(cursor.row).get(cursor.col)
                 @pair = left + right
-                if pairedSymbols.have(pair) {
-                     content.set(cursor.row, line.remove(cursor.col).remove(cursor.col-1))
-                     cursor.shift(0, -1)
-                     renderContent(content, null)
-                     cursor.render()
-                     return
+                if PAIRED_SYMBOLS.have(pair) {
+                    @newLine = line.remove(cursor.col).remove(cursor.col-1)
+                    textArea.updateLine(cursor.row, newLine)
+                    textArea.setListener(cursor)
+                    cursor.shift(0, -1)
+                    cursor.render(self.textArea.references)
+                    return
                 }
             }
 
-            if cursor.colStatus(content) == -1 {
-                content.remove(cursor.row)
+             @ws = 0
+             each c of line {
+                 if c /= " " {
+                     break
+                 }
+                 ws++
+            }
+            if line.size() - ws == 0 and cursor.col == ws + 1 {
+                textArea.removeLine(cursor.row)
                 cursor.move(cursor.row-1, content.get(cursor.row-1).size()+1)
-                content.set(cursor.row, content.get(cursor.row)+line)
+            } elif cursor.colStatus(content).have(STATUS_LESS) {
+                textArea.removeLine(cursor.row)
+                cursor.move(cursor.row-1, content.get(cursor.row-1).size()+1)
+                textArea.updateLine(cursor.row, content.get(cursor.row)+line)
             } else {
-                content.set(cursor.row, line.remove(cursor.col-1))
+                textArea.updateLine(cursor.row, line.remove(cursor.col-1))
                 cursor.shift(0, -1)
             }
-            renderContent(content, null)
-            cursor.render()
+            cursor.render(textArea.references)
+            textArea.setListener(cursor)
         }
         case "Enter" {
             @line = content.get(cursor.row)
@@ -99,37 +116,30 @@ impl handleKeys(self, event) for Editor {
                 }
                 ws++
             }
+
+            cursor.detach()
             if content.get(cursor.row).size() >= cursor.col and cursor.col > 1 {
                 @left = content.get(cursor.row).get(cursor.col-1)
                 @right = content.get(cursor.row).get(cursor.col)
                 @pair = left + right
-                if pairedSymbols.have(pair) {
-                    content.set(cursor.row, line.substring(1, cursor.col-1))
+                if PAIRED_SYMBOLS.have(pair) {
+                    textArea.updateLine(cursor.row, line.substring(1, cursor.col-1))
                     @last = " " * ws + line.substring(cursor.col, line.size())
-                    if content.size() == cursor.row {
-                        content.add last
-                    } else {
-                        content.insert(cursor.row+1, last)
-                    }
-
-                    content.insert(cursor.row+1, " " * (ws+4))
+                    textArea.insertLine(cursor.row+1, last)
+                    textArea.insertLine(cursor.row+1, " " * (ws+4))
+                    textArea.setListener(cursor)
                     cursor.move(cursor.row+1, ws+4+1)
-                    renderContent(content, null)
-                    cursor.render()
+                    cursor.render(textArea.references)
                     return
                 }
             }
 
-            content.set(cursor.row, line.substring(1, cursor.col-1))
+            textArea.updateLine(cursor.row, line.substring(1, cursor.col-1))
             @newLine = " " * ws + line.substring(cursor.col, line.size())
-            if cursor.row == content.size() {
-                content.add newLine
-            } else {
-                content.insert(cursor.row+1, newLine)
-            }
+            textArea.insertLine(cursor.row+1, newLine)
+            textArea.setListener(cursor)
             cursor.move(cursor.row+1, ws+1)
-            renderContent(content, null)
-            cursor.render()
+            cursor.render(textArea.references)
         }
         case "End" {
             cursor.move(null, content.get(cursor.row).size()+1)
@@ -148,14 +158,11 @@ impl handleKeys(self, event) for Editor {
         }
         case "Tab" {
             @line = content.get(cursor.row)
-            if cursor.col > line.size() {
-                content.set(cursor.row, line + " " * 4)
-            } else {
-                content.set(cursor.row, line.insert(cursor.col, " " * 4))
-            }
-            renderContent(content, null)
+            cursor.detach()
+            textArea.updateLine(cursor.row, line.insert(cursor.col, " " * 4))
+            textArea.setListener(cursor)
             cursor.shift(null, 4)
-            cursor.render()
+            cursor.render(textArea.references)
         }
         default {
             if key.size() /= 1 {
@@ -165,33 +172,24 @@ impl handleKeys(self, event) for Editor {
             each pair of PAIRED_SYMBOLS {
                 if key == pair.get(1) {
                     @line = content.get(cursor.row)
-                    if cursor.col > line.size() {
-                        content.set(cursor.row, line + pair)
-                    } else {
-                        content.set(cursor.row, line.insert(cursor.col, pair))
-                    }
-                    renderContent(content, null)
+                    textArea.updateLine(cursor.row, line.insert(cursor.col, pair))
+                    textArea.setListener(cursor)
                     cursor.shift(null, 1)
-                    cursor.render()
+                    cursor.render(textArea.references)
                     return
                 }
             }
-
             @line = content.get(cursor.row)
-            content.set(cursor.row, line
-            if cursor.row > content.size() {
-                content.add event.key
+            if cursor.col > line.size() {
+                line = line + key
             } else {
-                @line = content.get(cursor.row)
-                if cursor.col > line.size() {
-                    content.set(cursor.row, line + event.key)
-                } else {
-                    content.set(cursor.row, line.insert(cursor.col, event.key))
-                }
+                line = line.insert(cursor.col, key)
             }
-            renderContent(content, null)
-            cursor.shift(null, 1)
-            cursor.render()
+            cursor.detach()
+            textArea.updateLine(cursor.row, line)
+            textArea.setListener(cursor)
+            self.cursor.shift(null, 1)
+            self.cursor.render(textArea.references)
         }
     }
     event.preventDefault()
@@ -201,7 +199,38 @@ impl bind(self) for Editor {
 
     # bind keys
     self.textArea.root.listen("keydown", func(event) self.handleKeys(event))
+    self.textArea.setListener(self.cursor)
 
+    # bind drag and drop
+    $textArea = self.textArea.root
+    $textArea.listen("dragover", func(event) event.preventDefault())
+    $textArea.listen("dragenter", func(_) $textArea.setStyle("border", "2px solid white"))
+    $textArea.listen("dragleave", func(_) $textArea.removeStyle("border"))
+    $textArea.listen("drop", func(event) {
+        event.preventDefault()
+        $textArea.setStyle("border", "2px solid yellow")
+
+        # hand it to js
+        javascript """
+        const callback = pl.import("callback");
+        const event = pl.import("event")["#raw"].value;
+        const file = event.dataTransfer.files[0];
+        const reader = new window.FileReader();
+        reader.onload = (e) => {
+            callback(e.target.result);
+        }
+        reader.readAsText(file);
+        """
+    })
+    func callback(text) {
+        $textArea.removeStyle("border")
+        text = text.split("\r\n").join("\n")
+        text = text.split("\r").join("\n")
+        self.textArea.updateContent(text.split("\n"))
+        self.textArea.setListener(self.cursor)
+        self.cursor.move(1, 1)
+        self.cursor.render(self.textArea.references)
+    }
 }
 
 

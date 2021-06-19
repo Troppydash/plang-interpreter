@@ -114,4 +114,5 @@ export const operators: ExportNative = {
     ...generateCompare(PlStuffType.Func, equals),
     ...generateCompare(PlStuffType.List, equals),
     ...generateCompare(PlStuffType.Dict, equals),
+    ...generateCompare(PlStuffType.Inst, equals),
 };

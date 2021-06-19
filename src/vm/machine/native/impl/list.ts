@@ -93,6 +93,10 @@ export const list = {
         return NewPlStuff(PlStuffType.Num, self.value.length);
     }),
     [ScrambleType("insert", PlStuffType.List)]: GenerateGuardedTypeFunction("insert", [PlStuffType.Num, PlStuffTypeAny], function (self: PlStuff, index: PlStuff, value: PlStuff) {
+        if (index.value == self.value.length+1) {
+            self.value.push(value);
+            return self;
+        }
         const idx = index.value - 1;
         if (idx < 0 || idx >= self.value.length) {
             throw new Error(MakeOutOfRangeMessage("insert", PlStuffType.List, self.value.length, index.value));
