@@ -1308,6 +1308,7 @@ export class PlStackMachine implements StackMachine {
             return PlStuffNull;
         } catch (e) {
             // if anything bad happens, this will notify the user
+            debugger;
             return this.newProblem("DE0002", this.pointer, '' + e);
         }
     }

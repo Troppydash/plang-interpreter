@@ -1,0 +1,9 @@
+type FaIcon(element)
+
+impl new(self, style, color) for FaIcon {
+    self.element = $("i").new().setClass("fas fa-\(style)").setStyle("color", color)
+}
+
+impl raw(self) for FaIcon {
+    return self.element
+}

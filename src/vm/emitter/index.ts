@@ -151,20 +151,22 @@ class ProgramBuilder {
  * Replaces the breaks and continues of in the block, assuming the block ends with a jmprel
  * This is use to generate continues and jump in loops, it directly modifies the block
  * @param block The block that have its program replaces
+ * @param extra
  */
-function replaceBC(block: PlProgram) {
+function replaceBC(block: PlProgram, extra: number) {
     let surround = 0;
-    for ( let i = 0; i < block.program.length; ++i ) {
+    const length =  block.program.length;
+    for ( let i = 0; i < length; ++i ) {
         const byte = block.program[i];
         switch (byte.type) {
             case PlBytecodeType.DOBRAK: {
                 if (byte.value == null)
-                    block.program[i] = NewBytecode( PlBytecodeType.DOBRAK, `${(block.program.length - i)},${surround}` );
+                    block.program[i] = NewBytecode( PlBytecodeType.DOBRAK, `${(length + extra - i)},${surround}` );
                 break;
             }
             case PlBytecodeType.DOCONT: {
                 if (byte.value == null)
-                    block.program[i] = NewBytecode( PlBytecodeType.DOCONT, `${(block.program.length - i - 1)},${surround}` );
+                    block.program[i] = NewBytecode( PlBytecodeType.DOCONT, `${(length + extra - i - 1)},${surround}` );
                 break;
             }
             case PlBytecodeType.STKENT:
@@ -506,7 +508,7 @@ function traverseAST( node: ASTNode ): PlProgram {
         let block = makePureBlock( node.block );
 
         // replace break and continue
-        replaceBC(block);
+        replaceBC(block, afterLength);
 
         // emit condition
         if ( cond ) {
@@ -545,7 +547,7 @@ function traverseAST( node: ASTNode ): PlProgram {
         let block = makePureBlock( node.block );
 
         // replace breaks and continues
-        replaceBC(block);
+        replaceBC(block, 0);
 
         node.condition.attribute = ASTAttributes.ASTCondition;
         programBuilder
@@ -593,7 +595,7 @@ function traverseAST( node: ASTNode ): PlProgram {
             bodySize += out.program.length + 1;
         }
 
-        replaceBC(block);
+        replaceBC(block, 0);
 
         programBuilder.addPWD( block )
             .addBytecode( NewBytecode( PlBytecodeType.JMPREL, '-' + (bodySize + 1) ) );
@@ -692,7 +694,7 @@ function traverseAST( node: ASTNode ): PlProgram {
         const block = makePureBlock( node.block );
 
         // replace breaks and continues
-        replaceBC(block);
+        replaceBC(block, 0);
 
         return programBuilder
             .addPWD( cond )

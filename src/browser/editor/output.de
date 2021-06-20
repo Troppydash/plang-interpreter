@@ -1,0 +1,25 @@
+type Output(element)
+
+impl new(self, root) for Output {
+    self.element = $("div").new().setClass("editor-output")
+    root.attach(self.element)
+}
+
+impl setText(self, text: Str) for Output {
+    self.clear()
+    each line of text.split("\n") {
+        self.element.attach($("div").new().setHtml(line))
+    }
+}
+
+impl clear(self) for Output {
+    self.element.clear()
+}
+
+impl addLine(self, line: Str) for Output {
+    self.element.attach($("div").new().setHtml(line))
+}
+
+impl bind(self) for Output {
+
+}

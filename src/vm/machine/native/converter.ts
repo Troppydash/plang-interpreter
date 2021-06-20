@@ -31,6 +31,7 @@ function protectPlangCall(callback: Function, sm: StackMachine) {
             try {
                 return callback(...args);
             } catch (e) {
+                debugger;
                 sm.restoreState(saved);
                 const problem = sm.problems.pop();
                 const trace = sm.getTrace();

@@ -9,6 +9,8 @@ import inout, {PlInout} from "../inout";
 import {IACTPrepare} from "../problem/interactive";
 import {LogProblem, LogProblemShort} from "../problem/printer";
 import {isvariablefirst, isvariablerest} from "../extension/types";
+import {TryRunParser} from "../linking";
+import {PlProblem} from "../problem/problem";
 
 export function Highlight(text: string): any[] | null {
     const file = NewPlFile("highlighter", text);
@@ -69,6 +71,9 @@ export function Execute(text: string, std: PlInout): number {
     return 0;
 }
 
+export function Errors(text: string): PlProblem[] | null {
+    return TryRunParser(NewPlFile("errors", text));
+}
 
 export function IsVariableHead(c: string): boolean {
     return isvariablefirst(c);

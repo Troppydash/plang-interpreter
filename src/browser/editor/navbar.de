@@ -1,0 +1,73 @@
+type NavButton(element)
+
+impl new(self, text: Str, icon: FaIcon) for NavButton {
+    self.element = $("button").new().setClass("navbar-button")
+    self.element.attach(icon.raw())
+    self.element.attach($("span").new().setText(text))
+}
+
+impl raw(self) for NavButton {
+    return self.element
+}
+
+impl clicked(self, fn) for NavButton {
+    self.element.listen("click", fn)
+}
+
+
+type Navbar(root, run, new, export)
+
+impl new(self, parent) for Navbar {
+    self.root = $("div").new().setClass("editor-navbar")
+    parent.attach(self.root)
+
+    self.run = NavButton("Run", FaIcon("play", "green"))
+    self.root.attach(self.run.raw())
+
+    self.new = NavButton("New", FaIcon("file", "white"))
+    self.root.attach(self.new.raw())
+
+    self.export = NavButton("Copy", FaIcon("clipboard", "white"))
+    self.root.attach(self.export.raw())
+}
+
+impl bind(self, output: Output, editor) for Navbar {
+    @inout = dict(
+        print: func(message) {
+            @text = message.replace("<span\\", "<span ").replace(" ", "&nbsp;")
+            output.addLine(text)
+        },
+        input: func(message) {
+            javascript """
+            pl.export("text", window.prompt(pl.import("message")));
+            """
+            return text
+        },
+        flush: func() {}
+    )
+
+    self.run.clicked(func(event) {
+        output.setText("> ./devia browser.de\n&nbsp;")
+        @text = editor.textArea.raw()
+        @code = bindings.Execute(text, inout)
+        output.addLine("&nbsp;")
+        output.addLine("> program exited with code \(code)")
+    })
+
+    self.new.clicked(func(_) {
+        output.clear()
+        editor.textArea.updateContent(list(""))
+        editor.textArea.setListener(editor.cursor)
+        editor.cursor.move(1, 1)
+        editor.cursor.render(editor.textArea.references)
+    })
+
+    self.export.clicked(func(_) {
+        @text = editor.textArea.raw()
+        javascript """
+            const content = pl.import("text");
+            const cb = navigator.clipboard;
+            cb.writeText(content);
+        """
+    })
+}

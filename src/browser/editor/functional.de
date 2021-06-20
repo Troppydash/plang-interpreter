@@ -171,3 +171,22 @@ impl find(self, indexes: List) for List {
     }
     return newList
 }
+
+impl partition(self, n: Num) for List {
+    @partitions = list()
+    @l = list()
+    @c = 0
+    each item of self {
+        if c == n {
+            partitions.add(l)
+            l = list()
+            c = 0
+        }
+        l.add(item)
+        c++
+    }
+    if l.size() > 0 {
+        partitions.add(l)
+    }
+    return partitions
+}

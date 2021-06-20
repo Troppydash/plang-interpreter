@@ -4,6 +4,7 @@ import {GenerateGuardedTypeFunction} from "../helpers";
 import {ExportJs, ExportNative} from "../types";
 import {MakeOutOfRangeMessage} from "../messeger";
 import {StackMachine} from "../../index";
+import {capitalize} from "../../../../extension/text";
 
 export const jsStr: ExportJs = {
     [ScrambleType("size", PlStuffType.Str)]: GenerateGuardedTypeFunction("size", [], function (self) {
@@ -58,6 +59,12 @@ export const jsStr: ExportJs = {
     [ScrambleType("lower", PlStuffType.Str)]: GenerateGuardedTypeFunction("lower", [], function (self: string) {
         return self.toLowerCase();
     }),
+    [ScrambleType("capitalize", PlStuffType.Str)]: GenerateGuardedTypeFunction("capitalize", [], function (self: string) {
+        return capitalize(self);
+    }),
+    [ScrambleType("reverse", PlStuffType.Str)]: GenerateGuardedTypeFunction("reverse", [], function (self: string) {
+        return self.split('').reverse().join('');
+    })
 };
 
 export const str: ExportNative = {
