@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deviation Tutorial</title>
+    <link href="../editor/editor.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="../editor/bindings.de" type="application/devia"></script>
+<script src="../editor/fa.de" type="application/devia"></script>
+<script src="../editor/output.de" type="application/devia"></script>
+<script src="../editor/editor-components.de" type="application/devia"></script>
+<script src="../editor/navbar.de" type="application/devia"></script>
+<script src="../editor/editor.de" type="application/devia"></script>
+<script type="application/devia">
+    attachEditor($("#root"))
+</script>
+
+
+<!--External CDN-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/<version tag>/showdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+
+<!--THESE ARE ALL FOR LOADING THE PROGRAMMING LANGUAGE-->
+<div id="pl-model"
+     style="display:none;top:0;left:0;height: 100vh;width: 100vw;position: absolute;z-index: 99;align-items: center;justify-content: center;background-color: rgba(0, 0, 0, 0.8)"
+     onclick="closeModel()">
+    <div id="pl-model-body"
+         style="background-color: #393939;color:#cecece;font-family: monospace;font-size: 1.25rem;padding: 0.75rem;overflow: auto"
+         onclick="event.stopPropagation()"></div>
+</div>
+<script>const model=document.getElementById("pl-model"),body=document.getElementById("pl-model-body");function openModel(e){body.innerHTML=e,model.style.display="flex"}function modelOpen(){return"flex"===model.style.display}function closeModel(){model.style.display="none",buffer.length>0&&openModel(buffer.shift())}function replace(e,n,o){return e.split(n).join(o)}let content=[],buffer=[];window.extern={print(e){content.push(`<span>${replace(replace(e," ","&nbsp;"),"<span\\","<span ")}</span>`)},flush(){if(0===content.length)return;const e=content.join("<br/>");buffer.push(replace(e,"\n","<br/>")),content=[],modelOpen()||openModel(buffer.shift())}};</script>
+<script src="../../../out/index.js"></script>
+<script>require(["inout/otherInout","browser/exports"],function(o,r){window.data={exports:r}});</script>
+<script>require(['browser/index']);</script>
+</body>
+</html>

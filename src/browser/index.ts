@@ -6,7 +6,7 @@ import {PlStackMachine} from "../vm/machine";
 import inout from "../inout";
 
 
-const attribute = "application/plang";
+const attribute = "application/devia";
 
 async function getSources(): Promise<PlFile[]> {
     const nodes = Array.from(document.querySelectorAll(`script[type="${attribute}"]`));

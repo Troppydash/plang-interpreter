@@ -218,32 +218,21 @@ impl bind(self) for Editor {
     })
     func callback(text) {
         $textArea.removeStyle("border")
-        text = text.split("\r\n").join("\n")
-        text = text.split("\r").join("\n")
-        self.textArea.updateContent(text.split("\n"))
-        self.textArea.setListener(self.cursor)
-        self.cursor.move(1, 1)
-        self.cursor.render(self.textArea.references)
+        self.setContent(text)
     }
+}
 
-    func getContent() {
-        return self.textArea.raw()
-    }
+impl getContent(self) for Editor {
+    return self.textArea.raw()
+}
 
-    # autosave
-    javascript """
-        let initial = window.localStorage.getItem("de-editor-saved");
-        if (initial == null) {
-            initial = 'say("Hello World!")';
-        }
-        const callback = pl.import("callback");
-        const getContent = pl.import("getContent");
-        callback(initial);
-        window.setInterval(() => {
-            const content = getContent();
-            window.localStorage.setItem("de-editor-saved", content);
-        }, 1000)
-    """
+impl setContent(self, text: Str) for Editor {
+    text = text.split("\r\n").join("\n")
+    text = text.split("\r").join("\n")
+    self.textArea.updateContent(text.split("\n"))
+    self.textArea.setListener(self.cursor)
+    self.cursor.move(1, 1)
+    self.cursor.render(self.textArea.references)
 }
 
 func attachEditor($root) {
@@ -254,6 +243,9 @@ func attachEditor($root) {
 
     editor.bind()
     navbar.bind(output, editor)
+    return dict(
+        navbar: navbar,
+        editor: editor,
+        output: output
+    )
 }
-
-attachEditor($("#de-editor1"))
