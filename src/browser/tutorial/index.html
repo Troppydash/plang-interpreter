@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Deviation Tutorial</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/81cbfd46c3.js" crossorigin="anonymous"></script>
     <link href="../editor/editor.css" rel="stylesheet">
+    <link href="page.css" rel="stylesheet">
 </head>
 <body>
 
@@ -15,14 +20,24 @@
 <script src="../editor/editor-components.de" type="application/devia"></script>
 <script src="../editor/navbar.de" type="application/devia"></script>
 <script src="../editor/editor.de" type="application/devia"></script>
-<script type="application/devia">
-    attachEditor($("#root"))
-</script>
+<script type="application/devia" src="page.de"></script>
+<script type="application/devia" src="controller.de"></script>
 
 
 <!--External CDN-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/<version tag>/showdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<script>
+    // showdown markdown parser bindings
+    const converter = new showdown.Converter();
+    window.data = {
+        exports: {
+            markdown: {
+                makeHtml: text => converter.makeHtml(text)
+            }
+        }
+    };
+</script>
 
 <!--THESE ARE ALL FOR LOADING THE PROGRAMMING LANGUAGE-->
 <div id="pl-model"
@@ -34,7 +49,7 @@
 </div>
 <script>const model=document.getElementById("pl-model"),body=document.getElementById("pl-model-body");function openModel(e){body.innerHTML=e,model.style.display="flex"}function modelOpen(){return"flex"===model.style.display}function closeModel(){model.style.display="none",buffer.length>0&&openModel(buffer.shift())}function replace(e,n,o){return e.split(n).join(o)}let content=[],buffer=[];window.extern={print(e){content.push(`<span>${replace(replace(e," ","&nbsp;"),"<span\\","<span ")}</span>`)},flush(){if(0===content.length)return;const e=content.join("<br/>");buffer.push(replace(e,"\n","<br/>")),content=[],modelOpen()||openModel(buffer.shift())}};</script>
 <script src="../../../out/index.js"></script>
-<script>require(["inout/otherInout","browser/exports"],function(o,r){window.data={exports:r}});</script>
+<script>require(["inout/otherInout","browser/exports"],function(o,r){window.data={exports:{...window.data.exports, ...r}}});</script>
 <script>require(['browser/index']);</script>
 </body>
 </html>

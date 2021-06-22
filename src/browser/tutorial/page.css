@@ -1,0 +1,58 @@
+.controller {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.page {
+    height: 100%;
+    display: flex;
+    justify-content: stretch;
+    align-items: stretch;
+}
+
+.page-text {
+    background: #343434;
+    color: white;
+    flex: 1.5;
+
+    font-family: "CMU Serif", serif;
+    font-size: 20px;
+    padding: 0.5rem 1.5rem;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.page-editor {
+    flex: 2.5;
+}
+
+/*scrollbar*/
+.page-text::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+.page-text::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.3);
+}
+
+.page-text::-webkit-scrollbar-thumb {
+    background-color: #adadad;
+}
+
+.page-navigate {
+}
+.page-navigate button {
+
+}
+
+@media only screen and (max-width: 1000px) {
+    .page {
+        flex-direction: column;
+    }
+
+    .page-text {
+        flex: 3;
+    }
+}

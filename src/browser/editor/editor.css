@@ -21,14 +21,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    border-bottom: 1px solid #d7d7d7;
+    /*border-bottom: 1px solid #d7d7d7;*/
 }
 
 .editor-navbar > button.navbar-button {
     border: 1px solid #a0a0a0;
     background: #232222;
     padding: 0.25rem 0.75rem;
-    color: #c9c9c9;
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -69,7 +69,7 @@ body {
 .editor-linenum {
     padding: 0 1.5rem 0 1rem;
     background: #404040;
-    border-right: 1px solid #d7d7d7;
+    /*border-right: 1px solid #d7d7d7;*/
     min-height: 100%;
 }
 
@@ -146,9 +146,9 @@ body {
 
 .editor-output {
     height: 200px;
-    border-top: 1px solid #d7d7d7;
-    background: #262626;
-    color: #d7d7d7;
+    /*border-top: 1px solid #d7d7d7;*/
+    background: #000000;
+    color: #efefef;
     font-family: monospace;
     font-size: 18px;
     padding: 0.5rem;

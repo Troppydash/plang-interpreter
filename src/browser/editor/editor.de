@@ -236,7 +236,7 @@ impl setContent(self, text: Str) for Editor {
 }
 
 func attachEditor($root) {
-    $root.setClass("editor")
+    $root.setClass("\($root.class()) editor")
     @navbar = Navbar($root)
     @editor = Editor($root)
     @output = Output($root)
@@ -248,4 +248,10 @@ func attachEditor($root) {
         editor: editor,
         output: output
     )
+}
+
+func createEditor(root, text) {
+    @out = attachEditor(root)
+    out.editor.setContent(text)
+    return out
 }

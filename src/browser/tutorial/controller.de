@@ -1,0 +1,48 @@
+MDS = 2
+
+type Controller(
+    element,
+    pages,
+    current
+)
+
+impl new(self, root, max) for Controller {
+    self.element = $("div").new().setClass("controller")
+    root.attach(self.element)
+    self.current = 1
+
+    self.pages = list()
+    each n of range(max) {
+        self.pages.add(Page(n))
+    }
+
+    self.render(1)
+}
+
+impl render(self, n: Num) for Controller {
+    @page = self.pages.get(n)
+    @context = page.render(self)
+    @back = $("button").new().setText("<")
+    @forward = $("button").new().setText(">")
+    @navigate = $("div").new().setClass("page-navigate")
+    navigate.attach(back)
+    navigate.attach(forward)
+    context.1.attach(navigate)
+
+    back.listen("click", func(e) {
+        if n > 1 {
+            context.1.detach(navigate)
+            self.render(n-1)
+        }
+    })
+    forward.listen("click", func(e) {
+        if n < self.pages.size() {
+            context.1.detach(navigate)
+            self.render(n+1)
+        }
+    })
+}
+
+$root = $("#root")
+c = Controller($root, MDS)
+

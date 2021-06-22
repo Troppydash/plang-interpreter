@@ -1,0 +1,40 @@
+PREFIX = "md/page"
+
+type Page(
+    element,
+    number,
+    _loaded
+)
+
+impl new(self, number) for Page {
+    self.number = number
+    self._loaded = false
+}
+
+impl render(self, parent) for Page {
+    if not self._loaded {
+        self._loaded = true
+
+        # create page
+        @md = fetch("\(PREFIX)\(self.number).md")
+        if not md.ok {
+            panic("Unable to fetch page\(self.number) markdown")
+        }
+        @html = bindings.markdown.makeHtml(md.text)
+        self.element = $("div").new().setClass("page")
+        self.element.clear()
+
+        @text = $("div").new().setClass("page-text").setHtml(html)
+        @code = text.children().1
+        text.detach(code)
+
+        @editor = $("div").new().setClass("page-editor")
+        createEditor(editor, code.text())
+        self.element.attach(text)
+        self.element.attach(editor)
+    }
+    parent.element.clear()
+    parent.element.attach(self.element)
+
+    return self.element.children()
+}
