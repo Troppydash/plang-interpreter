@@ -345,7 +345,6 @@ if (isNode) {
 
     function makeElement(items: HTMLElement[], selector: string, sm: StackMachine) {
         let result: HTMLElement[] = items;
-        let multi = false;
 
         function toPl(any) {
             return PlConverter.JsToPl(any, sm);
@@ -363,20 +362,7 @@ if (isNode) {
                     throw new Error('cannot attach a none-node type');
                 }
                 const other = nf.value.get();
-                if (multi) {
-                    for (const element of (result as HTMLElement[])) {
-                        if (other.multi)
-                            element.append(other.result);
-                        else
-                            element.appendChild(other.result[0]);
-                    }
-                } else {
-                    if (other.multi)
-                        result[0].append(other.result);
-                    else {
-                        result[0].appendChild(other.result[0]);
-                    }
-                }
+                result[0].appendChild(other.result[0]);
                 return self;
             }),
             detach: GenerateGuardedFunction("detach", [PlStuffType.Dict], (node) => {
@@ -385,148 +371,68 @@ if (isNode) {
                     throw new Error('cannot detach a none-node type');
                 }
                 const other = nf.value.get();
-                if (multi) {
-                    for (const element of (result as HTMLElement[])) {
-                        if (other.multi) {
-                            for (const oele of other.result) {
-                                element.removeChild(oele);
-                            }
-                        } else
-                            element.removeChild(other.result[0]);
-                    }
-                } else {
-                    if (other.multi) {
-                        for (const oele of other.result) {
-                            result[0].removeChild(oele);
-                        }
-                    } else {
-                        result[0].removeChild(other.result[0]);
-                    }
-                }
+                result[0].removeChild(other.result[0]);
                 return self;
             }),
             clear: GenerateGuardedFunction("clear", [], () => {
-                if (multi) {
-                    for (const node of result) {
-                        while (node.firstChild) {
-                            node.firstChild.remove();
-                        }
-                    }
-                } else {
-                    while (result[0].firstChild) {
-                        result[0].firstChild.remove();
-                    }
+                while (result[0].firstChild) {
+                    result[0].firstChild.remove();
                 }
                 return self;
             }),
             setStyle: GenerateGuardedFunction("setStyle", [PlStuffType.Str, PlStuffType.Str], (attr, text) => {
-                if (multi) {
-                    for (const node of result) {
-                        node.style[attr.value] = text.value;
-                    }
-                } else {
-                    result[0].style[attr.value] = text.value;
-                }
+                result[0].style[attr.value] = text.value;
                 return self;
             }),
             removeStyle: GenerateGuardedFunction("removeStyle", [PlStuffType.Str], (attr) => {
-                if (multi) {
-                    for (const node of result) {
-                        node.style[attr.value] = null;
-                    }
-                } else {
-                    result[0].style[attr.value] = null;
-                }
+                result[0].style[attr.value] = null;
                 return self;
             }),
             class: GenerateGuardedFunction("class", [], () => {
-                if (multi) {
-                    const list = [];
-                    for (const node of result) {
-                        list.push(NewPlStuff(PlStuffType.Str, node.className));
-                    }
-                    return NewPlStuff(PlStuffType.List, list);
-                }
                 return NewPlStuff(PlStuffType.Str, result[0].className);
             }),
             setClass: GenerateGuardedFunction("setClass", [PlStuffType.Str], (newClass) => {
-                if (multi) {
-                    for (const node of result) {
-                        node.className = newClass.value;
-                    }
-                } else {
-                    result[0].className = newClass.value;
-                }
+                result[0].className = newClass.value;
                 return self;
             }),
             id: GenerateGuardedFunction("id", [], () => {
-                if (multi) {
-                    const list = [];
-                    for (const node of result) {
-                        list.push(NewPlStuff(PlStuffType.Str, node.id));
-                    }
-                    return NewPlStuff(PlStuffType.List, list);
-                }
                 return NewPlStuff(PlStuffType.Str, result[0].id);
             }),
             setId: GenerateGuardedFunction("setId", [PlStuffType.Str], (newId) => {
-                if (multi) {
-                    for (const node of result) {
-                        node.id = newId.value;
-                    }
-                } else {
-                    result[0].id = newId.value;
-                }
+                result[0].id = newId.value;
                 return self;
             }),
             any: GenerateGuardedFunction("any", [], () => result.length > 0 ? PlStuffTrue : PlStuffFalse),
             size: GenerateGuardedFunction("size", [], () => NewPlStuff(PlStuffType.Num, result.length)),
             all: GenerateGuardedFunction("all", [], function () {
-                multi = true;
-                return self;
+                return NewPlStuff(PlStuffType.List, result.map(r => makeElement([r], selector, sm)));
             }),
             text: GenerateGuardedFunction("text", [], function () {
-                if (multi)
-                    return toPl(result.map(node => node.innerText));
-                else
-                    return toPl(result[0].innerText);
+                return toPl(result[0].innerText);
             }),
             setText: GenerateGuardedFunction("setText", [PlStuffType.Str], function (text) {
-                result.forEach(node => {
-                    node.innerText = text.value;
-                })
+                result[0].innerText = text.value;
                 return self;
             }),
             html: GenerateGuardedFunction("text", [], function () {
-                if (multi)
-                    return toPl(result.map(node => node.innerHTML));
-                else
-                    return toPl(result[0].innerHTML);
+                return toPl(result[0].innerHTML);
             }),
             setHtml: GenerateGuardedFunction("setHTML", [PlStuffType.Str], function (text) {
-                result.forEach(node => {
-                    node.innerHTML = text.value;
-                })
+                result[0].innerHTML = text.value;
                 return self;
             }),
             key: GenerateGuardedFunction("key", [PlStuffType.Str], function (attr) {
-                if (multi)
-                    return toPl(result.map(node => node[attr.value]));
-                else
-                    return toPl(result[0][attr.value]);
+                return toPl(result[0][attr.value]);
             }),
             setKey: GenerateGuardedFunction("setKey", [PlStuffType.Str, PlStuffTypeAny], function (attr, value) {
-                result.forEach(node => node[attr.value] = value.value);
+                result[0][attr.value] = value.value;
                 return self;
             }),
             attr: GenerateGuardedFunction("attr", [PlStuffType.Str], function (attr) {
-                if (multi)
-                    return toPl(result.map(node => node.getAttribute(attr.value)));
-                else
-                    return toPl(result[0].getAttribute(attr.value));
+                return toPl(result[0].getAttribute(attr.value));
             }),
             setAttr: GenerateGuardedFunction("setAttr", [PlStuffType.Str, PlStuffTypeAny], function (attr, value) {
-                result.forEach(node => node.setAttribute(attr.value, value.value));
+                result[0].setAttribute(attr.value, value.value);
                 return self;
             }),
             listen: GenerateGuardedFunction("listen", [PlStuffType.Str, PlStuffType.Func], function (event, callback) {
@@ -555,25 +461,15 @@ if (isNode) {
                 return self;
             }),
             children: GenerateGuardedFunction("children", [], () => {
-                if (multi)
-                    return null;
-                else {
-                    const out = [];
-                    for (const child of result[0].children) {
-                        out.push(makeElement([child as HTMLElement], '', sm));
-                    }
-                    return NewPlStuff(PlStuffType.List, out);
+                const out = [];
+                for (const child of result[0].children) {
+                    out.push(makeElement([child as HTMLElement], '', sm));
                 }
+                return NewPlStuff(PlStuffType.List, out);
             }),
             remove: GenerateGuardedFunction("remove", [PlStuffType.Num], (index) => {
                 const idx = index.value - 1;
-                // todo: make out of bound error
-                if (multi) {
-                    for (const node of result)
-                        node.removeChild(node.children[idx]);
-                } else {
-                    result[0].removeChild(result[0].children[idx]);
-                }
+                result[0].removeChild(result[0].children[idx]);
                 return self;
             }),
             insert: GenerateGuardedFunction("insert", [PlStuffType.Num, PlStuffTypeAny], (index, node) => {
@@ -587,23 +483,14 @@ if (isNode) {
                 }
 
                 const other = nf.value.get();
-                if (multi) {
-                    for (const element of (result as HTMLElement[])) {
-                        if (other.multi) {
-                            for (const node of other.result)
-                                element.insertBefore(node, element.children[idx]);
-                        } else
-                            element.insertBefore(other.result[0], element.children[idx]);
-                    }
-                } else {
-                    if (other.multi)
-                        for (const node of other.result)
-                            result[0].insertBefore(node, result[0].children[idx]);
-                    else {
-                        result[0].insertBefore( other.result[0], result[0].children[idx]);
-                    }
-                }
+                result[0].insertBefore(other.result[0], result[0].children[idx]);
                 return self;
+            }),
+            $: GenerateGuardedFunction("$", [PlStuffType.Str], (selector) => {
+                return makeElement(Array.from(result[0].querySelectorAll(selector.value)), selector.value, sm);
+            }),
+            parent: GenerateGuardedFunction("parent", [], () => {
+                return makeElement([result[0].parentElement], selector + ":parent", sm);
             })
         });
         for (const key of Object.keys(self.value)) {
@@ -613,7 +500,6 @@ if (isNode) {
             get() {
                 return {
                     result,
-                    multi
                 }
             }
         })

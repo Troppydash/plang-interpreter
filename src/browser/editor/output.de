@@ -19,7 +19,3 @@ impl clear(self) for Output {
 impl addLine(self, line: Str) for Output {
     self.element.attach($("div").new().setHtml(line))
 }
-
-impl bind(self) for Output {
-
-}

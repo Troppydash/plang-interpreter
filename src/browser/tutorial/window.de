@@ -1,0 +1,14 @@
+type Window
+
+impl hash(self) for Window {
+    javascript "pl.export('hash', window.location.hash.slice(1));"
+    return hash
+}
+
+impl setHash(self, hash) for Window {
+    javascript "window.location.hash = pl.import('hash');"
+    return hash
+}
+
+
+window = Window()

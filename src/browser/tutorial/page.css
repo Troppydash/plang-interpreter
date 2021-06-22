@@ -1,7 +1,13 @@
+@font-face {
+    font-family: "CMU Serif";
+    src: url("fonts/cmunrm.ttf");
+}
+
 .controller {
     height: 100vh;
     width: 100vw;
     overflow: hidden;
+    position: relative;
 }
 
 .page {
@@ -21,7 +27,12 @@
     padding: 0.5rem 1.5rem;
 
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
+}
+
+.page-text a:visited,
+.page-text a:link {
+    color: #50b7e3;
 }
 
 .page-editor {
@@ -42,10 +53,27 @@
 }
 
 .page-navigate {
-}
-.page-navigate button {
 
 }
+
+.page-navigate button {
+    padding: 0.3rem 1rem;
+    background: #cbcbcb;
+    color: #000000;
+    border: 1px solid #444444;
+    font-size: 17px;
+}
+
+.page-navigate button:hover {
+    background: #a0a0a0;
+}
+
+.progress {
+    color: white;
+    float: right;
+}
+
+
 
 @media only screen and (max-width: 1000px) {
     .page {

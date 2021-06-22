@@ -20,6 +20,7 @@
 <script src="../editor/editor-components.de" type="application/devia"></script>
 <script src="../editor/navbar.de" type="application/devia"></script>
 <script src="../editor/editor.de" type="application/devia"></script>
+<script type="application/devia" src="window.de"></script>
 <script type="application/devia" src="page.de"></script>
 <script type="application/devia" src="controller.de"></script>
 
@@ -29,7 +30,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
 <script>
     // showdown markdown parser bindings
-    const converter = new showdown.Converter();
+    const converter = new showdown.Converter({
+        omitExtraWLInCodeBlocks: true,
+        openLinksInNewWindow: true,
+    });
     window.data = {
         exports: {
             markdown: {

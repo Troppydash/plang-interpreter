@@ -240,9 +240,6 @@ func attachEditor($root) {
     @navbar = Navbar($root)
     @editor = Editor($root)
     @output = Output($root)
-
-    editor.bind()
-    navbar.bind(output, editor)
     return dict(
         navbar: navbar,
         editor: editor,
@@ -253,5 +250,14 @@ func attachEditor($root) {
 func createEditor(root, text) {
     @out = attachEditor(root)
     out.editor.setContent(text)
+    out.editor.bind()
+    out.navbar.bind(out.output, out.editor)
     return out
+}
+
+func createSnippet(root, text) {
+     root.setClass("\(root.class()) editor editor-snippet")
+     @editor = Editor(root)
+     editor.setContent(text)
+     return editor
 }

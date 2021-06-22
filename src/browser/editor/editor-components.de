@@ -205,7 +205,7 @@ impl renderLine(self, lineNumber: Num) for TextArea {
             start = false
             continue
         }
-
+        start = false
         if bindings.IsVariableHead(c) {
             @word = c
             i++
@@ -231,7 +231,6 @@ impl highlight(self, change) for TextArea {
     @regions = bindings.Highlight(self.raw())
     if regions == null {
         self.showError()
-        # todo: Error handling here
         return
     }
 

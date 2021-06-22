@@ -16,8 +16,12 @@ body {
     align-items: stretch;
 }
 
+.editor-snippet {
+    box-shadow: 0 0 7px 0 #02668e;
+}
+
 .editor-navbar {
-    padding: 0.5rem 0.3rem;
+    padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -114,6 +118,14 @@ body {
     }
 }
 
+.editor.editor-snippet .editor-textarea > div > span.cursor {
+    border: none;
+}
+
+.editor.editor-snippet .editor-textarea > div.selected {
+    background: transparent;
+}
+
 .editor-textarea > div > span.error {
     position: absolute;
     right: 0;
@@ -123,6 +135,7 @@ body {
     color: #d4d4d4;
     animation: fadein 2.5s ease;
 }
+
 
 @keyframes fadein {
     0% {

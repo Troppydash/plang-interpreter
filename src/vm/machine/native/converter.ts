@@ -332,8 +332,9 @@ export namespace PlConverter {
                         const out = parseFloat(source.value);
                         if (!isNaN(out)) {
                             num = out;
-                        }
-                        break;
+                            break;
+                        } else
+                            return PlStuffNull;
                     }
                     case PlStuffType.Null:
                         num = 0;

@@ -1,4 +1,4 @@
-MDS = 2
+MDS = 4
 
 type Controller(
     element,
@@ -16,10 +16,18 @@ impl new(self, root, max) for Controller {
         self.pages.add(Page(n))
     }
 
-    self.render(1)
+    # auto load
+    @hash = window.hash()
+    if hash.size() /= 0 and Num(hash) /= null {
+        self.render(Num(hash))
+    } else {
+        self.render(1)
+    }
 }
 
 impl render(self, n: Num) for Controller {
+    window.setHash(Str(n))
+
     @page = self.pages.get(n)
     @context = page.render(self)
     @back = $("button").new().setText("<")
@@ -32,17 +40,21 @@ impl render(self, n: Num) for Controller {
     back.listen("click", func(e) {
         if n > 1 {
             context.1.detach(navigate)
+            context.1.detach(progress)
             self.render(n-1)
         }
     })
     forward.listen("click", func(e) {
         if n < self.pages.size() {
             context.1.detach(navigate)
+            context.1.detach(progress)
             self.render(n+1)
         }
     })
+
+    @progress = $("div").new().setClass("progress").setText("\(n)/\(MDS)")
+    context.1.insert(1, progress)
 }
 
-$root = $("#root")
-c = Controller($root, MDS)
+c = Controller($("#root"), MDS)
 

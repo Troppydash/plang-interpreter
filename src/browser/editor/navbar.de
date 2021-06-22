@@ -47,11 +47,11 @@ impl bind(self, output: Output, editor) for Navbar {
     )
 
     self.run.clicked(func(event) {
-        output.setText("> ./devia browser.de\n&nbsp;")
+        #output.setText("> ./devia browser.de\n&nbsp;")
         @text = editor.textArea.raw()
         @code = bindings.Execute(text, inout)
-        output.addLine("&nbsp;")
-        output.addLine("> program exited with code \(code)")
+        #output.addLine("&nbsp;")
+        #output.addLine("> program exited with code \(code)")
     })
 
     self.new.clicked(func(_) {
