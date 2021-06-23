@@ -16,12 +16,13 @@ import { IsPreLower } from "./ops";
 
 const PPINDENT = 4;
 
-const HIGHLIGHT_TYPES = ["kw", "sr", "mt", "nu"] as const;
+const HIGHLIGHT_TYPES = ["kw", "sr", "mt", "nu", "op"] as const;
 export const HIGHLIGHT: Record<typeof HIGHLIGHT_TYPES[number], PlColors> = {
     kw: 'magenta',
     sr: 'green',
     mt: 'yellow',
     nu: 'cyan',
+    op: "white",
 };
 
 let c = {
@@ -29,6 +30,7 @@ let c = {
     sr: colors[HIGHLIGHT.sr],
     mt: colors[HIGHLIGHT.mt],
     nu: colors[HIGHLIGHT.nu],
+    op: colors[HIGHLIGHT.op],
 };
 
 /**

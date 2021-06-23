@@ -24,5 +24,6 @@ export const maths = {
         exp: "exp",
         pi: "PI",
         e: "E",
+        sqrt: "sqrt"
     })
 };

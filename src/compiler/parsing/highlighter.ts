@@ -76,11 +76,7 @@ export function ASTProgramToColorRegions(ast: ASTProgram): PlColorRegion[] {
             }
         } else if (node instanceof ASTBinary) {
             const info = node.operator.info;
-            if (node.operator.type == PlTokenType.AND || node.operator.type == PlTokenType.OR) {
-                regions.push(NewPlColorRegion(info, HIGHLIGHT.kw));
-            } else {
-                regions.push(NewPlColorRegion(info, HIGHLIGHT.mt));
-            }
+            regions.push(NewPlColorRegion(info, HIGHLIGHT.op));
         } else if (node instanceof ASTAssign || node instanceof ASTCreate) {
             const info = node.tokens[0].info;
             regions.push(NewPlColorRegion(info, HIGHLIGHT.mt));
@@ -100,7 +96,7 @@ export function ASTProgramToColorRegions(ast: ASTProgram): PlColorRegion[] {
         } else if (node instanceof ASTNumber) {
             regions.push(NewPlColorRegion(node.getSpanToken().info, HIGHLIGHT.nu));
         } else if (node instanceof ASTUnary) {
-            regions.push(NewPlColorRegion(node.operator.info, HIGHLIGHT.mt));
+            regions.push(NewPlColorRegion(node.operator.info, HIGHLIGHT.op));
         }
 
     }

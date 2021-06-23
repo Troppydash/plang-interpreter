@@ -926,6 +926,9 @@ export class PlAstParser implements Parser {
         if ( this.peekMatch( [ PlTokenType.NOT, PlTokenType.ADD, PlTokenType.SUB ] ) ) {
             const token = this.nextToken();
             const value = this.pPrefix();
+            if (value == null) {
+                return value;
+            }
             return new ASTUnary( [ token ], token, value );
         }
         return this.pPostfix();
