@@ -743,7 +743,7 @@ export class PlAstParser implements Parser {
                 case PlTokenType.CASE: {
                     tokens.push( this.nextToken() );
 
-                    const args = this.pArgs( nextToken, "ET0034", "ET0035", PlTokenType.LBRACE );
+                    const args = this.pArgs( nextToken, "ET0034", "ET0035", PlTokenType.LBRACE, false );
                     if ( args == null ) {
                         return null;
                     }
@@ -1198,6 +1198,7 @@ export class PlAstParser implements Parser {
         commaCode: PlProblemCode,
         endTokenCode: PlProblemCode = "CE0005",
         endToken: PlTokenType = PlTokenType.RPAREN,
+        consume: boolean = true
     ): [ ASTExpression[], PlToken[] ] | null {
         let expressions = [];
         let tokens = [];
@@ -1232,7 +1233,8 @@ export class PlAstParser implements Parser {
             tokens.push( peekToken );
             expressions.push( expression );
         }
-        tokens.push( this.nextToken() );
+        if (consume)
+            tokens.push( this.nextToken() );
         return [ expressions, tokens ];
     }
 

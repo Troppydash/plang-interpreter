@@ -26,7 +26,6 @@ import {
 } from "./ast";
 import {colors, PlColors} from "../../inout/color";
 import {PlFileInfo} from "../lexing/info";
-import {PlTokenType} from "../lexing/token";
 
 interface PlColorRegion {
     info: PlFileInfo,
@@ -97,6 +96,9 @@ export function ASTProgramToColorRegions(ast: ASTProgram): PlColorRegion[] {
             regions.push(NewPlColorRegion(node.getSpanToken().info, HIGHLIGHT.nu));
         } else if (node instanceof ASTUnary) {
             regions.push(NewPlColorRegion(node.operator.info, HIGHLIGHT.op));
+        } else if (node instanceof ASTMatch) {
+            for (const token of node.tokens)
+                regions.push(NewPlColorRegion(token.info, HIGHLIGHT.kw));
         }
 
     }
@@ -105,7 +107,7 @@ export function ASTProgramToColorRegions(ast: ASTProgram): PlColorRegion[] {
         visit(s, visitor);
     }
 
-    return regions.sort((r1, r2) => {
+    return regions.filter(r => r.info.length > 0).sort((r1, r2) => {
         if (r1.info.row > r2.info.row) {
             return 1;
         }
@@ -232,6 +234,8 @@ function visit(node: ASTNode | null, closure: (node: ASTNode) => void) {
             }
             visit(node.blocks[i], closure);
         }
+        if (node.other)
+            visit(node.other, closure);
     } else if (node instanceof ASTClosure) {
         for (const a of node.args) {
             visit(a, closure);

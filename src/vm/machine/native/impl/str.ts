@@ -64,6 +64,12 @@ export const jsStr: ExportJs = {
     }),
     [ScrambleType("reverse", PlStuffType.Str)]: GenerateGuardedTypeFunction("reverse", [], function (self: string) {
         return self.split('').reverse().join('');
+    }),
+    [ScrambleType("startsWith", PlStuffType.Str)]: GenerateGuardedTypeFunction("startsWith", [PlStuffType.Str], function (self: string, other: string) {
+        return self.startsWith(other);
+    }),
+    [ScrambleType("endsWith", PlStuffType.Str)]: GenerateGuardedTypeFunction("ensdWith", [PlStuffType.Str], function (self: string, other: string) {
+        return self.endsWith(other);
     })
 };
 

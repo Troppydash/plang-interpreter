@@ -120,7 +120,7 @@ export const special: ExportNative = {
 
         try {
             this.inout.execute(code.value, {
-                pl: {
+                de: {
                     import: _import,
                     export: _export
                 }

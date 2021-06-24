@@ -1,6 +1,6 @@
 import { PlFile } from "../../inout/file";
 import PlToken, { NewPlToken, PlTokenType } from "./token";
-import { NewFileInfo, PlFileInfo } from "./info";
+import {NewEmptyFileInfo, NewFileInfo, PlFileInfo} from "./info";
 import {isalpha, isblank, isnum, isvariablefirst, isvariablerest} from "../../extension/types";
 import { NewPlProblem, PlProblem } from "../../problem/problem";
 import { PlProblemCode } from "../../problem/codes";
@@ -486,8 +486,7 @@ class PlLexer implements Lexer {
             // regular string
             this.advancePointer();
 
-            let oldCol = this.currentCol; // first string segment col
-            let lastCol = oldCol; // last string segment col
+            let lastCol = this.currentCol; // first string segment col
 
             // initial buffer length
             const lastBuffer = this.buffer.length;
@@ -541,7 +540,7 @@ class PlLexer implements Lexer {
                             this.advancePointer();
 
                             this.addBuffer(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(2)))
-                            this.addBuffer(NewPlToken(PlTokenType.VARIABLE, 'Str', this.currentFileInfo(1)));
+                            this.addBuffer(NewPlToken(PlTokenType.VARIABLE, 'Str', NewEmptyFileInfo('')));
                             this.addBuffer(NewPlToken(PlTokenType.LPAREN, '(', this.currentFileInfo(1)));
 
                             const lparen = this.currentFileInfo(2); // lparen token info
@@ -578,7 +577,7 @@ class PlLexer implements Lexer {
                             // emit +
                             this.addBuffer(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(1)))
 
-                            lastCol = this.currentCol;
+                            lastCol = this.currentCol+1;
                             continue;
                         }
                         default: {
