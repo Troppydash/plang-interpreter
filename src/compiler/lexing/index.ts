@@ -541,7 +541,7 @@ class PlLexer implements Lexer {
 
                             this.addBuffer(NewPlToken(PlTokenType.ADD, '+', this.currentFileInfo(2)))
                             this.addBuffer(NewPlToken(PlTokenType.VARIABLE, 'Str', NewEmptyFileInfo('')));
-                            this.addBuffer(NewPlToken(PlTokenType.LPAREN, '(', this.currentFileInfo(1)));
+                            this.addBuffer(NewPlToken(PlTokenType.LPAREN, '(', NewEmptyFileInfo('')));
 
                             const lparen = this.currentFileInfo(2); // lparen token info
                             // used for counting parenthesis
@@ -595,11 +595,11 @@ class PlLexer implements Lexer {
                 this.advancePointer();
             }
 
-            const hasMore = this.buffer.length - lastBuffer > 1;
+            const hasMore = this.buffer.length - lastBuffer > 0;
 
             // add the final/first string segment
             this.addBuffer(
-                NewPlToken(PlTokenType.STR, content.substring(0, content.length - 1), this.currentFileInfo(this.currentCol - lastCol + (hasMore ? 0 : 1)))
+                NewPlToken(PlTokenType.STR, content.substring(0, content.length - 1), this.currentFileInfo(this.currentCol - lastCol + 1))
             );
 
             // if there is more than one emitted

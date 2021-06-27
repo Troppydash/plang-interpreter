@@ -64,7 +64,6 @@ export function execute(code: string, vars: Record<string, any>): void {
         Boolean,
         Symbol,
         Error,
-        BigInt,
         RegExp,
         Map,
         Set,
