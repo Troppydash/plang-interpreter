@@ -436,27 +436,48 @@ if (isNode) {
                 return self;
             }),
             listen: GenerateGuardedFunction("listen", [PlStuffType.Str, PlStuffType.Func], function (event, callback) {
-                for (const node of result) {
-                    node.addEventListener(event.value, (event: any) => {
-                        const e = {
-                            preventDefault: () => event.preventDefault(),
-                            "#raw": {
-                                _version: VERSION,
-                                type: "Raw",
-                                value: event
-                            },
-                        } as ListenCallbackEvent;
-                        if (event.currentTarget) {
-                            e.location = {
-                                x: event.clientX - event.currentTarget.getBoundingClientRect().left,
-                                y: event.clientY - event.currentTarget.getBoundingClientRect().top,
-                            }
+                let f;
+                result[0].addEventListener(event.value, f = (event: any) => {
+                    const e = {
+                        preventDefault: () => event.preventDefault(),
+                        "#raw": {
+                            _version: VERSION,
+                            type: "Raw",
+                            value: event
+                        },
+                    } as ListenCallbackEvent;
+                    if (event.currentTarget) {
+                        e.location = {
+                            x: event.clientX - event.currentTarget.getBoundingClientRect().left,
+                            y: event.clientY - event.currentTarget.getBoundingClientRect().top,
                         }
-                        if (event.key) {
-                            e.key = event.key;
-                        }
-                        PlConverter.PlToJs(callback, sm)(e);
-                    });
+                    }
+                    if (event.key) {
+                        e.key = event.key;
+                    }
+                    PlConverter.PlToJs(callback, sm)(e);
+                });
+
+                const node = result[0] as any;
+                if (node.data == null) {
+                    node.data = {};
+                }
+                const arr = node.data[event.value];
+                if (arr != null) {
+                    result[0].removeEventListener(event.value, arr);
+                }
+                node.data[event.value] = f;
+                return self;
+            }),
+            unlisten: GenerateGuardedFunction("unlisten", [PlStuffType.Str], function (event) {
+                const node = result[0] as any;
+                if (node.data == null) {
+                    node.data = {};
+                }
+                const arr = node.data[event.value];
+                if (arr != null) {
+                    result[0].removeEventListener(event.value, arr);
+                    node.data[event.value] = undefined;
                 }
                 return self;
             }),

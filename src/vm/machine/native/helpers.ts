@@ -70,26 +70,6 @@ export function GenerateGuardedTypeFunction(name: string, guards: PlParameterTyp
     };
 }
 
-//
-// export function GenerateJsGuardedFunction(name: string, guards: (PlStuffType | "*")[], func: Function): PlNativeFunction {
-//     return {
-//         name,
-//         parameters: guards,
-//         self: null,
-//         native: func.bind(this)
-//     };
-// }
-//
-//
-// export function GenerateJsGuardedTypeFunction(name: string, guards: (TypeofTypes | "*")[], func: Function) {
-//     return {
-//         name,
-//         parameters: guards,
-//         self: null,
-//         native: func.bind(this)
-//     };
-// }
-
 export function GenerateForAll(name: string, func: PlNativeFunction) {
     const out = {};
     for (const item of PlStuffTypes) {

@@ -5,24 +5,18 @@ import {PlProgramToString} from "../../../emitter/printer";
 import {IACTSync} from "../../../../problem/interactive/index";
 import {IACTDebugger} from "../../../../problem/interactive/debugger";
 import {isNode} from "../../../../inout";
+import {NewPlStuff, PlStuff, PlStuffType, PlStuffTypeAny} from "../../stuff";
+import PlToDebugString = PlConverter.PlToDebugString;
 
-const debug = {
+export const debug = {
     stack: GenerateGuardedFunction("stack", [], function (this: StackMachine) {
-        return this.stack.map(i => PlConverter.PlToJs(i, this));
+        return NewPlStuff(PlStuffType.List, [...this.stack]);
     }),
     closure: GenerateGuardedFunction("closure", [], function (this: StackMachine) {
-        const values = {};
-        for (const [key, value] of Object.entries(this.closureFrame.values)) {
-            values[key] = PlConverter.PlToJs(value, this);
-        }
-        return values;
+        return NewPlStuff(PlStuffType.Dict, {...this.closureFrame.values});
     }),
     locals: GenerateGuardedFunction("locals", [], function (this: StackMachine) {
-        const values = {};
-        for (const [key, value] of Object.entries(this.stackFrame.values)) {
-            values[key] = PlConverter.PlToJs(value, this);
-        }
-        return values;
+        return NewPlStuff(PlStuffType.Dict, {...this.stackFrame.values});
     }),
     globals: GenerateGuardedFunction("globals", [], function (this: StackMachine) {
         let out = {};
@@ -30,18 +24,23 @@ const debug = {
         do {
             const values = {};
             for (const [key, value] of Object.entries(sf.values)) {
-                values[key] = PlConverter.PlToJs(value, this);
+                values[key] = value;
             }
             out = {...out, ...values};
         } while ((sf = sf.outer) != null);
-        return out;
+        return NewPlStuff(PlStuffType.Dict, out);
     }),
     program: GenerateGuardedFunction("program", [], function (this: StackMachine) {
-        return PlProgramToString(this.program, false).split('\n');
+        return NewPlStuff(PlStuffType.List, PlProgramToString(this.program, false)
+            .split('\n')
+            .map(s => NewPlStuff(PlStuffType.Str, s)));
     }),
     pointer: GenerateGuardedFunction("pointer", [], function (this: StackMachine) {
-        return this.pointer;
+        return NewPlStuff(PlStuffType.Num, this.pointer);
     }),
+    format: GenerateGuardedFunction("format", [PlStuffTypeAny], function (item: PlStuff) {
+        return NewPlStuff(PlStuffType.Str, PlToDebugString(item))
+    })
 };
 
 if (isNode) {
@@ -52,7 +51,3 @@ if (isNode) {
         throw "debugger";
     });
 }
-
-export const jsdebug = {
-    debug
-};

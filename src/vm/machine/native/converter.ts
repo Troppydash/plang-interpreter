@@ -1,5 +1,5 @@
 import {
-    NewPlStuff,
+    NewPlStuff, PlFunction,
     PlInstance,
     PlNativeFunction,
     PlStuff,
@@ -132,7 +132,7 @@ export namespace PlConverter {
     function jsToType(js: CustomValue): PlStuff {
         return NewPlStuff(PlStuffType.Type, {
             type: js.value.type,
-            format: js.value.value
+            format: js.value.format
         } as PlType);
     }
 
@@ -186,15 +186,19 @@ export namespace PlConverter {
                 return out;
             }
             case PlStuffType.NFunc: {
-                return (...args) => {
+                const fn = ((...args) => {
                     return PlToJs(object.value.native(...args.map(a => JsToPl(a, sm))), sm);
-                };
+                });
+                (fn as any).data = (object.value as PlNativeFunction);  // save data
+                return fn;
             }
             case PlStuffType.Func: {
                 const callPointer = sm.pointer;
-                return protectPlangCall((...args) => {
+                const fn = protectPlangCall((...args) => {
                     return PlToJs(sm.runFunction(object, args.map(arg => JsToPl(arg, sm)), callPointer), sm);
                 }, sm);
+                (fn as any).data = (object.value as PlFunction);  // save data
+                return fn;
             }
             case PlStuffType.Raw:
                 return rawToJs(object);
@@ -223,6 +227,10 @@ export namespace PlConverter {
                 return PlStuffFalse;
             }
             case "function": {
+                let additional = {};  // restore data saved
+                if (object.data) {
+                    additional = object.data;
+                }
                 return NewPlStuff(PlStuffType.NFunc, {
                     native: (...args) => {
                         return JsToPl(object.bind(sm)(...args.map(a => PlToJs(a, sm))), sm);
@@ -230,6 +238,7 @@ export namespace PlConverter {
                     name: "native",
                     parameters: [PlStuffTypeRest],
                     self: null,
+                    ...additional
                 } as PlNativeFunction);
             }
             case "undefined": {
