@@ -223,7 +223,7 @@ if (isNode) {
     const path = require('path');
     const fs = require('fs');
     const cp = require('child_process');
-    jsSpecial['$'] = GenerateGuardedFunction("$", [PlStuffType.Str, PlStuffType.Dict], function (command, rel) {
+    jsSpecial['$'] = GenerateGuardedFunction("$", [PlStuffType.Str, PlStuffType.Str], function (command, rel) {
         const targetPath = path.join(this.inout.paths.rootPath, rel);
         if (!fs.existsSync(targetPath)) {
             return {
