@@ -11,6 +11,8 @@ import {time} from "./modules/time";
 import {random} from "./modules/random";
 import {debug} from "./modules/debug";
 import {func} from "./impl/func";
+import {system} from "./modules/system";
+import {isNode} from "../../../inout";
 
 
 export const jsNatives: ExportJs = {
@@ -33,11 +35,15 @@ export const natives: ExportNative = {
 };
 
 export const jsModules: Record<string, any> = {
-    ...maths,
-    ...time,
-    ...random,
+    maths,
+    time,
+    random,
 };
 
 export const modules = {
     debug,
+}
+
+if (isNode) {
+    (jsModules as any).system = system;
 }

@@ -23,7 +23,6 @@ function randomNumber(lower, upper) {
 }
 
 export const random = {
-    random: {
         number: GenerateGuardedFunction("number", [PlStuffTypeRest], randomNumber),
         list: GenerateGuardedFunction("list", [PlStuffType.Num, PlStuffType.Num, PlStuffType.Num], function (lower, upper, n) {
             let out = [];
@@ -32,5 +31,4 @@ export const random = {
             }
             return out;
         })
-    }
 };

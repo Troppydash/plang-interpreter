@@ -52,6 +52,7 @@ export function readFile(filePath: string, type: PathType) {
 }
 
 export function execute(code: string, vars: Record<string, any>): void {
+    // TODO: new Function syntax
     MaskedEval(code, {
         console,
         Math,

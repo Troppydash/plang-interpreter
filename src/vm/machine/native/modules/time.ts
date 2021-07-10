@@ -2,7 +2,6 @@ import {GenerateGuardedFunction} from "../helpers";
 import {PlStuffType} from "../../stuff";
 
 export const time = {
-    time: {
         now: GenerateGuardedFunction("now", [], () => {
             return (new Date()).getTime();
         }),
@@ -20,5 +19,4 @@ export const time = {
             }
             return trial;
         })
-    }
 };

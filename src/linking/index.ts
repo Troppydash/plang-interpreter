@@ -190,9 +190,9 @@ export function RunVM(file: PlFile, args: string[]): number {
         const ok = ReportProblems(file.content, problems, trace);
 
         // fancy
-        if (ok && inout.options["mode"] == "debug" && ok && trace.length > 2 && IACTPrepare()) {
+        // if (ok && inout.options["mode"] == "debug" && ok && trace.length > 2 && IACTPrepare()) {
             // IACTSync(IACTTrace(file.content, problems, trace));
-        }
+        // }
 
         return 1;
     }

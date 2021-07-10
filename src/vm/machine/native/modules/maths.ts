@@ -14,16 +14,14 @@ function generateBindings(target: any, converter: Record<string, string>): objec
 }
 
 
-export const maths = {
-    maths: generateBindings(Math, {
-        sin: "sin",
-        cos: "cos",
-        tan: "tan",
-        log2: "log2",
-        ln: "log",
-        exp: "exp",
-        pi: "PI",
-        e: "E",
-        sqrt: "sqrt"
-    })
-};
+export const maths = generateBindings(Math, {
+    sin: "sin",
+    cos: "cos",
+    tan: "tan",
+    log2: "log2",
+    ln: "log",
+    exp: "exp",
+    pi: "PI",
+    e: "E",
+    sqrt: "sqrt"
+});
