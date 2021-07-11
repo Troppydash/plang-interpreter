@@ -1,7 +1,7 @@
 import PlLexer from "../compiler/lexing";
 import {ReportProblems} from "../problem";
 import {NewPlFile, PlFile} from "../inout/file";
-import inout from "../inout";
+import inout, {isNode} from "../inout";
 import {ASTProgram} from "../compiler/parsing/ast";
 import {PlAstParser} from "../compiler/parsing";
 import {PlProblem} from "../problem/problem";
@@ -191,7 +191,7 @@ export function RunVM(file: PlFile, args: string[]): number {
 
         // fancy
         // if (ok && inout.options["mode"] == "debug" && ok && trace.length > 2 && IACTPrepare()) {
-            // IACTSync(IACTTrace(file.content, problems, trace));
+        // IACTSync(IACTTrace(file.content, problems, trace));
         // }
 
         return 1;
@@ -208,7 +208,16 @@ export function ReadFile(filePath: string): PlFile | null {
     inout.setRootPath(filePath);
 
     const filename = path.basename(filePath);
-    const content = inout.readFile(filename, "rootPath");
+    let content;
+    if (path.isAbsolute(filePath)) {
+        try {
+            content = require('fs').readFileSync(filePath).toString();
+        } catch (e) {
+            content = null
+        }
+    } else {
+        content = inout.readFile(filename, "rootPath");
+    }
     if (content === null) {
         inout.print(`Cannot read file '${filePath}'`);
         inout.print(`Reason: file doesn't exist or can't be read`);
