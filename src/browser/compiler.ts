@@ -1,14 +1,12 @@
 // used for easy compiles
 
-import {RunVM} from "../linking/index.js";
-import {NewPlFile} from "../inout/file.js";
-import PlLexer from "../compiler/lexing/index.js";
-import {PlAstParser} from "../compiler/parsing/index.js";
-import {ReportProblems} from "../problem/index.js";
-import {EmitProgram} from "../vm/emitter/index.js";
-import inout, {PlInout} from "../inout/index.js";
-import {LogProblem, LogTrace} from "../problem/printer.js";
-import {PlStackMachine} from "../vm/machine/index.js";
+import {NewPlFile} from "../inout/file";
+import PlLexer from "../compiler/lexing";
+import {PlAstParser} from "../compiler/parsing";
+import {EmitProgram} from "../vm/emitter";
+import inout, {PlInout} from "../inout/index";
+import {LogProblem, LogTrace} from "../problem/printer";
+import {PlStackMachine} from "../vm/machine";
 
 interface Result {
     code: number;
