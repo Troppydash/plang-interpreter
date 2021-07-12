@@ -128,7 +128,7 @@ export function LogCallbackProblem(problem: PlProblem): string {
 }
 
 export function LogProblemShort(problem: PlProblem) {
-    return `${colors.cyan(PCFullName(problem.code))}: ${capitalize(problem.message)}`;
+    return `On line ${problem.info.row+1}\n${colors.cyan(PCFullName(problem.code))}: ${capitalize(problem.message)}`;
 }
 
 export function CreateFrame(name: string, info: PlFileInfo) {
@@ -139,7 +139,7 @@ export function CreateFrame(name: string, info: PlFileInfo) {
     return text;
 }
 
-export function LogTrace(trace: PlTrace) {
+export function LogTrace(trace: PlTrace): string {
     let buffer = [];
 
     for (const frame of trace) {

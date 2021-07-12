@@ -5,8 +5,9 @@ import PlLexer from "../compiler/lexing";
 import {PlAstParser} from "../compiler/parsing";
 import {EmitProgram} from "../vm/emitter";
 import inout, {PlInout} from "../inout/index";
-import {LogProblem, LogTrace} from "../problem/printer";
+import {LogProblem, LogProblemShort, LogTrace} from "../problem/printer";
 import {PlStackMachine} from "../vm/machine";
+import {colors, SetColorNone} from "../inout/color";
 
 interface Result {
     code: number;
@@ -16,6 +17,8 @@ interface Result {
 }
 
 export function execute(text: string, options: PlInout): Result {
+    SetColorNone();
+
     const file = NewPlFile("browser", text);
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
@@ -26,7 +29,7 @@ export function execute(text: string, options: PlInout): Result {
             code: 1,
             ok: false,
             trace: [],
-            problems: problems.map(p => LogProblem(p, text))
+            problems: problems.map(p => LogProblemShort(p))
         };
     }
 
@@ -45,8 +48,8 @@ export function execute(text: string, options: PlInout): Result {
         return {
             code: 1,
             ok: false,
-            trace: trace.map(t => LogTrace(t)),
-            problems: problems.map(p => LogProblem(p, text))
+            trace: LogTrace(trace).split('\n'),
+            problems: problems.map(p => LogProblemShort(p))
         };
     }
     vm.inout.flush();
