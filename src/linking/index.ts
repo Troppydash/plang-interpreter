@@ -10,6 +10,7 @@ import {PlStackMachine} from "../vm/machine";
 import {IACTPrepare, IACTSync} from "../problem/interactive/index";
 import {IACTTrace} from "../problem/interactive/trace";
 import {ASTProgramHighlight, ASTProgramToColorRegions} from "../compiler/parsing/highlighter";
+import {OptimizeProgram} from "../vm/optimizer";
 
 
 export function RunParser(file: PlFile): ASTProgram | null {
@@ -27,11 +28,12 @@ export function RunParser(file: PlFile): ASTProgram | null {
 }
 
 export function RunEmitter(file: PlFile): PlProgram | null {
-    const ast = RunParser(file);
+    let ast = RunParser(file);
     if (ast == null) {
         return null;
     }
 
+    ast = OptimizeProgram(ast);
     return EmitProgram(ast, true);
 }
 
@@ -65,12 +67,13 @@ export function RunHighlighter(file: PlFile) {
 export function RunOnce(vm: PlStackMachine, file: PlFile) {
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
-    const ast = parser.parseAll();
+    let ast = parser.parseAll();
     if (ast == null) {
         const problems = parser.getProblems();
         ReportProblems(file.content, problems);
         return null;
     }
+    ast = OptimizeProgram(ast);
 
     const program = EmitProgram(ast);
     program.program.pop(); // remove final stkpop
@@ -93,12 +96,13 @@ export function RunOnce(vm: PlStackMachine, file: PlFile) {
 export function RunFile(vm: PlStackMachine, file: PlFile) {
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
-    const ast = parser.parseAll();
+    let ast = parser.parseAll();
     if (ast == null) {
         const problems = parser.getProblems();
         ReportProblems(file.content, problems);
         return null;
     }
+    ast = OptimizeProgram(ast);
 
     const program = EmitProgram(ast);
     for (const debug of program.debug) {
@@ -166,13 +170,14 @@ export function RunVmFast(file: PlFile, args: string[]): number {
 export function RunVM(file: PlFile, args: string[]): number {
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);
-    const ast = parser.parseAll();
+    let ast = parser.parseAll();
     if (ast == null) {
         const problems = parser.getProblems();
         ReportProblems(file.content, problems);
         return 1;
     }
 
+    ast = OptimizeProgram(ast);
     const program = EmitProgram(ast, true);
     const vm = new PlStackMachine({
         ...inout,
