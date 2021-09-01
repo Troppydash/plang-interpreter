@@ -44,6 +44,8 @@ export enum PlTokenType {
     COMMA,      // ,
     COLON,      // :
     SEMICOLON,  // ;
+    LBRACK,     // [
+    RBRACK,     // ]
 
     // data types
     TYPE,
@@ -51,8 +53,6 @@ export enum PlTokenType {
     BOOLEAN,
     VARIABLE,
     NULL,
-    // LIST,
-    // DICT,
     STR,
 
     // others

@@ -25,7 +25,7 @@ export const dict = {
     [ScrambleType("set", PlStuffType.Dict)]: GenerateGuardedTypeFunction("set", [PlStuffTypeAny, PlStuffTypeAny], function ( self: PlStuff, key: PlStuff, value: PlStuff) {
         const skey = PlToString(key, this);
         self.value[skey] = value;
-        return self;
+        return value;
     }),
     [ScrambleType("delete", PlStuffType.Dict)]: GenerateGuardedTypeFunction("delete", [PlStuffTypeAny], function ( self: PlStuff, key: PlStuff) {
         const skey = PlToString(key, this);

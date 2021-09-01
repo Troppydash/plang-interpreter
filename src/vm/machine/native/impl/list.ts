@@ -68,20 +68,6 @@ export const list = {
         }
         const list = self.value;
 
-        // if (index.type == PlStuffType.List) {
-        //     const indexes = index.value;
-        //     let out = [];
-        //     for (const index of indexes) {
-        //         AssertType("get", index, PlStuffType.Num, 1);
-        //         const idx = index.value - 1;
-        //         if (idx < 0 || idx >= list.length) {
-        //             throw new Error(MakeOutOfRangeMessage("get", PlStuffType.List, list.length, idx));
-        //         }
-        //         out.push(list[idx]);
-        //     }
-        //     return NewPlStuff(PlStuffType.List, out);
-        //
-        // }
         const idx = index.value - 1;
         if (idx < 0 || idx >= list.length) {
             throw new Error(MakeOutOfRangeMessage("get", PlStuffType.List, list.length, index.value));
@@ -117,7 +103,7 @@ export const list = {
             throw new Error(MakeOutOfRangeMessage("set", PlStuffType.List, list.length, index.value));
         }
         list[idx] = value;
-        return self;
+        return value;
     }),
     [ScrambleType("have", PlStuffType.List)]: GenerateGuardedTypeFunction("have", [PlStuffTypeAny], function (self, value) {
         for (const item of self.value) {

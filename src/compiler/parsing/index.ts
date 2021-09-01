@@ -829,6 +829,20 @@ export class PlAstParser implements Parser {
                 }
                 pre = left.left;
                 variable = right.right;
+            } else if (left instanceof ASTCall && left.target instanceof ASTDot && left.target.right.content == "get") {
+                this.nextToken();
+
+                const item = left.target.left;
+                const index = left.args[0];
+                const value = this.pExpression();
+                if (value == null) {
+                    return null;
+                }
+
+                const target = new ASTDot([peekToken], item, new ASTVariable([peekToken], "set"));
+                return new ASTCall([peekToken], target, [
+                    index, value
+                ]);
             } else {
                 this.newProblem( left.getSpanToken(), "ET0002" );
                 return null;
@@ -980,6 +994,27 @@ export class PlAstParser implements Parser {
                 left = new ASTDot( [ peekToken ], left, right );
                 continue;
             }
+            if (peekToken.type == PlTokenType.LBRACK) {
+                this.nextToken();
+                const index = this.pExpression();
+                if (index == null) {
+                    // error
+                    return null;
+                }
+
+                const peek = this.peekToken();
+                if (peek.type != PlTokenType.RBRACK) {
+                    // error
+                    return null;
+                }
+                this.nextToken();
+
+                const target = new ASTDot([peekToken], left, new ASTVariable([peekToken], "get"))
+                left = new ASTCall([peekToken], target, [index]);
+                continue;
+            }
+
+
             // try parsing no paren
             // This is beyond stupid
             const args = this.pArgsNoParen();

@@ -223,6 +223,8 @@ class PlLexer implements Lexer {
             ',': PlTokenType.COMMA,
             ':': PlTokenType.COLON,
             ';': PlTokenType.SEMICOLON,
+            '[': PlTokenType.LBRACK,
+            ']': PlTokenType.RBRACK,
         }
         if (singleSymbolMap.hasOwnProperty(c)) {
             // parse
