@@ -23,7 +23,7 @@ import {ScrambleImpl, ScrambleName, ScrambleType} from "./scrambler";
 import {PlProblemCode} from "../../problem/codes";
 import {PlActions, PlConverter} from "./native/converter";
 import {PlProgram} from "../emitter";
-import {NewPlTraceFrame, PlTrace} from "../../problem/trace";
+import {NewPlTraceFrame, PlTrace, PlTraceFrame} from "../../problem/trace";
 import {PlInout} from "../../inout";
 import {PlStackFrame} from "./memory";
 import {PlFile} from "../../inout/file";
@@ -738,7 +738,7 @@ export class PlStackMachine implements StackMachine {
         return this.problems;
     }
 
-    getTrace() {
+    getTrace(): PlTrace {
         const trace = [];
         let frame = this.stackFrame;
         while (true) {
