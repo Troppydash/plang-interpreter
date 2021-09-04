@@ -5,7 +5,7 @@ module.exports = {
     target: 'node',
     mode: "production",
     entry: {
-        'deviation': './src/browser/compiler.ts',
+        'deviation': './src/everything.ts',
     },
     output: {
         path: path.resolve(__dirname, 'out'),

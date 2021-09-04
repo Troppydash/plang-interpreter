@@ -4,7 +4,7 @@ import {NewPlFile} from "../inout/file";
 import PlLexer from "../compiler/lexing";
 import {PlAstParser} from "../compiler/parsing";
 import {EmitProgram} from "../vm/emitter";
-import inout, {PlInout} from "../inout/index";
+import {Inout, PlInout} from "../inout/index";
 import {LogProblem, LogProblemShort, LogTrace} from "../problem/printer";
 import {PlStackMachine} from "../vm/machine";
 import {colors, SetColorNone} from "../inout/color";
@@ -35,7 +35,7 @@ export function execute(text: string, options: PlInout): Result {
 
     const program = EmitProgram(ast);
     const vm = new PlStackMachine({
-        ...inout,
+        ...Inout(),
         ...options,
     }, file, []);
     vm.addProgram(program);

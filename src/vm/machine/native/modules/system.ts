@@ -1,6 +1,6 @@
 import {GenerateGuardedFunction} from "../helpers";
 import {PlStuff, PlStuffType} from "../../stuff";
-import inout from "../../../../inout";
+import {Inout} from "../../../../inout";
 
 
 export const system = {
@@ -8,7 +8,7 @@ export const system = {
         const fs = require('fs');
         const path = require('path');
         try {
-            const data = fs.readFileSync(path.join(inout.paths.rootPath, dir));
+            const data = fs.readFileSync(path.join(Inout().paths.rootPath, dir));
             return {
                 text: data.toString(),
                 ok: true,
@@ -24,7 +24,7 @@ export const system = {
         const fs = require('fs');
         const path = require('path');
         try {
-            fs.writeFileSync(path.join(inout.paths.rootPath, dir), content);
+            fs.writeFileSync(path.join(Inout().paths.rootPath, dir), content);
             return {
                 text: content,
                 ok: true,

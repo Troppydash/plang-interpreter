@@ -4,7 +4,7 @@
 
 // Starting repl
 import {StartREPL} from "./repl";
-import inout, {isNode} from "./inout";
+import {Inout, isNode} from "./inout";
 import {ReadFile, RunEmitter, RunHighlighter, RunParser, RunVM, RunVmFast} from "./linking";
 import {CliArguments} from "./cli";
 import {CliHandleMagicFlags} from "./cli/magic";
@@ -57,15 +57,15 @@ if (!isNode || args.getArgSize() == 0 || args.is("run-repl")) { // If running in
     if (args.is("run-compiler")) {
         const out = RunParser(file);
         if (out != null) {
-            inout.print(ASTProgramToString(RunParser(file)));
+            Inout().print(ASTProgramToString(RunParser(file)));
         }
         process.exit(0);
     }
     if (args.is("run-emitter")) {
         const out = RunEmitter(file);
         if (out != null) {
-            inout.print(PlProgramToString(out));
-            inout.print(`Emitted ${out.program.length} instructions, with ${out.debug.length} debug messages`);
+            Inout().print(PlProgramToString(out));
+            Inout().print(`Emitted ${out.program.length} instructions, with ${out.debug.length} debug messages`);
         }
         process.exit(0);
     }

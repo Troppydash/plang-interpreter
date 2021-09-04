@@ -1,14 +1,12 @@
 import PlLexer from "../compiler/lexing";
 import {ReportProblems} from "../problem";
 import {NewPlFile, PlFile} from "../inout/file";
-import inout, {isNode} from "../inout";
+import  {Inout, isNode} from "../inout";
 import {ASTProgram} from "../compiler/parsing/ast";
 import {PlAstParser} from "../compiler/parsing";
 import {PlProblem} from "../problem/problem";
 import {EmitProgram, EmitStatement, PlProgram} from "../vm/emitter/";
 import {PlStackMachine} from "../vm/machine";
-import {IACTPrepare, IACTSync} from "../problem/interactive/index";
-import {IACTTrace} from "../problem/interactive/trace";
 import {ASTProgramHighlight, ASTProgramToColorRegions} from "../compiler/parsing/highlighter";
 import {OptimizeProgram} from "../vm/optimizer";
 
@@ -61,7 +59,7 @@ export function RunHighlighter(file: PlFile) {
 
     const regions = ASTProgramToColorRegions(ast);
     const out = ASTProgramHighlight(regions, file.content);
-    inout.print(out);
+    Inout().print(out);
 }
 
 export function RunOnce(vm: PlStackMachine, file: PlFile) {
@@ -117,7 +115,7 @@ export function RunFile(vm: PlStackMachine, file: PlFile) {
         ReportProblems(file.content, problems, trace);
         return 1;
     }
-    inout.flush();
+    Inout().flush();
 
     if (typeof out.value == "number")
         return out.value;
@@ -135,10 +133,10 @@ export function RunVmFast(file: PlFile, args: string[]): number {
     const parser = new PlAstParser(lexer);
 
     const vm = new PlStackMachine({
-        ...inout,
+        ...Inout(),
         print: message => {
-            inout.print(message);
-            inout.flush();
+            Inout().print(message);
+            Inout().flush();
         }
     }, file, args);
 
@@ -180,10 +178,10 @@ export function RunVM(file: PlFile, args: string[]): number {
     ast = OptimizeProgram(ast);
     const program = EmitProgram(ast, true);
     const vm = new PlStackMachine({
-        ...inout,
+        ...Inout(),
         print: message => {
-            inout.print(message);
-            inout.flush();
+            Inout().print(message);
+            Inout().flush();
         }
     }, file, args);
 
@@ -195,13 +193,13 @@ export function RunVM(file: PlFile, args: string[]): number {
         const ok = ReportProblems(file.content, problems, trace);
 
         // fancy
-        // if (ok && inout.options["mode"] == "debug" && ok && trace.length > 2 && IACTPrepare()) {
+        // if (ok && Inout().options["mode"] == "debug" && ok && trace.length > 2 && IACTPrepare()) {
         // IACTSync(IACTTrace(file.content, problems, trace));
         // }
 
         return 1;
     }
-    inout.flush();
+    Inout().flush();
 
     if (typeof out.value == "number")
         return out.value;
@@ -210,7 +208,7 @@ export function RunVM(file: PlFile, args: string[]): number {
 
 export function ReadFile(filePath: string): PlFile | null {
     const path = require('path');
-    inout.setRootPath(filePath);
+    Inout().setRootPath(filePath);
 
     const filename = path.basename(filePath);
     let content;
@@ -221,12 +219,12 @@ export function ReadFile(filePath: string): PlFile | null {
             content = null
         }
     } else {
-        content = inout.readFile(filename, "rootPath");
+        content = Inout().readFile(filename, "rootPath");
     }
     if (content === null) {
-        inout.print(`Cannot read file '${filePath}'`);
-        inout.print(`Reason: file doesn't exist or can't be read`);
-        inout.flush();
+        Inout().print(`Cannot read file '${filePath}'`);
+        Inout().print(`Reason: file doesn't exist or can't be read`);
+        Inout().flush();
         return null;
     }
     return NewPlFile(filename, content);

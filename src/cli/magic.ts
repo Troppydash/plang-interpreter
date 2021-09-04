@@ -1,6 +1,6 @@
 import { CliArguments } from "./index";
 import {StartDemo} from "../repl";
-import inout from "../inout";
+import  {Inout} from "../inout";
 import {colors} from "../inout/color";
 import {PNAME} from "./constants";
 import {LogProblemList} from "../problem/printer";
@@ -8,7 +8,7 @@ import {LogProblemList} from "../problem/printer";
 export function CliHandleMagicFlags(args: CliArguments): boolean {
 
     if (args.is("help")) {
-        inout.print(`Usage: ${PNAME} ...flags [file] ...program_arguments
+        Inout().print(`Usage: ${PNAME} ...flags [file] ...program_arguments
 
 ${colors.cyan('Examples')}
 ${PNAME} code.de                  ~ Run the file called [code.de]
@@ -33,7 +33,7 @@ mode-release    ~ Run [file] in release mode, have no detailed errors
     }
 
     if (args.is("view-problems")) {
-        inout.print(LogProblemList(args.getArgs()));
+        Inout().print(LogProblemList(args.getArgs()));
         return false;
     }
 
@@ -44,11 +44,11 @@ mode-release    ~ Run [file] in release mode, have no detailed errors
 
     if (args.is("mode-release")) {
         // bad way, but it is a singleton so whatever
-        inout.options["mode"] = "release";
+        Inout().options["mode"] = "release";
     }
 
     if (args.is("run-demo") || args.is("run-repl") || args.raw.length == 0) {
-        inout.options["run"] = "repl";
+        Inout().options["run"] = "repl";
     }
 
 

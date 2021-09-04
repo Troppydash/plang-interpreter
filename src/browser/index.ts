@@ -3,8 +3,9 @@
 import {RunFile, RunVM} from "../linking";
 import {NewPlFile, PlFile} from "../inout/file";
 import {PlStackMachine} from "../vm/machine";
-import inout from "../inout";
-
+import {Inout} from "../inout";
+import {execute} from "./compiler";
+import * as useful from './exports';
 
 const attribute = "application/devia";
 
@@ -51,21 +52,39 @@ function ready(fn) {
     }
 }
 
-ready(async () => {
-    const sources = await getSources();
-    const vm = new PlStackMachine({
-        ...inout,
-        print: message => {
-            inout.print(message);
-            inout.flush();
-        }
-    }, NewPlFile('browser.de', ''), []);
-    for (const source of sources) {
-        const code = RunFile(vm, source);
-        console.debug(`[${source.filename}] sync return code: ${code}`);
+export function ExecuteBrowserTags() {
+    ready(async () => {
+        const sources = await getSources();
+        const vm = new PlStackMachine({
+            ...Inout(),
+            print: message => {
+                Inout().print(message);
+                Inout().flush();
+            }
+        }, NewPlFile('browser.de', ''), []);
+        for (const source of sources) {
+            const code = RunFile(vm, source);
+            console.debug(`[${source.filename}] sync return code: ${code}`);
 
-        if (code !== 0) {
-            break;
+            if (code !== 0) {
+                break;
+            }
         }
+    })
+}
+export function Inject(obj: any = null) {
+    if (obj == null) {
+        return Inject(useful);
     }
-})
+
+    let win = window as any;
+    win.data = {
+        ...win.data,
+        exports: {
+            ...(win.data || {}).exports,
+            ...obj
+        }
+    };
+}
+export const Execute = execute;
+export const Useful = useful;

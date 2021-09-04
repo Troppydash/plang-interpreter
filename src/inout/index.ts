@@ -28,4 +28,11 @@ if ( isNode ) {
     inout = require('./otherInout');
 }
 
-export default inout;
+export function ChangeInout(newInout: PlInout) {
+    inout = {
+        ...inout,
+        ...newInout
+    };
+}
+
+export const Inout = () => inout;

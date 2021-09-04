@@ -1,4 +1,4 @@
-import inout, { isNode } from "../inout";
+import { Inout, isNode } from "../inout";
 import { RunOnce, TryRunParser} from "../linking";
 import { LogProblemShort } from "../problem/printer";
 import { colors } from "../inout/color";
@@ -22,7 +22,7 @@ export function GetLine(filename: string): string | null {
             let out = firstPrompt ? `${filename}> ` : `${('' + linenum).padStart(filename.length, ' ')}| `;
             linenum += 1;
 
-            const message = inout.input(out);
+            const message = Inout().input(out);
             if (message === null) {
                 if (firstPrompt) {
                     return null;
@@ -49,8 +49,8 @@ export function GetLine(filename: string): string | null {
                     }
                 }
                 if (!oldFirstPrompt) {
-                    inout.print(`${LogProblemShort(outcome[0])}`);
-                    const result = inout.input(colors.magenta(`Undo line ${linenum - 1}? `) + `[${colors.green('y')}/n]: `);
+                    Inout().print(`${LogProblemShort(outcome[0])}`);
+                    const result = Inout().input(colors.magenta(`Undo line ${linenum - 1}? `) + `[${colors.green('y')}/n]: `);
                     if (result != 'n') {
                         linenum -= 1;
                         content = oldContent;
@@ -64,24 +64,24 @@ export function GetLine(filename: string): string | null {
 }
 
 export function StartREPL( filename: string ): number {
-    inout.print( `Welcome to the Deviation interactive console (version ${timestamp})` );
+    Inout().print( `Welcome to the Deviation interactive console (version ${timestamp})` );
     if ( isNode ) {
         const os = require( 'os' );
-        inout.print( `Running on ${os.platform()}-${os.arch()}. Hello ${os.hostname()}!` );
-        inout.print( `Press Ctrl+C to quit` );
+        Inout().print( `Running on ${os.platform()}-${os.arch()}. Hello ${os.hostname()}!` );
+        Inout().print( `Press Ctrl+C to quit` );
     }
 
     let stream = false;
     const vm = new PlStackMachine({
-        ...inout,
+        ...Inout(),
         input: message => {
             stream = true;
-            return inout.input(message)
+            return Inout().input(message)
         },
         print: message => {
             stream = true;
-            inout.print(message);
-            inout.flush()
+            Inout().print(message);
+            Inout().flush()
         }
     }, NewPlFile('repl', ''));
 
@@ -95,25 +95,25 @@ export function StartREPL( filename: string ): number {
         const file = NewPlFile(filename, line);
         const result = RunOnce(vm, file);
         if (stream == false && result != null) {
-            inout.print(`${' '.repeat(filename.length)}> ${PlConverter.PlToString(result, vm)}`);
+            Inout().print(`${' '.repeat(filename.length)}> ${PlConverter.PlToString(result, vm)}`);
         }
         vm.rearm();
     }
 
 
-    inout.print("Input Terminated, Goodbye");
-    inout.flush();
+    Inout().print("Input Terminated, Goodbye");
+    Inout().flush();
     return 0;
 }
 
 export function StartDemo(filename: string): number {
-    inout.print( `Running Deviation in demo mode (version ${timestamp})` );
+    Inout().print( `Running Deviation in demo mode (version ${timestamp})` );
     if (isNode) {
-        inout.print("Press Ctrl-C to quit");
+        Inout().print("Press Ctrl-C to quit");
     }
 
     const vm = new PlStackMachine({
-        ...inout,
+        ...Inout(),
         input: _ => {return ''},
         print: _ => {}
     }, NewPlFile('demo', ''));
@@ -127,31 +127,31 @@ export function StartDemo(filename: string): number {
         const file = NewPlFile(filename, line);
 
         // steps
-        inout.print("[Running] Lexing and Parsing...");
+        Inout().print("[Running] Lexing and Parsing...");
 
         const lexer = new PlLexer(file);
         const parser = new PlAstParser(lexer);
         const ast = parser.parseAll();
         if (ast == null) {
-            inout.print("[Error] Parser error found, try again?");
+            Inout().print("[Error] Parser error found, try again?");
             continue;
         }
-        inout.print("[Display] Printing Parser output");
-        inout.print(ASTProgramToString(ast));
-        inout.print('');
+        Inout().print("[Display] Printing Parser output");
+        Inout().print(ASTProgramToString(ast));
+        Inout().print('');
 
-        inout.print("[Running] Emitting bytecodes...");
+        Inout().print("[Running] Emitting bytecodes...");
         const program = EmitProgram(ast);
-        inout.print("[Display] Printing bytecodes");
-        inout.print(PlProgramToString(program));
-        inout.print('');
+        Inout().print("[Display] Printing bytecodes");
+        Inout().print(PlProgramToString(program));
+        Inout().print('');
 
-        inout.print("[Running] Executing Virtual Machine");
+        Inout().print("[Running] Executing Virtual Machine");
         program.program.pop();
         vm.addProgram(program, file.content);
         const result = vm.runProgram();
         if (result == null) {
-            inout.print("[Error] VM error found, try again?");
+            Inout().print("[Error] VM error found, try again?");
             vm.rearm();
             continue;
         }
@@ -162,13 +162,13 @@ export function StartDemo(filename: string): number {
             str = PlConverter.PlToString(out, vm);
         }
 
-        inout.print("[Display] Printing expression result");
-        inout.print(`${' '.repeat(filename.length)}> ${str}`);
+        Inout().print("[Display] Printing expression result");
+        Inout().print(`${' '.repeat(filename.length)}> ${str}`);
 
         vm.rearm();
     }
 
-    inout.print("Input Terminated, demo stopped");
-    inout.flush();
+    Inout().print("Input Terminated, demo stopped");
+    Inout().flush();
     return 0;
 }

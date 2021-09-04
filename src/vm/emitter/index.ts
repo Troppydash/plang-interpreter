@@ -36,7 +36,7 @@ import {
 } from "../../compiler/parsing/ast";
 import {NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram} from "./debug";
 import {NewFakePlToken, PlTokenType} from "../../compiler/lexing/token";
-import inout from "../../inout";
+import {Inout} from "../../inout";
 
 export const METHOD_SEP = '@';
 export const LOOP_INDEX = 'i@';
@@ -73,7 +73,7 @@ class ProgramBuilder {
     emitDebug: boolean;
 
     constructor() {
-        this.emitDebug = inout.options['mode'] == 'debug';
+        this.emitDebug = Inout().options['mode'] == 'debug';
         this.code = [];
         this.debugs = [];
         this.line = 0;

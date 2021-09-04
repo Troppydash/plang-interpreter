@@ -4,7 +4,7 @@ import {PlAstParser} from "../compiler/parsing";
 import {ASTProgramHighlight, ASTProgramToColorRegions} from "../compiler/parsing/highlighter";
 import {EmitProgram} from "../vm/emitter";
 import {PlStackMachine} from "../vm/machine";
-import inout, {PlInout} from "../inout";
+import {Inout, PlInout} from "../inout";
 import {LogProblem, LogProblemShort} from "../problem/printer";
 import {isvariablefirst, isvariablerest} from "../extension/types";
 import {TryRunParser} from "../linking";
@@ -42,7 +42,7 @@ export function Execute(text: string, std: PlInout): number {
 
     const program = EmitProgram(ast, true);
     const vm = new PlStackMachine({
-        ...inout,
+        ...Inout(),
         ...std,
         print: message => {
             std.print(message);
@@ -80,3 +80,4 @@ export function IsVariableHead(c: string): boolean {
 export function IsVariableRest(c: string): boolean {
     return isvariablerest(c);
 }
+

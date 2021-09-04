@@ -1,6 +1,6 @@
 {
   "name": "plang-interpreter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Deviation Language Interpreter",
   "repository": "https://github.com/Troppydash/plang-interpreter/",
   "scripts": {
@@ -14,10 +14,10 @@
     "watch-build": "npm run clean && tsc --watch",
     "watch-build-browser": "npm run clean && tsc --module AMD --outFile \"./out/index.js\" --watch",
     "clean": "tsc --build --clean",
-    "browser-publish": "npm run build-browser && npm publish"
+    "browser-publish": "npm run build-umd && npm publish"
   },
   "files": [
-    "out/index.js"
+    "out/deviation.js"
   ],
   "pkg": {
     "scripts": "out/**/*.js",

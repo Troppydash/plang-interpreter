@@ -1,4 +1,4 @@
-import inout from "../inout";
+import {Inout} from "../inout";
 import { colors } from "../inout/color";
 import {PNAME} from "./constants";
 
@@ -18,8 +18,8 @@ export function NewCliError(index: number, reason: string) {
 export function LogCliError(args: string[], error: CliError) {
     const {index, reason} = error;
 
-    inout.print(colors.red(`CLI Problems:`));
-    inout.print(`> ${PNAME} ${args.join(' ')}`);
+    Inout().print(colors.red(`CLI Problems:`));
+    Inout().print(`> ${PNAME} ${args.join(' ')}`);
 
     // count offsets
     let offset = PNAME.length + 3; // for '> devia '
@@ -27,9 +27,9 @@ export function LogCliError(args: string[], error: CliError) {
         offset += args[i].length + 1;
     }
 
-    inout.print(' '.repeat(offset) + colors.red('^'.repeat(args[index].length) + " here"));
+    Inout().print(' '.repeat(offset) + colors.red('^'.repeat(args[index].length) + " here"));
 
-    inout.print('');
-    inout.print(`${colors.yellow('Tip')}: run '${PNAME} --help' to see the correct usages`);
-    inout.print(`${colors.cyan('Reason')}: ${reason}`);
+    Inout().print('');
+    Inout().print(`${colors.yellow('Tip')}: run '${PNAME} --help' to see the correct usages`);
+    Inout().print(`${colors.cyan('Reason')}: ${reason}`);
 }

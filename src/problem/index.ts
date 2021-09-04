@@ -1,61 +1,61 @@
 import { PlProblem } from "./problem";
 import {LogCallbackProblem, LogProblem, LogTrace} from "./printer";
-import inout from "../inout";
+import {Inout} from "../inout";
 import { colors } from "../inout/color";
 import { PlTrace } from "./trace";
 
 
 export function ReportProblem(problem: PlProblem, content: string) {
-    inout.print(colors.red("Problem(s) Occurred"));
-    inout.print(LogProblem(problem, content));
-    inout.flush();
+    Inout().print(colors.red("Problem(s) Occurred"));
+    Inout().print(LogProblem(problem, content));
+    Inout().flush();
 }
 
 export function ReportProblems(content: string, problems: PlProblem[], trace?: PlTrace): boolean {
-    inout.print(colors.red("Problem(s) Occurred"));
+    Inout().print(colors.red("Problem(s) Occurred"));
     if (trace && trace.length > 2) {
-        inout.print(colors.red('Callframes (Most Recent Last)'));
-        inout.print(LogTrace(trace));
-        inout.print('');
+        Inout().print(colors.red('Callframes (Most Recent Last)'));
+        Inout().print(LogTrace(trace));
+        Inout().print('');
     }
     try {
         for (const problem of problems) {
-            inout.print(LogProblem(problem, content));
+            Inout().print(LogProblem(problem, content));
         }
     } catch (e) {
-        inout.print(`${colors.red("Exception")} in reporting the problems: ${e}`);
-        inout.print("This is a developer error, please report this to him");
-        inout.flush();
+        Inout().print(`${colors.red("Exception")} in reporting the problems: ${e}`);
+        Inout().print("This is a developer error, please report this to him");
+        Inout().flush();
         return false;
     }
-    if (inout.options["mode"] != "debug") {
-        inout.print(colors.green("\nTo see a more detailed error, pass '--mode-debug' when running from cli"));
+    if (Inout().options["mode"] != "debug") {
+        Inout().print(colors.green("\nTo see a more detailed error, pass '--mode-debug' when running from cli"));
     }
 
-    inout.flush();
+    Inout().flush();
     return true;
 }
 
 // DEPRECATED, unused when there is no content in the stack machine
 export function ReportCallbackProblems(problem: PlProblem, trace: PlTrace): boolean {
-    inout.print(colors.red("Callback Problem(s) Occurred"));
+    Inout().print(colors.red("Callback Problem(s) Occurred"));
     if (trace.length == 0) {
-        inout.print(colors.red('No Callframes'))
+        Inout().print(colors.red('No Callframes'))
     } else {
-        inout.print(colors.red('Callframes:'));
-        inout.print(LogTrace(trace));
+        Inout().print(colors.red('Callframes:'));
+        Inout().print(LogTrace(trace));
     }
-    inout.print('');
+    Inout().print('');
 
     try {
-        inout.print(LogCallbackProblem(problem));
+        Inout().print(LogCallbackProblem(problem));
     } catch (e) {
-        inout.print(`Exception in reporting the problems: ${e}`);
-        inout.print("This is a developer error, please report this to him");
-        inout.flush();
+        Inout().print(`Exception in reporting the problems: ${e}`);
+        Inout().print("This is a developer error, please report this to him");
+        Inout().flush();
         return false;
     }
-    inout.flush();
+    Inout().flush();
     return true;
 }
 
