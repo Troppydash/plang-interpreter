@@ -4,7 +4,8 @@ import * as path from 'path';
 import * as ps from 'prompt-sync';
 import * as psh from 'prompt-sync-history';
 import { MaskedEval } from "./proxy";
-
+import * as readline from "readline";
+import * as deasync from 'deasync';
 function complete( commands ) {
     return function ( str ) {
         if (str.length == 0) {
@@ -29,6 +30,20 @@ const prompt = ps( {
     autocomplete: complete( ac.split( ' ' ) )
 } );
 
+function read(prompt: string, callback) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    rl.question(prompt, answer => {
+        rl.close();
+        callback(null, answer);
+    })
+}
+const readSync = deasync(read);
+
+
 export function print( message ) {
     console.log(message);
 }
@@ -38,7 +53,7 @@ export function flush() {
 }
 
 export function input( message ) {
-    return prompt( message );
+    return readSync( message );
 }
 
 export let paths = {

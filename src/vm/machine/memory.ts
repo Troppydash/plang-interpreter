@@ -25,6 +25,10 @@ export class PlStackFrame {
         return this.trace == null;
     }
 
+    get isFunction() {
+        return this.trace != null;
+    }
+
     /**
      * Sets the debug name for this trace
      * @param name The debug name
