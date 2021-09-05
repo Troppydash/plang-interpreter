@@ -15,6 +15,8 @@ export enum PlTokenType {
     FOR,
     MATCH, CASE, DEFAULT,
 
+    OUTER, INNER, LOCAL,
+
     // operators words
     AND,
     OR,

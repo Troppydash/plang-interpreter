@@ -1,9 +1,9 @@
-import { PlFile } from "../../inout/file";
-import PlToken, { NewPlToken, PlTokenType } from "./token";
+import {PlFile} from "../../inout/file";
+import PlToken, {NewPlToken, PlTokenType} from "./token";
 import {NewEmptyFileInfo, NewFileInfo, PlFileInfo} from "./info";
-import {isalpha, isblank, isnum, isvariablefirst, isvariablerest} from "../../extension/types";
-import { NewPlProblem, PlProblem } from "../../problem/problem";
-import { PlProblemCode } from "../../problem/codes";
+import {isblank, isnum, isvariablefirst, isvariablerest} from "../../extension/types";
+import {NewPlProblem, PlProblem} from "../../problem/problem";
+import {PlProblemCode} from "../../problem/codes";
 
 
 export interface Lexer {
@@ -301,7 +301,7 @@ class PlLexer implements Lexer {
                 break;
             }
             case 'i': {
-                for (const pair of [["impl", PlTokenType.IMPL], ["import", PlTokenType.IMPORT], ["if", PlTokenType.IF]]) {
+                for (const pair of [["impl", PlTokenType.IMPL], ["import", PlTokenType.IMPORT], ["if", PlTokenType.IF], ["inner", PlTokenType.INNER]]) {
                     const [str, type] = (pair as [string, PlTokenType]);
                     const token = this.testNextKeyword(str, type);
                     if (token) {
@@ -371,7 +371,7 @@ class PlLexer implements Lexer {
                 break;
             }
             case 'l': {
-                for (const pair of [["loop", PlTokenType.LOOP]]) {
+                for (const pair of [["loop", PlTokenType.LOOP], ["local", PlTokenType.LOCAL]]) {
                     const [str, type] = (pair as [string, PlTokenType]);
                     const token = this.testNextKeyword(str, type);
                     if (token) {
@@ -411,7 +411,7 @@ class PlLexer implements Lexer {
                 break;
             }
             case 'o': {
-                for (const pair of [["or", PlTokenType.OR],  ["of", PlTokenType.OF]]) {
+                for (const pair of [["or", PlTokenType.OR],  ["of", PlTokenType.OF], ["outer", PlTokenType.OUTER]]) {
                     const [str, type] = (pair as [string, PlTokenType]);
                     const token = this.testNextKeyword(str, type);
                     if (token) {

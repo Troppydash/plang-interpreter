@@ -9,7 +9,6 @@ import {
     ASTCall,
     ASTClosure,
     ASTContinue,
-    ASTCreate,
     ASTDict,
     ASTDot,
     ASTEach,
@@ -32,16 +31,19 @@ import {
     ASTType,
     ASTUnary,
     ASTVariable,
-    ASTWhile
+    ASTWhile, ASTAssignType
 } from "../../compiler/parsing/ast";
 import {NewPlDebugSingle, NewPlDebugStretch, PlDebug, PlDebugProgram} from "./debug";
 import {NewFakePlToken, PlTokenType} from "../../compiler/lexing/token";
 import {Inout} from "../../inout";
 
-export const METHOD_SEP = '@';
-export const LOOP_INDEX = 'i@';
-export const EACH_ITER = 'iter@';
-export const MATCH_VALUE = 'value@';
+export const METHOD_SEP = '.';
+export const LOOP_INDEX = '|i|';
+export const EACH_ITER = '|iter|';
+export const MATCH_VALUE = '|value|';
+
+export const DEFAULT_SET_BC = PlBytecodeType.DOASNL;  // local
+export const DEFAULT_SET_AST = ASTAssignType.LOCAL;  // local
 
 export type PlProgram = { program: PlBytecode[], debug: PlDebugProgram };
 
@@ -233,18 +235,8 @@ function traverseAST( node: ASTNode ): PlProgram {
             .addBytecode(NewBytecode(PlBytecodeType.DEFTYP))
             .addEmpty()
             .addBytecode(makeVariable(node.name))
-            .addBytecode(NewBytecode(PlBytecodeType.DOCRET))
+            .addBytecode(NewBytecode(DEFAULT_SET_BC))
             .toProgram();
-    } else if ( node instanceof ASTCreate ) {
-        programBuilder.addPWD( traverseAST( node.value ) );
-        if ( node.pre ) {
-            programBuilder.addPWD( traverseAST( node.pre ) );
-        } else {
-            programBuilder.addEmpty();
-        }
-        programBuilder.addBytecode( makeVariable( node.variable ) );
-        programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOCRET ), node );
-        return programBuilder.toProgram();
     } else if ( node instanceof ASTAssign ) {
         programBuilder.addPWD( traverseAST( node.value ) );
         if ( node.pre ) {
@@ -253,8 +245,21 @@ function traverseAST( node: ASTNode ): PlProgram {
             programBuilder.addEmpty();
         }
 
+        let bc;
+        switch (node.type) {
+            case ASTAssignType.INNER:
+                bc = PlBytecodeType.DOASNI;
+                break;
+            case ASTAssignType.OUTER:
+                bc = PlBytecodeType.DOASNO;
+                break;
+            case ASTAssignType.LOCAL:
+                bc = PlBytecodeType.DOASNL;
+                break;
+        }
+
         programBuilder.addBytecode( makeVariable( node.variable ) );
-        programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOASGN ), node );
+        programBuilder.addBytecodeStretch( NewBytecode( bc ), node );
         return programBuilder.toProgram();
     } else if ( node instanceof ASTDot ) {
         return programBuilder
@@ -359,7 +364,7 @@ function traverseAST( node: ASTNode ): PlProgram {
 
         return programBuilder.addEmpty()
             .addBytecode( NewBytecode( PlBytecodeType.DEFSTR, node.name.content ) )
-            .addBytecodeStretch( NewBytecode( PlBytecodeType.DOCRET ), node )
+            .addBytecodeStretch( NewBytecode( DEFAULT_SET_BC ), node )
             .toProgram();
     } else if ( node instanceof ASTClosure ) {
         const block = makePureBlock( node.block );
@@ -426,7 +431,7 @@ function traverseAST( node: ASTNode ): PlProgram {
 
         const value = `${node.target.content}${METHOD_SEP}${node.name.content}`;
         programBuilder.addBytecode( NewBytecode( PlBytecodeType.DEFSTR, value ) );
-        programBuilder.addBytecodeStretch( NewBytecode( PlBytecodeType.DOCRET ), node );
+        programBuilder.addBytecodeStretch( NewBytecode(DEFAULT_SET_BC), node );
         return programBuilder.toProgram();
     } else if ( node instanceof ASTCall ) {
         node.args.reverse();
@@ -570,9 +575,9 @@ function traverseAST( node: ASTNode ): PlProgram {
         // emit counter variable and compare
         if ( node.amount ) {
             const target = node.amount.getSpanToken();
-            const assignment = new ASTCreate( [], undefined,
+            const assignment = new ASTAssign( [], undefined,
                 new ASTVariable( [], LOOP_INDEX ),
-                node.amount );
+                node.amount, DEFAULT_SET_AST );
 
             programBuilder
                 .addPWD( traverseAST( assignment ) )
@@ -609,7 +614,7 @@ function traverseAST( node: ASTNode ): PlProgram {
         let value = null;
         if ( node.value ) {
             value = new ASTVariable( [], MATCH_VALUE );
-            const assignment = new ASTCreate( [], undefined, value, node.value );
+            const assignment = new ASTAssign( [], undefined, value, node.value, DEFAULT_SET_AST );
             programBuilder
                 .addBytecode( NewBytecode( PlBytecodeType.STKENT ) )
                 .addPWD( traverseAST( assignment ) )
@@ -663,9 +668,10 @@ function traverseAST( node: ASTNode ): PlProgram {
 
         const dot = new ASTDot( [], node.iterator, new ASTVariable( [ target ], "iter" ) )
         dot.attribute = ASTAttributes.ASTCondition;
-        const assignment = new ASTCreate( [], undefined,
+        const assignment = new ASTAssign( [], undefined,
             iter,
-            new ASTCall( [], dot, [] )
+            new ASTCall( [], dot, [] ),
+            DEFAULT_SET_AST
         );
         programBuilder
             .addPWD( traverseAST( assignment ) )
@@ -674,18 +680,19 @@ function traverseAST( node: ASTNode ): PlProgram {
         const one = new ASTVariable( [], '1' );
         const two = new ASTVariable( [], '2' );
 
-        const condition = new ASTDot( [], new ASTCreate( [], undefined,
+        const condition = new ASTDot( [], new ASTAssign( [], undefined,
             index,
-            new ASTCall( [ target ], new ASTDot( [], iter, new ASTVariable( [], "next" ) ), [] )
+            new ASTCall( [ target ], new ASTDot( [], iter, new ASTVariable( [], "next" ) ), [] ),
+            DEFAULT_SET_AST
         ), two );
 
         let inBlock = [];
-        const valueAssign = new ASTCreate( [], undefined, node.value,
-            new ASTDot( [], new ASTDot([], index, one), one) );
+        const valueAssign = new ASTAssign( [], undefined, node.value,
+            new ASTDot( [], new ASTDot([], index, one), one), DEFAULT_SET_AST );
         inBlock.push( valueAssign );
         if ( node.key ) {
-            const keyAssign = new ASTCreate( [], undefined, node.key,
-                new ASTDot( [], new ASTDot([], index, one), two) );
+            const keyAssign = new ASTAssign( [], undefined, node.key,
+                new ASTDot( [], new ASTDot([], index, one), two), DEFAULT_SET_AST );
             inBlock.push( keyAssign );
         }
 

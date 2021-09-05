@@ -88,7 +88,7 @@ export class PlStackFrame {
      * @param key The value name
      * @param value The value value
      */
-    setValue(key: string, value: PlStuff) {
+    setValueOuter(key: string, value: PlStuff) {
         // First try to see if the value exists in the current scope
         if (key in this.values) {
             this.values[key] = value;
@@ -97,7 +97,7 @@ export class PlStackFrame {
 
         // Then create the value if cannot find it outside anywhere
         if (this.outer == null || this.outer.findValueDeep(key) == null) {
-            this.createValue(key, value);
+            this.setValueLocal(key, value);
             return;
         }
 
@@ -113,11 +113,29 @@ export class PlStackFrame {
     }
 
     /**
-     * Create a value in the current frame
+     * Set a value in the current scope
      * @param key The name of the value
      * @param value The value of the value
      */
-    createValue(key: string, value: PlStuff) {
+    setValueInner(key: string, value: PlStuff) {
+        let outer: PlStackFrame = this;
+        do {
+            const exist = outer.values[key];
+            if (exist) {
+                outer.values[key] = value;
+                return;
+            }
+            if (!outer.isShallow) {
+                break;
+            }
+            outer = outer.outer;
+        } while (outer != null);
+
+        // create if not exist
+        this.setValueLocal(key, value);
+    }
+
+    setValueLocal(key: string, value: PlStuff) {
         this.values[key] = value;
     }
 }

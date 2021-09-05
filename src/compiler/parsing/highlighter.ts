@@ -5,7 +5,7 @@ import {
     ASTBlock, ASTBoolean, ASTBreak,
     ASTCall,
     ASTClosure, ASTContinue,
-    ASTCreate,
+    ASTFind,
     ASTDict,
     ASTDot,
     ASTEach,
@@ -76,7 +76,7 @@ export function ASTProgramToColorRegions(ast: ASTProgram): PlColorRegion[] {
         } else if (node instanceof ASTBinary) {
             const info = node.operator.info;
             regions.push(NewPlColorRegion(info, HIGHLIGHT.op));
-        } else if (node instanceof ASTAssign || node instanceof ASTCreate) {
+        } else if (node instanceof ASTAssign || node instanceof ASTFind) {
             const info = node.tokens[0].info;
             regions.push(NewPlColorRegion(info, HIGHLIGHT.mt));
         } else if (node instanceof ASTEach) {
@@ -249,7 +249,7 @@ function visit(node: ASTNode | null, closure: (node: ASTNode) => void) {
     } else if (node instanceof ASTLoop) {
         visit(node.amount, closure);
         visit(node.block, closure);
-    } else if (node instanceof ASTAssign || node instanceof ASTCreate) {
+    } else if (node instanceof ASTAssign || node instanceof ASTFind) {
         visit(node.pre, closure);
         visit(node.variable, closure);
         visit(node.value, closure);

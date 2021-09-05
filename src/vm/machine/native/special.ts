@@ -114,7 +114,7 @@ export const special: ExportNative = {
             return PlConverter.PlToJs(value, this);
         }).bind(this);
         const _export = (function (key, value) {
-            this.createValue(key, PlConverter.JsToPl(value, this));
+            this.setValueInner(key, PlConverter.JsToPl(value, this));
             return null;
         }).bind(this);
 

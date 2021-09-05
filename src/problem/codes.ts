@@ -91,7 +91,7 @@ const templates = {
     ET0047: "expected variables for type members",
 
     ET0048: "expected a variable",
-
+    ET0049: "unexpected scope modifier",
 
 
     CE0001: "reached newline with unclosed '}'",
@@ -227,6 +227,8 @@ const hints: Record<PlProblemCode, string> = {
     ET0046: tryPutting("type members are separated with ','"),
     ET0047: INeedA("valid variable name for the type members"),
     ET0048: "",
+
+    ET0049: "modifiers prefix an assignment, perhaps '=' is missed here",
 
     CE0001: haveYouClosed("blocks", "a closing '}'"),
     CE0002: haveYouClosed("groups", "a closing ')'"),

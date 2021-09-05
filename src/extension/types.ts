@@ -28,7 +28,7 @@ export function tonum(c: string): number {
 }
 
 export function isvariablefirst(c) {
-    return isalpha(c) || c === '_' || c === '@' || c === '$';
+    return isalpha(c) || c === '_' || c === '$';
 }
 
 export function isvariablerest(c) {

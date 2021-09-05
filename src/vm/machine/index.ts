@@ -23,7 +23,7 @@ import {ScrambleImpl, ScrambleName, ScrambleType} from "./scrambler";
 import {PlProblemCode} from "../../problem/codes";
 import {PlActions, PlConverter} from "./native/converter";
 import {PlProgram} from "../emitter";
-import {NewPlTraceFrame, PlTrace, PlTraceFrame} from "../../problem/trace";
+import {NewPlTraceFrame, PlTrace} from "../../problem/trace";
 import {PlInout} from "../../inout";
 import {PlStackFrame} from "./memory";
 import {PlFile} from "../../inout/file";
@@ -49,14 +49,14 @@ export interface StackMachine {
      * @param key The name of the new value
      * @param value The value of the new value
      */
-    createValue(key: string, value: PlStuff);
+    setValueInner(key: string, value: PlStuff);
 
     /**
      * Assign or create a value in the stack machine at the current state
      * @param key The name of the new value
      * @param value The value of the new value
      */
-    setValue(key: string, value: PlStuff);
+    setValueOuter(key: string, value: PlStuff);
 
     /**
      * Run a devia function object with arguments at the current state
@@ -316,9 +316,9 @@ export class PlStackMachine implements StackMachine {
 
         // parameters
         for (let i = 0; i < args.length; ++i) {
-            this.createValue(parameters[i], args[i]);
+            this.setValueInner(parameters[i], args[i]);
         }
-        this.createValue(value.closure.trace.name, func); // so we can never actually modify the function in the function
+        this.setValueInner(value.closure.trace.name, func); // so we can never actually modify the function in the function
 
         this.pushStack(null);
         const out = this.runProgram(value.index + 1);
@@ -357,9 +357,9 @@ export class PlStackMachine implements StackMachine {
 
         // assign variables
         for (let i = 0; i < args.length; ++i) {
-            this.createValue(parameters[i], args[i]);
+            this.setValueInner(parameters[i], args[i]);
         }
-        this.createValue(value.closure.trace.name, func); // so we can never actually modify the function
+        this.setValueInner(value.closure.trace.name, func); // so we can never actually modify the function
 
         this.pushStack(NewPlStuff(PlStuffType.Num, this.pointer)); // return address
         this.pointer = value.index;
@@ -550,7 +550,7 @@ export class PlStackMachine implements StackMachine {
                 ...entry,
                 native: PlConverter.JsToPl(entry.native, this).value.native,
             };
-            this.stackFrame.createValue(
+            this.stackFrame.setValueInner(
                 key,
                 NewPlStuff(
                     PlStuffType.NFunc,
@@ -566,7 +566,7 @@ export class PlStackMachine implements StackMachine {
                 ...entry,
                 native: entry.native.bind(this),
             };
-            this.stackFrame.createValue(
+            this.stackFrame.setValueInner(
                 key,
                 NewPlStuff(PlStuffType.NFunc, fn)
             );
@@ -587,7 +587,7 @@ export class PlStackMachine implements StackMachine {
                 };
                 obj[methodName] = NewPlStuff(PlStuffType.NFunc, fn);
             }
-            this.stackFrame.createValue(
+            this.stackFrame.setValueInner(
                 moduleName,
                 NewPlStuff(PlStuffType.Dict, obj)
             );
@@ -603,7 +603,7 @@ export class PlStackMachine implements StackMachine {
                 };
                 obj[methodName] = NewPlStuff(PlStuffType.NFunc, fn);
             }
-            this.stackFrame.createValue(
+            this.stackFrame.setValueInner(
                 moduleName,
                 NewPlStuff(PlStuffType.Dict, obj)
             );
@@ -611,7 +611,7 @@ export class PlStackMachine implements StackMachine {
         }
 
         // Programing arguments
-        this.stackFrame.createValue(
+        this.stackFrame.setValueInner(
             "process",
             PlConverter.JsToPl({
                 arguments: args,
@@ -632,12 +632,12 @@ export class PlStackMachine implements StackMachine {
                 type: key,
                 format: null
             } as PlType);
-            this.stackFrame.createValue(
+            this.stackFrame.setValueInner(
                 key,
                 value
             );
             const newName = ScrambleName("new", key);
-            this.stackFrame.createValue(
+            this.stackFrame.setValueInner(
                 newName,
                 NewPlStuff(PlStuffType.NFunc, {
                     native: (...args) => {
@@ -763,6 +763,10 @@ export class PlStackMachine implements StackMachine {
         return frames;
     }
 
+    /**
+     * Find a value, regardless of scope
+     * @param key The name of the value
+     */
     findValue(key: string): PlStuff | null {
         let value = this.stackFrame.findValue(key);
         if (value != null) {
@@ -777,15 +781,29 @@ export class PlStackMachine implements StackMachine {
         return this.stackFrame.findValueDeep(key);
     }
 
-    createValue(key: string, value: PlStuff) {
-        return this.stackFrame.createValue(key, value);
+    /**
+     * Set a value at the local scope
+     * @param key Value name
+     * @param value Value value
+     */
+    setValueInner(key: string, value: PlStuff) {
+        return this.stackFrame.setValueInner(key, value);
     }
 
-    setValue(key: string, value: PlStuff) {
+    setValueLocal(key: string, value: PlStuff) {
+        return this.stackFrame.setValueLocal(key, value);
+    }
+
+    /**
+     * Set a value with drilling scope
+     * @param key Value name
+     * @param value Value value
+     */
+    setValueOuter(key: string, value: PlStuff) {
         if (this.stackFrame.findValue(key) == null && this.closureFrames.length != 0 && this.closureFrame.findValueDeep(key) != null) {
-            return this.closureFrame.setValue(key, value);
+            return this.closureFrame.setValueOuter(key, value);
         }
-        return this.stackFrame.setValue(key, value);
+        return this.stackFrame.setValueOuter(key, value);
     }
 
     /**
@@ -994,8 +1012,9 @@ export class PlStackMachine implements StackMachine {
                         return this.newProblem("RE0017", this.pointer, PlStuffGetType(value));
                     }
                     // do assign and create
-                    case PlBytecodeType.DOCRET:
-                    case PlBytecodeType.DOASGN: {
+                    case PlBytecodeType.DOASNL:
+                    case PlBytecodeType.DOASNI:
+                    case PlBytecodeType.DOASNO: {
                         const name = this.popStack(); // is a string
                         const target = this.popStack();
                         const value = PlActions.PlCopy(this.popStack());
@@ -1006,10 +1025,12 @@ export class PlStackMachine implements StackMachine {
                                 content.closure.setTraceName(name.value);
                             }
                             // set name to value
-                            if (byte.type == PlBytecodeType.DOCRET) {
-                                this.createValue(name.value, value);
+                            if (byte.type == PlBytecodeType.DOASNO) {
+                                this.setValueOuter(name.value, value);
+                            } else if (byte.type == PlBytecodeType.DOASNI) {
+                                this.setValueInner(name.value, value);
                             } else {
-                                this.setValue(name.value, value);
+                                this.setValueLocal(name.value, value);
                             }
                             this.pushStack(value);
                             break;
