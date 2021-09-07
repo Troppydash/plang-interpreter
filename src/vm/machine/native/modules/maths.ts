@@ -23,5 +23,10 @@ export const maths = generateBindings(Math, {
     exp: "exp",
     pi: "PI",
     e: "E",
-    sqrt: "sqrt"
+    sqrt: "sqrt",
+    asin: "asin",
+    acos: "acos",
+    atan: "atan"
 });
+
+
