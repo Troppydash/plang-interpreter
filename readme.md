@@ -58,10 +58,10 @@ func sayHello() {
 ```
 # closures are supported
 func makeCounter(initial) {
-    @count = initial # the @ shows that we are creating a variable, not assigning to an existing one
+    count = initial
     return func() {
-        @old = count
-        count = count + 1
+        old = count
+        outer count = count + 1  # note we are assigning to the outer `count` variable
         return old
     }
 }
@@ -75,13 +75,13 @@ say(counter()) # prints 3
 ```
 # who needs classes anyways
 func makeVector(x, y) {
-    @data = list(x, y)
+    data = list(x, y)
     return dict(
         get: func() {
             return data
         },
         set: func(newX, newY) {
-            data = list(newX, newY)
+            outer data = list(newX, newY)
             return data
         }
     )
@@ -117,6 +117,22 @@ each item, index of out {
 }
 ```
 
+```
+type Complex(real, imag)
+
+impl +(self, other: Complex) for Complex {
+    return Complex(self.real + other.real, self.imag + other.imag)
+}
+
+impl str(self) for Complex {
+    return "\(self.real)+\(self.imag)"
+}
+
+c1 = Complex(1, 2)
+c2 = Complex(2, 3)
+say(c1 + c2)
+```
+
 ### How do I use it
 If you have the executable, `devia.exe <file>`
 will run the file. You can also start the REPL by running `devia.exe` directly with no arguments.
@@ -125,8 +141,8 @@ If there is no executable, see the section below to build it yourself.
 
 ### How do I build it
 Node 12 or higher is used to build the interpreter, but feel free to try it with a lower node version. The command `node -v` will tell you if node is installed on your machine.
-
-Run `npm install` first to install all the dependencies, and run `npm run build-cli` to make an executable in the `dist/` folder. Rename the executable for your platform to `devia.exe`. 
+pl
+Run `npm install` first to install all the dependencies, and run `npm run build-cli` to make an executable in the `dist/` folder. Rename the executable for youplplplr platform to `devia.exe`. 
 
 Other commands located in package.json are as follows
 ```
