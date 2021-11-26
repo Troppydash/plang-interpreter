@@ -125,12 +125,12 @@ impl +(self, other: Complex) for Complex {
 }
 
 impl str(self) for Complex {
-    return "\(self.real)+\(self.imag)"
+    return "\(self.real)+\(self.imag)i"
 }
 
 c1 = Complex(1, 2)
 c2 = Complex(2, 3)
-say(c1 + c2)
+say("\(c1) + \(c2) = \(c1 + c2)")
 ```
 
 ### How do I use it
@@ -141,8 +141,7 @@ If there is no executable, see the section below to build it yourself.
 
 ### How do I build it
 Node 12 or higher is used to build the interpreter, but feel free to try it with a lower node version. The command `node -v` will tell you if node is installed on your machine.
-pl
-Run `npm install` first to install all the dependencies, and run `npm run build-cli` to make an executable in the `dist/` folder. Rename the executable for youplplplr platform to `devia.exe`. 
+Run `npm install` first to install all the dependencies, and run `npm run build-cli` to make an executable in the `dist/` folder. Rename the executable for your platform to `devia.exe`. 
 
 Other commands located in package.json are as follows
 ```
@@ -151,5 +150,6 @@ npm run run           ;; runs the compiled javascript using node
 npm run clean         ;; cleans the compiled javascript folder
 npm run build-run     ;; clean, compile typescript then runs it
 npm run build-browser ;; produce a AMD format single file index.js for use in a browser
+npm run build-umd     ;; produce a UMD format single file used for use in a browser
 ```
 
