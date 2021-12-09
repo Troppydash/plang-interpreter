@@ -103,6 +103,7 @@ const templates = {
     CE0007: "reached newline with unclosed '}'",
     CE0008: "reached newline with unclosed '\"\"\"'",
     CE0009: "reached newline with unclosed ')'",
+    CE0010: "reached newline with unclosed ']'",
 
 
     LP0001: "more than one default cases in a match statement",
@@ -239,6 +240,7 @@ const hints: Record<PlProblemCode, string> = {
     CE0007: haveYouClosed("match statement", "a closing '}'"),
     CE0008: haveYouClosed("multiline string", "a closing '\"\"\"'"),
     CE0009: haveYouClosed("type member", "a closing ')'"),
+    CE0010: haveYouClosed("type member", "a closing ']'"),
 
     LP0001: "there can be only one default block in a match statement, try removing all other default cases",
     LP0002: "the first parameter in an impl statement is by convention 'self'",

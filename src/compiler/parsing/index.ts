@@ -1070,7 +1070,7 @@ export class PlAstParser implements Parser {
                 return this.pBoolean();
             case PlTokenType.NULL:
                 return this.pNull();
-            case PlTokenType.FUNC:
+            case PlTokenType.LBRACK:
                 return this.pClosure();
         }
 
@@ -1080,11 +1080,8 @@ export class PlAstParser implements Parser {
 
     pClosure(): ASTClosure | null {
         const token = this.nextToken();
-        if ( this.expectedPeekToken( PlTokenType.LPAREN, "ET0014", token ) == null ) {
-            return null;
-        }
 
-        const param = this.pParam( token, "ET0016", "ET0015" );
+        const param = this.pParam( token, "ET0016", "ET0015" , "CE0010", PlTokenType.RBRACK);
         if ( param == null ) {
             return null;
         }

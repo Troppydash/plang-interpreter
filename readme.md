@@ -45,12 +45,14 @@ impl times(self, function) for Num {
 func sayHello() {
     say("Hello")
 }
+# or
+sayHello = [] say("Hello")
 
 # print Hello 3 times
 3.times(sayHello)
 
 # or alternatively
-3.times(func() {
+3.times([] {
     say("Hello")
 })
 ```
@@ -59,7 +61,7 @@ func sayHello() {
 # closures are supported
 func makeCounter(initial) {
     count = initial
-    return func() {
+    return [] {
         old = count
         outer count = count + 1  # note we are assigning to the outer `count` variable
         return old
@@ -75,22 +77,22 @@ say(counter()) # prints 3
 ```
 # who needs classes anyways
 func makeVector(x, y) {
-    data = list(x, y)
+    data = dict(x: x, y: y)
     return dict(
-        get: func() {
-            return data
+        get: [axis: Str] data[axis],
+        set: [axis: Str, value] {
+            data[axis] = value
+            return value
         },
-        set: func(newX, newY) {
-            outer data = list(newX, newY)
-            return data
-        }
+        str: [] "(\(data.x), \(data.y))"
     )
 }
 
 v1 = makeVector(1, 2)
-say(v1.get()) # prints list(1, 2)
-v1.set(2, 3)
-say(v1.get()) # prints list(2, 3)
+say(v1.str())  # prints "(1, 2)"
+
+v1["y"] = v1["x"] = 3
+say(v1.str())  # prints "(3, 3)"
 ```
 
 ```
@@ -98,7 +100,7 @@ say(v1.get()) # prints list(2, 3)
 values = list(1, 10, 20, 30)
 
 javascript """
-    const values = pl.import("values"); // import the variable "values" from devia
+    const values = de.import("values"); // import the variable "values" from devia
     function factorial(n) {
         if (n < 2) {
             return 1;
@@ -109,11 +111,11 @@ javascript """
     for (const value of values) {
         out.push(factorial(value));
     }
-    pl.export("out", out); // export the variable as "out" to devia
+    de.export("out", out); // export the variable as "out" to devia
 """
 
 each item, index of out {
-    say("factorial", values.get(index), "=", item)
+    say("factorial", values[index], "=", item)
 }
 ```
 
