@@ -171,7 +171,7 @@ interface FetchOutput {
 function sanitizeOptions(options: object): FetchOptions {
     const method = 'method' in options ? options["method"] : 'GET';
     const headers = 'headers' in options ? options["headers"] : {};
-    const body = 'body' in options ? options["body"] : null;
+    const body = 'body' in options ? options["body"] : undefined;
     return {
         method,
         headers,

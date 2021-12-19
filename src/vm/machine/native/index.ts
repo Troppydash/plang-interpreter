@@ -13,6 +13,7 @@ import {debug} from "./modules/debug";
 import {func} from "./impl/func";
 import {system} from "./modules/system";
 import {isNode} from "../../../inout";
+import {color} from "./modules/color";
 
 
 export const jsNatives: ExportJs = {
@@ -38,6 +39,7 @@ export const jsModules: Record<string, any> = {
     maths,
     time,
     random,
+    color
 };
 
 export const modules = {

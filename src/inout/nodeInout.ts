@@ -1,8 +1,6 @@
 import { PathType } from "./path";
 import * as fs from 'fs';
 import * as path from 'path';
-import * as ps from 'prompt-sync';
-import * as psh from 'prompt-sync-history';
 import { MaskedEval } from "./proxy";
 import * as readline from "readline";
 import * as deasync from 'deasync';
@@ -25,10 +23,6 @@ function complete( commands ) {
 
 // list of common keywords
 const ac = "func impl import for as select export return break continue if elif else each loop while match case default and or not in print input list dict true false null Int Str Null List Dict Func Type";
-const prompt = ps( {
-    history: psh(),
-    autocomplete: complete( ac.split( ' ' ) )
-} );
 
 function read(prompt: string, callback) {
     const rl = readline.createInterface({
@@ -40,6 +34,12 @@ function read(prompt: string, callback) {
         rl.close();
         callback(null, answer);
     })
+
+    rl.on("SIGINT", function () {
+        rl.close();
+        console.log('^C');
+        callback(null, null)
+    });
 }
 const readSync = deasync(read);
 

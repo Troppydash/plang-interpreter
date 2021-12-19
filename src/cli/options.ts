@@ -12,7 +12,8 @@ export const CLI_FLAGS = [
     "help",
     "mode-release",
     "mode-debug",
-    "view-problems"
+    "view-problems",
+    "update"
 ] as const;
 
 export function MatchPrefix(raw: string): string | null {
@@ -27,7 +28,8 @@ export function MatchFlag(flag: string): boolean {
 }
 
 export const CLI_OPTIONS = [
-    "lib"
+    "lib",
+    "version",
 ] as const;
 
 export function MatchOption(text: string): boolean {

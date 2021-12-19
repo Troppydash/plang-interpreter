@@ -5,7 +5,7 @@ import { colors } from "../inout/color";
 import { PlConverter } from "../vm/machine/native/converter";
 import {PlStackMachine} from "../vm/machine";
 import { NewPlFile } from "../inout/file";
-import { timestamp } from "../timestamp";
+import {timestamp, version} from "../timestamp";
 import PlLexer from "../compiler/lexing";
 import {PlAstParser} from "../compiler/parsing";
 import {EmitProgram} from "../vm/emitter";
@@ -64,7 +64,8 @@ export function GetLine(filename: string): string | null {
 }
 
 export function StartREPL( filename: string ): number {
-    Inout().print( `Welcome to the Deviation interactive console (version ${timestamp})` );
+    Inout().print( `Welcome to the Deviation interactive console` );
+    Inout().print( `Built on ${timestamp} (version ${version})` );
     if ( isNode ) {
         const os = require( 'os' );
         Inout().print( `Running on ${os.platform()}-${os.arch()}. Hello ${os.hostname()}!` );

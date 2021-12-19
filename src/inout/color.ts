@@ -1,6 +1,6 @@
 import { isNode } from "./index";
 
-const COLORS = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white'] as const;
+export const COLORS = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white'] as const;
 export type PlColors = (typeof COLORS[number]) | 'grey';
 
 export let colors;
