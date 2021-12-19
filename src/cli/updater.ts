@@ -3,6 +3,11 @@ import * as path from "path";
 import * as fs from 'fs';
 import * as cp from 'child_process';
 
+/**
+ * Update the executable to a new version using tdu
+ * @param version The version parameter passed to tdu
+ * @constructor
+ */
 export function UpdateSelf(version: string) {
     const dir = path.dirname(Inout().paths.exePath);
     const exe = process.platform === 'win32' ? 'tdu.exe' : 'tdu';
