@@ -1,6 +1,6 @@
 {
   "name": "plang-interpreter",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A Deviation Language Interpreter",
   "repository": "https://github.com/Troppydash/plang-interpreter/",
   "scripts": {
