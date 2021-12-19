@@ -136,6 +136,10 @@ say("\(c1) + \(c2) = \(c1 + c2)")
 ```
 
 ### How do I use it
+Under Github Release, download `tdu.exe` and the executable of your os (`plang-interpreter-win.exe` for windows users).
+Place both under the same folder. Add the folder to path if you wish, and rename `plang-interpreter` to `devia` if you wish.
+
+
 If you have the executable, `devia.exe <file>`
 will run the file. You can also start the REPL by running `devia.exe` directly with no arguments.
 
