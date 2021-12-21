@@ -225,6 +225,7 @@ class PlLexer implements Lexer {
             ';': PlTokenType.SEMICOLON,
             '[': PlTokenType.LBRACK,
             ']': PlTokenType.RBRACK,
+            '&': PlTokenType.SELF
         }
         if (singleSymbolMap.hasOwnProperty(c)) {
             // parse
@@ -255,6 +256,14 @@ class PlLexer implements Lexer {
             case '*': {
                 this.advancePointer();
                 return NewPlToken(PlTokenType.MUL, c, this.currentFileInfo(1));
+            }
+            case '%': {
+                this.advancePointer();
+                return NewPlToken(PlTokenType.MOD, c, this.currentFileInfo(1));
+            }
+            case '^': {
+                this.advancePointer();
+                return NewPlToken(PlTokenType.EXP, c, this.currentFileInfo(1));
             }
             case '/': {
                 let token = this.testNextChars("/=", PlTokenType.NEQ);

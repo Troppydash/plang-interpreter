@@ -23,12 +23,11 @@ import {
     ASTImport,
     ASTList,
     ASTLoop,
-    ASTMatch,
+    ASTMatch, ASTNode,
     ASTNull,
     ASTNumber,
     ASTProgram,
-    ASTReturn,
-    ASTStatement,
+    ASTReturn,     ASTStatement,
     ASTString,
     ASTType,
     ASTUnary,
@@ -36,7 +35,12 @@ import {
     ASTWhile,
     CreateSpanToken
 } from "./ast";
-import PlToken, {NAME_BLACKLIST, PlTokenToPlVariable, PlTokenType, TOKEN_OPERATORS} from "../lexing/token";
+import PlToken, {
+    NAME_BLACKLIST,
+    PlTokenToPlVariable,
+    PlTokenType,
+    TOKEN_OPERATORS
+} from "../lexing/token";
 import {PlProblemCode} from "../../problem/codes";
 
 
@@ -53,6 +57,13 @@ interface Parser {
     getProblems(): PlProblem[];
 }
 
+interface ParserState {
+    asgnNode: ASTNode | null;
+}
+
+interface ParserState {
+    asgnNode: ASTNode | null;
+}
 
 // TODO: make this more generic so we don't need an emitter
 // this parser is only an ast parser, the bytecode emitting parser will not make an ast tree
@@ -62,11 +73,17 @@ export class PlAstParser implements Parser {
     private cacheToken: PlToken[];
     private problems: PlProblem[];
 
+    private state: ParserState;
+
     constructor( lexer: Lexer ) {
         this.lexer = lexer;
 
         this.cacheToken = [];
         this.problems = [];
+
+        this.state = {
+            asgnNode: null
+        };
     }
 
     // implementations
@@ -809,6 +826,10 @@ export class PlAstParser implements Parser {
             let pre;
             let variable;
 
+            // TODO: make this a function
+            let asgnNodePrev = this.state.asgnNode;
+            this.state.asgnNode = left;
+
             if ( left instanceof ASTVariable ) {
                 pre = null;
                 variable = left;
@@ -830,10 +851,12 @@ export class PlAstParser implements Parser {
                 }
 
                 const target = new ASTDot([peekToken], item, new ASTVariable([peekToken], "set"));
+                this.state.asgnNode = asgnNodePrev;
                 return new ASTCall([peekToken], target, [
                     index, value
                 ]);
             } else {
+                this.state.asgnNode = asgnNodePrev;
                 this.newProblem( left.getSpanToken(), "ET0002" );
                 return null;
             }
@@ -843,6 +866,8 @@ export class PlAstParser implements Parser {
             if ( value == null ) {
                 return null;
             }
+
+            this.state.asgnNode = asgnNodePrev;
 
             let type;
             if (prefix == null)
@@ -925,12 +950,30 @@ export class PlAstParser implements Parser {
     }
 
     pMult(): ASTExpression | null {
-        let left = this.pPrefix();
+        let left = this.pExp();
         if ( left == null ) {
             return null;
         }
 
         while ( this.peekMatch( [ PlTokenType.MUL, PlTokenType.DIV ] ) ) {
+            const token = this.nextToken();
+            const right = this.pExp();
+            if ( right == null ) {
+                return null;
+            }
+            left = new ASTBinary( [ token ], left, right, token );
+        }
+
+        return left;
+    }
+
+    pExp(): ASTExpression | null {
+        let left = this.pPrefix();
+        if ( left == null ) {
+            return null;
+        }
+
+        while ( this.peekMatch( [ PlTokenType.EXP, PlTokenType.MOD ] ) ) {
             const token = this.nextToken();
             const right = this.pPrefix();
             if ( right == null ) {
@@ -1072,10 +1115,22 @@ export class PlAstParser implements Parser {
                 return this.pNull();
             case PlTokenType.LBRACK:
                 return this.pClosure();
+            case PlTokenType.SELF:
+                return this.pSelf();
         }
 
         this.newProblem( token, "ET0004", token.content );
         return null;
+    }
+
+    pSelf(): ASTNode | null {
+        const token = this.nextToken();
+        if (this.state.asgnNode == null) {
+            this.newProblem( token, "LP0004" );
+            return null;
+        }
+
+        return this.state.asgnNode;
     }
 
     pClosure(): ASTClosure | null {

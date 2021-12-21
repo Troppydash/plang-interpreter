@@ -1,8 +1,6 @@
 import {ScrambleType} from "../scrambler";
 import {PlStuff, PlStuffFalse, PlStuffTrue, PlStuffType, PlStuffTypeAny} from "../stuff";
-import {
-    GenerateGuardedTypeFunction,
-} from "./helpers";
+import {GenerateGuardedTypeFunction,} from "./helpers";
 import {ExportJs, ExportNative} from "./types";
 
 export function equals(l: PlStuff, r: PlStuff) {
@@ -96,7 +94,8 @@ export const jsOperators: ExportJs = {
     [ScrambleType("-", PlStuffType.Num)]: generateOperation("-", PlStuffType.Num, (l, r) => l - r),
     [ScrambleType("*", PlStuffType.Num)]: generateOperation("*", PlStuffType.Num, (l, r) => l * r),
     [ScrambleType("/", PlStuffType.Num)]: generateOperation("/", PlStuffType.Num, (l, r) => l / r),
-    [ScrambleType("mod", PlStuffType.Num)]: generateOperation("mod", PlStuffType.Num, (l, r) => l % r),
+    [ScrambleType("%", PlStuffType.Num)]: generateOperation("%", PlStuffType.Num, (l, r) => ((l % r) + r) % r),
+    [ScrambleType("^", PlStuffType.Num)]: generateOperation("^", PlStuffType.Num, (l, r) => l ** r),
 
     // strings
     [ScrambleType("+", PlStuffType.Str)]: generateOperation("+", PlStuffType.Str, (l, r) => l + r),

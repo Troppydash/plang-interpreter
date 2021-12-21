@@ -109,6 +109,7 @@ const templates = {
     LP0001: "more than one default cases in a match statement",
     LP0002: "zero parameters for an impl definition",
     LP0003: "no conditions for a case statement",
+    LP0004: "self operator cannot be used outside an assignment",
 
     DE0001: "problem during compiling\n%0",
     DE0002: "problem during interpreting\n%0",
@@ -245,6 +246,7 @@ const hints: Record<PlProblemCode, string> = {
     LP0001: "there can be only one default block in a match statement, try removing all other default cases",
     LP0002: "the first parameter in an impl statement is by convention 'self'",
     LP0003: "a case statement with no expressions will match nothing, if matching nothing is intended, try the 'default {}' syntax",
+    LP0004: "",
 
     DE0001: "the developer made a mistake, please report this",
     DE0002: "the developer made a mistake, please report this",

@@ -28,6 +28,11 @@ export enum PlTokenType {
     SUB,        // -
     MUL,        // *
     DIV,        // /
+    MOD,        // %
+    EXP,        // ^,
+    SELF,       // &
+
+
     ASGN,       // =
     INC,        // ++
     DEC,        // --
@@ -96,6 +101,8 @@ export const TOKEN_OPERATORS = [
     PlTokenType.SUB,
     PlTokenType.MUL,
     PlTokenType.DIV,
+    PlTokenType.MOD,
+    PlTokenType.EXP,
     PlTokenType.GT,
     PlTokenType.GTE,
     PlTokenType.LT,

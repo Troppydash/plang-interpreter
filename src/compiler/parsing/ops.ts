@@ -19,6 +19,9 @@ const OpPrecedence = {
 
     [PlTokenType.MUL]: 4,
     [PlTokenType.DIV]: 4,
+
+    [PlTokenType.EXP]: 5,
+    [PlTokenType.MOD]: 5,
 };
 
 export function IsPreHigher(left: PlTokenType, right: PlTokenType) {

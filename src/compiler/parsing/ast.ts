@@ -432,7 +432,6 @@ export class ASTDict extends ASTExpression {
     }
 }
 
-
 export class ASTClosure extends ASTExpression {
     args: ASTVariable[];
     guards: (ASTVariable | null)[];
