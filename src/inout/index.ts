@@ -5,12 +5,17 @@ export const isNode =
     process.versions != null &&
     process.versions.node != null;
 
+
+export type Formatter = (text: string) => void;
+
 export type OPTIONS = "mode" | "run";
 
 export interface PlInout {
     print: (message: string) => void;
     input: (message: string) => string | null;
     flush: () => void;
+
+    richInput?: (message: string, formatter: Formatter) => string | null;
 
     paths: Paths;
     setRootPath: (rootFile: string) => void;

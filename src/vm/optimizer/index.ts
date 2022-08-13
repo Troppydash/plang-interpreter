@@ -15,8 +15,17 @@ function hoisting(ast: ASTProgram) {
     return [...functions, ...statements];
 }
 
+function collapseConstants(ast: ASTProgram): ASTProgram {
+    return null;
+}
+
 const passes = [hoisting];
 
+/**
+ * Takes an ast tree and performance passes
+ * @param ast The ast tree to performance passes on
+ * @return The modified ast tree
+ */
 export function OptimizeProgram(ast: ASTProgram) {
     for (const pass of passes) {
         ast = pass(ast);
