@@ -1,5 +1,4 @@
 import {isalphanum, isws} from "./types";
-import {syncPromise} from "./sync";
 /**
  * Replace all **value** in the string with **newValue**
  * @param source The source string
@@ -104,7 +103,8 @@ export function capitalize(str: string): string {
 
 
 export function sliceColoredString(text: string, start: number): string {
-    const stringLength = syncPromise(import('string-length'));
+    // const stringLength = syncPromise(import('string-length'));
+    const stringLength = null;
 
     let startIndex = 0;
     for (let i = 0; i < text.length; ++i) {
@@ -118,4 +118,9 @@ export function sliceColoredString(text: string, start: number): string {
 
     return text.slice(startIndex);
 
+}
+
+//https://stackoverflow.com/a/43760745/9341734
+export function removeByIndex(str,index) {
+    return str.slice(0,index) + str.slice(index+1);
 }

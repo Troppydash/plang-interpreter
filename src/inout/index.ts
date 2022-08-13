@@ -1,4 +1,4 @@
-import { Paths, PathType } from "./path";
+import {Paths, PathType} from "./path";
 
 export const isNode =
     typeof process !== 'undefined' &&
@@ -15,7 +15,7 @@ export interface PlInout {
     input: (message: string) => string | null;
     flush: () => void;
 
-    richInput?: (message: string, formatter: Formatter) => string | null;
+    richInput?: (message: string, nextLine: (text: string) => boolean, formatter: Formatter) => string | null;
 
     paths: Paths;
     setRootPath: (rootFile: string) => void;
@@ -27,7 +27,7 @@ export interface PlInout {
 }
 
 let inout: PlInout;
-if ( isNode ) {
+if (isNode) {
     inout = require("./nodeInout");
 } else {
     inout = require('./otherInout');

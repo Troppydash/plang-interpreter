@@ -1,10 +1,10 @@
-import { Inout, isNode } from "../inout";
+import {Inout, isNode} from "../inout";
 import {HighlightProgram, RunOnce, TryRunParser} from "../linking";
-import { LogProblemShort } from "../problem/printer";
-import { colors } from "../inout/color";
-import { PlConverter } from "../vm/machine/native/converter";
+import {LogProblemShort} from "../problem/printer";
+import {colors} from "../inout/color";
+import {PlConverter} from "../vm/machine/native/converter";
 import {PlStackMachine} from "../vm/machine";
-import { NewPlFile } from "../inout/file";
+import {NewPlFile} from "../inout/file";
 import {timestamp, version} from "../timestamp";
 import PlLexer from "../compiler/lexing";
 import {PlAstParser} from "../compiler/parsing";
@@ -13,6 +13,28 @@ import {ASTProgramToString} from "../compiler/parsing/visualizer";
 import {PlProgramToString} from "../vm/emitter/printer";
 
 export function GetLine(filename: string): string | null {
+    if (Inout().richInput) {
+        const nextLine = (text: string) => {
+            const file = NewPlFile(filename, text);
+            const outcome = TryRunParser(file);
+
+            return outcome !== null;
+        }
+
+        const highlight = (text: string) => {
+            const file = NewPlFile(filename, text);
+            const outcome = TryRunParser(file);
+
+            if (outcome === null) {
+                return HighlightProgram(text);
+            }
+
+            const out =  HighlightProgram(text + '}');
+            return out.slice(0, out.length-1);
+        }
+        return Inout().richInput(`${filename}> `, nextLine, highlight);
+    }
+
     let content = "";
     let firstPrompt = true;
     let linenum = 1;
@@ -22,7 +44,7 @@ export function GetLine(filename: string): string | null {
             let out = firstPrompt ? `${filename}> ` : `${('' + linenum).padStart(filename.length, ' ')}| `;
             linenum += 1;
 
-            const message = Inout().richInput(out, HighlightProgram);
+            const message = Inout().input(out);
             if (message === null) {
                 if (firstPrompt) {
                     return null;
@@ -60,16 +82,16 @@ export function GetLine(filename: string): string | null {
             }
             break;
         }
-    return content.slice(0, content.length-1); // strip \n
+    return content.slice(0, content.length - 1); // strip \n
 }
 
-export function StartREPL( filename: string ): number {
-    Inout().print( `Welcome to the Deviation interactive console` );
-    Inout().print( `Built on ${timestamp} (version ${version})` );
-    if ( isNode ) {
-        const os = require( 'os' );
-        Inout().print( `Running on ${os.platform()}-${os.arch()}. Hello ${os.hostname()}!` );
-        Inout().print( `Press Ctrl+C to quit` );
+export function StartREPL(filename: string): number {
+    Inout().print(`Welcome to the Deviation interactive console`);
+    Inout().print(`Built on ${timestamp} (version ${version})`);
+    if (isNode) {
+        const os = require('os');
+        Inout().print(`Running on ${os.platform()}-${os.arch()}. Hello ${os.hostname()}!`);
+        Inout().print(`Press Ctrl+C to quit`);
     }
 
     let stream = false;
@@ -108,15 +130,18 @@ export function StartREPL( filename: string ): number {
 }
 
 export function StartDemo(filename: string): number {
-    Inout().print( `Running Deviation in demo mode (version ${timestamp})` );
+    Inout().print(`Running Deviation in demo mode (version ${timestamp})`);
     if (isNode) {
         Inout().print("Press Ctrl-C to quit");
     }
 
     const vm = new PlStackMachine({
         ...Inout(),
-        input: _ => {return ''},
-        print: _ => {}
+        input: _ => {
+            return ''
+        },
+        print: _ => {
+        }
     }, NewPlFile('demo', ''));
 
     while (true) {

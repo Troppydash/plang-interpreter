@@ -4,6 +4,8 @@ import * as path from 'path';
 import {MaskedEval} from "./proxy";
 import * as readline from "readline";
 import * as deasync from 'deasync';
+import * as colorReadline from 'node-color-readline';
+import {Formatter} from "./index";
 
 
 /// HELPERS ///
@@ -27,27 +29,63 @@ function complete(commands) {
 // list of common keywords
 const ac = "func impl import for as select export return break continue if elif else each loop while match case default and or not in print input list dict true false null Int Str Null List Dict Func Type";
 
-export function richRead(prompt: string, formatter, callback) {
-    const rl: any = read(prompt, callback);
+// TODO: Fix this
+export function richRead(prompt: string, nextLine: (text: string) => boolean, formatter: Formatter, callback) {
+    let input = [];
 
-    const start = 'repl> '
-    let buffer = start;
-    rl._writeToOutput = (text: string) => {
-        // console.log(text);
-        const oldBufferLength = buffer.length;
-        if (!text.includes(start)) {
-            buffer += text;
-            const colored = formatter(buffer.slice(start.length));
-            rl.output.clearLine();
-            rl.output.write(start + colored);
-        } else {
-            buffer = text;
-            const colored = formatter(buffer.slice(start.length));
-            rl.output.write(start + colored)
+    const rl = colorReadline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        colorize: function (text: string) {
+            try {
+                return formatter(text);
+            } catch (e) {
+                return text;
+            }
+        }
+    });
+
+    rl.setPrompt(prompt);
+
+    rl.on('line', cmd => {
+        input.push(cmd);
+        const text = input.join('\n');
+        let next;
+        try {
+            next = nextLine(text);
+        } catch (e) {
+            next = false;
         }
 
-        // rl.output.write(text);
-    };
+        if (next) {
+            rl.setPrompt(`${('' + (input.length + 1)).padStart(prompt.length-2, ' ')}| `);
+            rl.prompt();
+            const lastLine = input[input.length-1].trimEnd();
+            rl.write(' '.repeat(lastLine.length - lastLine.trimStart().length));
+            if (lastLine.length > 0) {
+                const lastChar = lastLine[lastLine.length-1];
+                if (['{', '('].includes(lastChar)) {
+                    rl.write('  ');
+                }
+            }
+        } else {
+            rl.close();
+            callback(null, text);
+        }
+    })
+
+    rl.on("SIGINT", function () {
+        rl.close();
+        console.log('^C');
+
+        if (input.length === 0) {
+            callback(null, null)
+        } else {
+            callback( null, input.join('\n'))
+        }
+    });
+
+    rl.prompt();
 }
 
 function read(prompt: string, callback): readline.Interface {
@@ -75,7 +113,7 @@ function read(prompt: string, callback): readline.Interface {
 const readSync = deasync(read);
 const richReadSync = deasync(richRead);
 
-export function print( message, end = '\n' ) {
+export function print(message, end = '\n') {
     process.stdout.write(message + end);
 
 }
@@ -88,8 +126,8 @@ export function input(message) {
     return readSync(message);
 }
 
-export function richInput(message, formatter) {
-    return richReadSync(message, formatter);
+export function richInput(message, nextLine, formatter) {
+    return richReadSync(message, nextLine, formatter);
 }
 
 export let paths = {
