@@ -46,6 +46,23 @@ export function TryRunParser(file: PlFile): PlProblem[] | null {
     return null;
 }
 
+export function HighlightProgram(text: string): string {
+    const file = NewPlFile("highlighter", text);
+    const lexer = new PlLexer(file);
+    const parser = new PlAstParser(lexer);
+    const ast = parser.parseAll();
+
+    if (parser.getProblems().length !== 0) {
+        return text;
+    }
+
+    const regions = ASTProgramToColorRegions(ast);
+    const out =  ASTProgramHighlight(regions, file.content);
+    // remove last \n
+    return out.slice(0, out.length-1);
+}
+
+
 export function RunHighlighter(file: PlFile) {
     const lexer = new PlLexer(file);
     const parser = new PlAstParser(lexer);

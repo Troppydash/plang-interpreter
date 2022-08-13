@@ -1,5 +1,5 @@
 import { Inout, isNode } from "../inout";
-import { RunOnce, TryRunParser} from "../linking";
+import {HighlightProgram, RunOnce, TryRunParser} from "../linking";
 import { LogProblemShort } from "../problem/printer";
 import { colors } from "../inout/color";
 import { PlConverter } from "../vm/machine/native/converter";
@@ -22,7 +22,7 @@ export function GetLine(filename: string): string | null {
             let out = firstPrompt ? `${filename}> ` : `${('' + linenum).padStart(filename.length, ' ')}| `;
             linenum += 1;
 
-            const message = Inout().input(out);
+            const message = Inout().richInput(out, HighlightProgram);
             if (message === null) {
                 if (firstPrompt) {
                     return null;

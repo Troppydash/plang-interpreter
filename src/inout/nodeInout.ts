@@ -1,21 +1,24 @@
-import { PathType } from "./path";
+import {PathType} from "./path";
 import * as fs from 'fs';
 import * as path from 'path';
-import { MaskedEval } from "./proxy";
+import {MaskedEval} from "./proxy";
 import * as readline from "readline";
 import * as deasync from 'deasync';
-function complete( commands ) {
-    return function ( str ) {
+
+
+/// HELPERS ///
+function complete(commands) {
+    return function (str) {
         if (str.length == 0) {
             return [];
         }
         let ret = [];
-        for ( let i = 0; i < commands.length; i++ ) {
+        for (let i = 0; i < commands.length; i++) {
             if (commands[i] == str) {
                 return [];
             }
-            if ( commands[i].indexOf( str ) == 0 )
-                ret.push( commands[i] );
+            if (commands[i].indexOf(str) == 0)
+                ret.push(commands[i]);
         }
         return ret;
     };
@@ -24,10 +27,34 @@ function complete( commands ) {
 // list of common keywords
 const ac = "func impl import for as select export return break continue if elif else each loop while match case default and or not in print input list dict true false null Int Str Null List Dict Func Type";
 
-function read(prompt: string, callback) {
+export function richRead(prompt: string, formatter, callback) {
+    const rl: any = read(prompt, callback);
+
+    const start = 'repl> '
+    let buffer = start;
+    rl._writeToOutput = (text: string) => {
+        // console.log(text);
+        const oldBufferLength = buffer.length;
+        if (!text.includes(start)) {
+            buffer += text;
+            const colored = formatter(buffer.slice(start.length));
+            rl.output.clearLine();
+            rl.output.write(start + colored);
+        } else {
+            buffer = text;
+            const colored = formatter(buffer.slice(start.length));
+            rl.output.write(start + colored)
+        }
+
+        // rl.output.write(text);
+    };
+}
+
+function read(prompt: string, callback): readline.Interface {
     const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout
+        output: process.stdout,
+
     });
 
     rl.question(prompt, answer => {
@@ -40,20 +67,29 @@ function read(prompt: string, callback) {
         console.log('^C');
         callback(null, null)
     });
-}
-const readSync = deasync(read);
 
+    return rl;
+}
+
+/// EXPORTS ///
+const readSync = deasync(read);
+const richReadSync = deasync(richRead);
 
 export function print( message, end = '\n' ) {
     process.stdout.write(message + end);
+
 }
 
 export function flush() {
     return;
 }
 
-export function input( message ) {
-    return readSync( message );
+export function input(message) {
+    return readSync(message);
+}
+
+export function richInput(message, formatter) {
+    return richReadSync(message, formatter);
 }
 
 export let paths = {
@@ -62,14 +98,14 @@ export let paths = {
     rootPath: process.execPath
 }
 
-export function setRootPath( rootFile: string ) {
-    paths.rootPath = path.join( paths.cliPath, path.dirname( rootFile ) );
+export function setRootPath(rootFile: string) {
+    paths.rootPath = path.join(paths.cliPath, path.dirname(rootFile));
 }
 
-export function readFile( filePath: string, type: PathType ) {
+export function readFile(filePath: string, type: PathType) {
     try {
-        const absPath = path.join( paths[type], filePath );
-        return fs.readFileSync( absPath, { encoding: 'utf8', flag: 'r' } );
+        const absPath = path.join(paths[type], filePath);
+        return fs.readFileSync(absPath, {encoding: 'utf8', flag: 'r'});
     } catch {
         return null;
     }

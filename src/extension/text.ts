@@ -1,5 +1,5 @@
 import {isalphanum, isws} from "./types";
-
+import {syncPromise} from "./sync";
 /**
  * Replace all **value** in the string with **newValue**
  * @param source The source string
@@ -98,4 +98,24 @@ export function shallowJSON(object: any): string {
 
 export function capitalize(str: string): string {
     return str[0].toUpperCase() + str.slice(1);
+}
+
+
+
+
+export function sliceColoredString(text: string, start: number): string {
+    const stringLength = syncPromise(import('string-length'));
+
+    let startIndex = 0;
+    for (let i = 0; i < text.length; ++i) {
+        if (stringLength(text.slice(0, i)) === start + 1) {
+            startIndex = i - 1;
+            break;
+        }
+    }
+
+    // else throw
+
+    return text.slice(startIndex);
+
 }

@@ -2,7 +2,7 @@ import {GenerateGuardedFunction} from "../helpers";
 import {StackMachine} from "../../index";
 import {PlConverter} from "../converter";
 import {PlProgramToString} from "../../../emitter/printer";
-import {IACTSync} from "../../../../problem/interactive/index";
+import {IACTSync} from "../../../../problem/interactive";
 import {IACTDebugger} from "../../../../problem/interactive/debugger";
 import {isNode} from "../../../../inout";
 import {NewPlStuff, PlStuff, PlStuffType, PlStuffTypeAny} from "../../stuff";
