@@ -44,8 +44,8 @@ function read(prompt: string, callback) {
 const readSync = deasync(read);
 
 
-export function print( message ) {
-    console.log(message);
+export function print( message, end = '\n' ) {
+    process.stdout.write(message + end);
 }
 
 export function flush() {
@@ -97,6 +97,7 @@ export function execute(code: string, vars: Record<string, any>): void {
         require: p => {
             return require(path.join(paths.rootPath, p));
         },
+        process,
         global,
         ...vars,
     });

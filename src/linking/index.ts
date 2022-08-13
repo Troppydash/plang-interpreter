@@ -134,8 +134,8 @@ export function RunVmFast(file: PlFile, args: string[]): number {
 
     const vm = new PlStackMachine({
         ...Inout(),
-        print: message => {
-            Inout().print(message);
+        print: (message, end) => {
+            Inout().print(message, end);
             Inout().flush();
         }
     }, file, args);
@@ -179,8 +179,8 @@ export function RunVM(file: PlFile, args: string[]): number {
     const program = EmitProgram(ast, true);
     const vm = new PlStackMachine({
         ...Inout(),
-        print: message => {
-            Inout().print(message);
+        print: (message, end) => {
+            Inout().print(message, end);
             Inout().flush();
         }
     }, file, args);

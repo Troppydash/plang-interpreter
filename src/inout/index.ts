@@ -8,7 +8,7 @@ export const isNode =
 export type OPTIONS = "mode" | "run";
 
 export interface PlInout {
-    print: (message: string) => void;
+    print: (message: string, end?: string) => void;
     input: (message: string) => string | null;
     flush: () => void;
 

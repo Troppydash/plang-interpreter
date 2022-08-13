@@ -969,18 +969,22 @@ export class PlAstParser implements Parser {
 
     pExp(): ASTExpression | null {
         let left = this.pPrefix();
-        if ( left == null ) {
+        if (left == null) {
             return null;
         }
 
-        while ( this.peekMatch( [ PlTokenType.EXP, PlTokenType.MOD ] ) ) {
+        while (this.peekMatch([PlTokenType.EXP, PlTokenType.MOD])) {
             const token = this.nextToken();
             const right = this.pPrefix();
-            if ( right == null ) {
+            if (right == null) {
                 return null;
             }
-            left = new ASTBinary( [ token ], left, right, token );
+            left = new ASTBinary([token], left, right, token);
         }
+
+        // [x] [y] {
+        //  return x + 1
+        // }
 
         return left;
     }

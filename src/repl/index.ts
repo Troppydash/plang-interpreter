@@ -79,10 +79,10 @@ export function StartREPL( filename: string ): number {
             stream = true;
             return Inout().input(message)
         },
-        print: message => {
+        print: (message, end) => {
             stream = true;
-            Inout().print(message);
-            Inout().flush()
+            Inout().print(message, end);
+            Inout().flush();
         }
     }, NewPlFile('repl', ''));
 

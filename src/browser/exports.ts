@@ -44,9 +44,9 @@ export function Execute(text: string, std: PlInout): number {
     const vm = new PlStackMachine({
         ...Inout(),
         ...std,
-        print: message => {
-            std.print(message);
-            std.flush();
+        print: (message, end) => {
+            Inout().print(message, end);
+            Inout().flush();
         }
     }, file, []);
 

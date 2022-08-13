@@ -135,22 +135,14 @@ export const special: ExportNative = {
     "panic": GenerateGuardedFunction("panic", [PlStuffTypeRest], function (...message: PlStuff[]) {
         throw new Error(message.map(m => PlToString(m, this)).join(' '));
     }),
-    "say": GenerateGuardedFunction("say", [PlStuffTypeRest], function (this: StackMachine, ...message: PlStuff[]) {
-        if (message.length == 0) {
-            this.inout.print('\n');
-        } else {
-            const combined = message.map(mess => PlToString(mess, this)).join(' ');
-            this.inout.print(combined);
-        }
+    "put": GenerateGuardedFunction("put", [PlStuffTypeRest], function (this: StackMachine, ...message: PlStuff[]) {
+        const combined = message.map(mess => PlToString(mess, this)).join(' ');
+        this.inout.print(combined, '');
         return PlStuffNull;
     }),
-    "log": GenerateGuardedFunction("log", [PlStuffTypeRest], function (this: StackMachine, ...message: PlStuff[]) {
-        if (message.length == 0) {
-            console.log('\n');
-        } else {
-            const combined = message.map(mess => PlToString(mess, this)).join(' ');
-            console.log(combined);
-        }
+    "say": GenerateGuardedFunction("say", [PlStuffTypeRest], function (this: StackMachine, ...message: PlStuff[]) {
+        const combined = message.map(mess => PlToString(mess, this)).join(' ');
+        this.inout.print(combined);
         return PlStuffNull;
     })
 };

@@ -57,8 +57,8 @@ export function ExecuteBrowserTags() {
         const sources = await getSources();
         const vm = new PlStackMachine({
             ...Inout(),
-            print: message => {
-                Inout().print(message);
+            print: (message, end) => {
+                Inout().print(message, end);
                 Inout().flush();
             }
         }, NewPlFile('browser.de', ''), []);
